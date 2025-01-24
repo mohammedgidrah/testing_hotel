@@ -1,0 +1,23 @@
+{
+"logout": "تسجيل الخروج",
+"title": "لوحة التحكم",
+"totalIncome": "إجمالي الدخل",
+"totalExpenses": "المصاريف",
+"totalBookings": "الحجوزات",
+"totalGuests": "إجمالي الضيوف",
+"totalRevenue": "إجمالي الإيرادات",
+"loading": "جاري التحميل...",
+"filterDateLabel": "تصفية حسب التاريخ",
+"allTime": "كل الوقت",
+"forThisYear": "لهذا العام",
+"forThisMonth": "لهذا الشهر",
+"forToday": "لهذا اليوم",
+"failedToLoadData": "فشل تحميل البيانات",
+"weekday": "long",
+"year": "numeric",
+"month": "long",
+"day": "numeric",
+"RoomsBookedbyType": "الغرف المحجوزة حسب النوع",
+"PaymentsOverview": "نظرة عامة على الدفعات",
+"ExpensesOverview": "نظرة عامة على المصاريف"
+}

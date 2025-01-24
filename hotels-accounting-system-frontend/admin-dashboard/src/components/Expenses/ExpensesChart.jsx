@@ -1,6 +1,7 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Function to calculate expenses by category
 const calculateExpensesByCategory = (expenses) => {
@@ -27,6 +28,7 @@ const calculateExpensesByCategory = (expenses) => {
 const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
 
 function ExpensePieChart({ expenses = [] }) {
+    const { t } = useTranslation("dashboard");
     const chartData = calculateExpensesByCategory(expenses);
 
     return (
@@ -36,7 +38,7 @@ function ExpensePieChart({ expenses = [] }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
         >
-            <h2 className='text-lg font-medium mb-4 text-gray-100'>Expenses Overview</h2>
+            <h2 className='text-lg font-medium mb-4 text-gray-100'>{t('ExpensesOverview')}</h2>
 
             <div className='h-80'>
                 <ResponsiveContainer width={"100%"} height={"100%"}>

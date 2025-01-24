@@ -1,0 +1,20 @@
+{
+    "logout": "Logout",
+    "title": "Dashboard",
+    "totalIncome": "Total Income",
+    "totalExpenses": "Expenses",
+    "totalBookings": "Bookings",
+    "totalGuests": "Total Guests",
+    "totalRevenue": "Total Revenue",
+    "loading": "Loading...",
+    "filterDateLabel": "Filter by Date",
+    "allTime": "All time",
+    "forThisYear": "For this year",
+    "forThisMonth": "For this month",
+    "forToday": "For today",
+    "failedToLoadData": "Failed to load data",
+    "RoomsBookedbyType": "Rooms Booked by Type",
+    "PaymentsOverview": "Payments Overview",
+    "ExpensesOverview": "Expenses Overview"
+  }
+  

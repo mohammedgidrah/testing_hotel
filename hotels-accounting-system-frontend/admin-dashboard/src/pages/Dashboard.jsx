@@ -7,11 +7,16 @@ import { Zap, Users, User, DollarSign } from 'lucide-react';
 import BookingChart from '../components/Dashboard/BookingChart';
 import PaymentChart from '../components/Dashboard/PaymentChart';
 import ExpensePieChart from '../components/Expenses/ExpensesChart';
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
 
 
 
 
 function Dashboard() {
+  const { t } = useTranslation("dashboard"); // Specify the namespace
+  const { i18n } = useTranslation();
+
+
 
   const [totalSales, setTotalSales] = React.useState(0);
   const [payments, setPayments] = React.useState([]);
@@ -182,21 +187,25 @@ function Dashboard() {
 
   return (
     <div className='flex-1 overflow-auto relative z-10'>
-      <Header title='Dashboard' />
+      <Header title={t("title")} />
       <main className='max-w-7xl mx-auto px-4 py-6 lg:px-8'>
         {error && <p>{error}</p>}
         <div>
-          {loading ? <p>Loading...</p> : <>
+          {loading ? <p>{t('loading')}</p>: <>
             <form className='mb-8 '>
               <div className="mt-1 flex nowrap justify-between">
                 <div>
-                  {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                </div>
+                {new Date().toLocaleDateString(i18n.language, {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}                </div>
                 <select onChange={(e) => { setFilterDate(e.target.value) }} className="self-end rounded-md w-1/4 border border-gray-600 bg-inherit focus:border-indigo-500 focus:ring-indigo-500 text-gray-200" >
-                  <option value="all" className='bg-gray-800'>All time</option>
-                  <option value="year" className='bg-gray-800'>For this year </option>
-                  <option value="month" className='bg-gray-800'>For this month </option>
-                  <option value="day" className='bg-gray-800'>For this day </option>
+                  <option value={(t('allTime'))} className='bg-gray-800'>{t('allTime')} </option>
+                  <option value={(t('forThisYear'))} className='bg-gray-800'>{t('forThisYear')} </option>
+                  <option value={(t('forThisMonth'))} className='bg-gray-800'>{t('forThisMonth')} </option>
+                  <option value={(t('forToday'))} className='bg-gray-800'>{t('forToday')} </option>
                 </select>
               </div>
             </form>
@@ -206,11 +215,11 @@ function Dashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1 }}
             >
-              <StatCard name="Total Income" value={`$${totalSales}`} icon={DollarSign} color="#6366f1" />
-              <StatCard name="Expenses" value={`-$${totalExpenses}`} icon={DollarSign} color="red" />
-              <StatCard name="Bookings" value={totalBookings} icon={Users} color="#34d399" />
-              <StatCard name="Total Guests" value={totalGuests} icon={User} color="#34d399" />
-              <StatCard name="Total Revenue" value={`$${totalRevenue}`} icon={Zap} color="#34d399" />
+              <StatCard name={t('totalIncome')} value={`$${totalSales}`} icon={DollarSign} color="#6366f1" />
+              <StatCard name={t('totalExpenses')} value={`-$${totalExpenses}`} icon={DollarSign} color="red" />
+              <StatCard name={(t('totalBookings'))} value={totalBookings} icon={Users} color="#34d399" />
+              <StatCard name={t('totalGuests')} value={totalGuests} icon={User} color="#34d399" />
+              <StatCard name={t('totalRevenue')} value={`$${totalRevenue}`} icon={Zap} color="#34d399" />
             </motion.div>
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
               <BookingChart bookings={bookings} />

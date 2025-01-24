@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import { Edit, Trash2, Search } from 'lucide-react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function BookingsTable() {
+    const { t } = useTranslation("bookings");
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredBookings, setFilteredBookings] = useState([]);
     const [bookings, setBookings] = useState([]);
@@ -56,11 +58,11 @@ function BookingsTable() {
             transition={{ delay: 0.2 }}
         >
             <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-semibold text-gray-100'>Booking List</h2>
+                <h2 className='text-xl font-semibold text-gray-100'>{t('BookingList')}</h2>
                 <div className='relative'>
                     <input
                         type='text'
-                        placeholder='Search bookings by number or name...'
+                        placeholder={t('Search')}
                         className='bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:w-80 sm:w-40'
                         onChange={handleSearch}
                         value={searchTerm}
@@ -74,28 +76,28 @@ function BookingsTable() {
                     <thead>
                         <tr>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Booking ID
+                               {t('ID')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Guest
+                                {t('GuestName')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Room Number
+                                {t('RoomNumber')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Check-in Date
+                                {t('CheckInDate')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Check-out Date
+                                {t('CheckOutDate')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Total Amount
+                                {t('TotalAmount')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Payment Status
+                                {t('Status')}
                             </th>
                             <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                                Actions
+                                {t('Actions')}
                             </th>
                         </tr>
                     </thead>

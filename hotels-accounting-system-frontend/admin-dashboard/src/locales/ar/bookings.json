@@ -1,0 +1,16 @@
+{
+  "title": "الحجوزات",
+  "Rooms": "الغرف",
+  "TotalGuests": "اجمالي الزائرين",
+  "BookingsToday": "الحجوزات اليوم",
+  "BookingList": "قائمة الحجوزات",
+  "Search": "ابحث عن الحجوزات بالرقم او الاسم...",
+  "ID": "رقم الحجز",
+  "GuestName": "الزائر",
+  "RoomNumber": "رقم الغرفة",
+   "CheckInDate": "تاريخ الوصول",
+  "CheckOutDate": "تاريخ الخروج",
+  "TotalAmount": "المبلغ الكلي",
+  "Status": " حالة الدفع",
+  "Actions": "الاجراءات"
+}

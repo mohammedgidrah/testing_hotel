@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import axios from 'axios';
 import ExpensesTable from '../components/Expenses/ExpensesTable';
-
+import { useTranslation } from 'react-i18next';
 function Expenses() {
+  const { t } = useTranslation("expenses");
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [expenseDate, setExpenseDate] = useState('');
@@ -92,14 +93,14 @@ function Expenses() {
 
   return (
     <div className="flex-1 overflow-auto relative z-10 ">
-      <Header title="Expenses" />
+      <Header title={t("title")}  />
 
       <div className="flex justify-end items-center mt-4 mr-4 ml-4">
         <button
           onClick={toggleForm}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
-          {showForm ? 'Hide Form' : 'Add Expense'}
+          {showForm ? t("HideForm") : t("addExpense")}
         </button>
       </div>
 
@@ -110,7 +111,7 @@ function Expenses() {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Description</label>
+              <label className="block text-gray-300 mb-2">{t("Description")}</label>
               <input
                 type="text"
                 value={description}
@@ -121,7 +122,7 @@ function Expenses() {
             </div>
 
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Amount</label>
+              <label className="block text-gray-300 mb-2">{t("Amount")} </label>
               <input
                 type="number"
                 value={amount}
@@ -132,7 +133,7 @@ function Expenses() {
             </div>
 
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Expense Date</label>
+              <label className="block text-gray-300 mb-2">{t("ExpenseDate")}</label>
               <input
                 type="date"
                 value={expenseDate}
@@ -143,18 +144,18 @@ function Expenses() {
             </div>
 
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Category</label>
+              <label className="block text-gray-300 mb-2">{t("Category")}</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full p-2 bg-gray-700 text-white rounded"
                 required
               >
-                <option value="" disabled>Select a category</option>
-                <option value="utilities">Utilities</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="supplies">Supplies</option>
-                <option value="other">Other</option>
+                <option value="" disabled>{t("SelectCategory")} </option>
+                <option value={t("Utilities")}>{t("Utilities")}</option>
+                <option value={t("Maintenance")}>{t("Maintenance")}</option>
+                <option value={t("Supplies")}>{t("Supplies")}</option>
+                <option value={t("other")}>{t("other")}</option>
               </select>
             </div>
 
@@ -162,7 +163,7 @@ function Expenses() {
               type="submit"
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg mt-4 transition duration-200"
             >
-              {editExpense ? 'Update Expense' : 'Add Expense'}
+              {editExpense ? t("UpdateExpense") : t("addExpense")}
             </button>
           </form>
         </div>

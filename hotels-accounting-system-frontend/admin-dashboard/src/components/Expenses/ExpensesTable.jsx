@@ -4,8 +4,10 @@ import { Edit, Trash2, Search, DollarSign } from "lucide-react";
 import axios from "axios";
 import StatCard from "../StatCard";
 import { Modal, Button } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 const ExpensesTable = ({ handleEdit, successMessage }) => {
+  const { t } = useTranslation("expenses");
   const [searchTerm, setSearchTerm] = useState("");
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
@@ -112,17 +114,17 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
       transition={{ delay: 0.2 }}
     >
       <StatCard
-        name="Total Expenses"
+        name={t("totalExpenses")}
         value={`-$${totalExpenses.toFixed(2)}`}
         color="red"
         icon={DollarSign}
       />
       <div className="flex justify-between items-center mb-6 mt-2">
-        <h2 className="text-xl font-semibold text-gray-100">Expense List</h2>
+        <h2 className="text-xl font-semibold text-gray-100">{t("ExpenseList")}</h2>
         <div className="relative">
           <input
             type="text"
-            placeholder="Search expenses..."
+            placeholder={t("Search")}
             className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:w-40"
             onChange={handleSearch}
             value={searchTerm}
@@ -140,22 +142,22 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
           <thead>
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Description
+                {t("Description")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Amount
+                {t("Amount")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Expense Date
+               {t("ExpenseDate")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Category
+                {t("Category")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Created By
+                {t("CreatedBy")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                Actions
+                {t("Actions")}
               </th>
             </tr>
           </thead>
@@ -208,15 +210,15 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
       {/* Bootstrap Modal for confirmation */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete Expense</Modal.Title>
+          <Modal.Title>{t("DeleteExpense")}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this expense?</Modal.Body>
+        <Modal.Body>{t("Are you sure you want to delete this expense?")}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button variant="danger" onClick={handleDelete}>
-            Delete
+            {t("delete")}
           </Button>
         </Modal.Footer>
       </Modal>

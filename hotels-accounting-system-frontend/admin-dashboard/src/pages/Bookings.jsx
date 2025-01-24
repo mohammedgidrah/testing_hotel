@@ -6,8 +6,11 @@ import StatCard from '../components/StatCard';
 import axios from 'axios';
 import { Users, User, School, Book } from 'lucide-react';
 import BookingsTable from '../components/Bookings/BookingsTable';
+import { useTranslation } from 'react-i18next';
 
 function Bookings() {
+
+  const { t } = useTranslation("bookings"); // Specify the namespace
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [bookings, setBookings] = React.useState([]);
@@ -76,10 +79,10 @@ function Bookings() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
           >
-            <StatCard name="Rooms" value={totalRooms} icon={School} color="#34d399" />
-            <StatCard name="Bookings" value={totalBookings} icon={Users} color="#34d399" />
-            <StatCard name="Bookings for today" value={totalBookingsToday} icon={Book} color="#34d399" />
-            <StatCard name="Guests" value={totalGuests} icon={User} color="#34d399" />
+            <StatCard name={t('Rooms')} value={totalRooms} icon={School} color="#34d399" />
+            <StatCard name={t('title')} value={totalBookings} icon={Users} color="#34d399" />
+            <StatCard name={t('BookingsToday')} value={totalBookingsToday} icon={Book} color="#34d399" />
+            <StatCard name={t('TotalGuests')} value={totalGuests} icon={User} color="#34d399" />
           </motion.div>
           <BookingsTable/>
         </>

@@ -1,0 +1,18 @@
+{
+    "title": "Bookings",
+    "Rooms": "Rooms",
+    "TotalGuests": "TotalGuests",
+     "BookingsToday": "Bookings Today",
+     "BookingList": "Booking List",
+     "Search": "Search bookings by number or name...",
+     "ID": "Booking ID",
+     "GuestName": "Guest",
+     "RoomNumber": "Room number",
+     "CheckInDate": "Check-in Date",
+     "CheckOutDate": "Check-out Date",  
+     "TotalAmount": "Total Amount",
+     "Status": "Payment Status",
+     "Actions": "Actions"
+
+  }
+  

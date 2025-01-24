@@ -1,6 +1,7 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 
 const calculatePaymentsByMethod = (payments) => {
@@ -27,6 +28,7 @@ const calculatePaymentsByMethod = (payments) => {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 function PaymentPieChart({ payments = [] }) {
+    const { t } = useTranslation("dashboard");
    
     const chartData = calculatePaymentsByMethod(payments);
 
@@ -37,7 +39,7 @@ function PaymentPieChart({ payments = [] }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
         >
-            <h2 className='text-lg font-medium mb-4 text-gray-100'>Payments Overview</h2>
+            <h2 className='text-lg font-medium mb-4 text-gray-100'>{t('PaymentsOverview')}</h2>
 
             <div className='h-80'>
                 <ResponsiveContainer width={"100%"} height={"100%"}>

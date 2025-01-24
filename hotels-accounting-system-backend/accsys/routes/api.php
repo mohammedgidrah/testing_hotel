@@ -61,3 +61,18 @@ Route::middleware(['auth:api'])->group(function () {
         Route::apiResource('financial-reports', FinancialReportController::class); // CRUD for Manager
     });
 });
+// API for Translations
+Route::get('/translations/{lang}', function ($lang) {
+    $translations = [
+        'ar' => [
+            'welcome' => 'مرحبًا',
+            'logout' => 'تسجيل الخروج',
+        ],
+        'en' => [
+            'welcome' => 'Welcome',
+            'logout' => 'Logout',
+        ],
+    ];
+
+    return response()->json($translations[$lang] ?? []);
+});

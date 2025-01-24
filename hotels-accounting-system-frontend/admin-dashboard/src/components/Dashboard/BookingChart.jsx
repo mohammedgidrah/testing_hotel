@@ -1,21 +1,24 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from "recharts";
 import { motion } from "framer-motion";
 import React from 'react';
+import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+
 
 const countRoomsByType = (bookings) => {
+    
     const roomCount = {};
-
+    
     bookings.forEach((booking) => {
         const roomType = booking.room.type;
-
+        
         if (roomCount[roomType]) {
             roomCount[roomType]++;
         } else {
             roomCount[roomType] = 1;
         }
     });
-
-
+    
+    
     return Object.keys(roomCount).map(type => ({
         type: type,
         count: roomCount[type]
@@ -23,8 +26,9 @@ const countRoomsByType = (bookings) => {
 };
 
 function BookingChart({ bookings }) {
+    const { t } = useTranslation("dashboard"); // Use translation function
     const chartData = countRoomsByType(bookings);
-
+    
     return (
         <motion.div
             className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700'
@@ -32,7 +36,7 @@ function BookingChart({ bookings }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
         >
-            <h2 className='text-lg font-medium mb-4 text-gray-100'>Rooms Booked by Type</h2>
+            <h2 className='text-lg font-medium mb-4 text-gray-100'>{t('RoomsBookedbyType')} </h2>
 
             <div className='h-80'>
                 <ResponsiveContainer width={"100%"} height={"100%"}>
