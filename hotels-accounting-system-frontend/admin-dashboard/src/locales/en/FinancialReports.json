@@ -1,0 +1,22 @@
+{
+    "FinancialReports": "Financial Reports",
+    "GenerateFinancialReport": "Generate Financial Report",
+    "StartDate": "Start Date",
+    "EndDate": "End Date",
+    "GenerateReport": "Generate Report",
+    "monthlySummary": "Monthly Financial Summary for {{month}} {{year}}",
+    "reportPeriod": "Report Period",
+    "income": "Income",
+    "totalIncome": "Total Income",
+    "totalBookings": "Total Bookings",
+    "expenses": "Expenses",
+    "totalExpenses": "Total Expenses",
+    "profitAnalysis": "Profit Analysis",
+    "netProfit": "Net Profit",
+    "profitMargin": "Profit Margin",
+    "dateTime": "Date Time",
+    "dateCreated": "Date Created",
+    "timeCreated": "Time Created",
+    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "printReport": "Print Report"
+}

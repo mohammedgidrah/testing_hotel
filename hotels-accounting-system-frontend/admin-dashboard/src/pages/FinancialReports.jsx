@@ -1,28 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import Header from '../components/Header';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import Header from "../components/Header";
+import { useTranslation } from "react-i18next";
 
 const FinancialReport = () => {
-  const [startDate, setStartDate] = useState('2024-10-01');
-  const [endDate, setEndDate] = useState('2024-10-31');
+  const { t, i18n } = useTranslation("financialReports");
+  const [startDate, setStartDate] = useState(""); // Start date for the report
+  const [endDate, setEndDate] = useState(""); // End date for the report
   const [report, setReport] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+  const [dateMessage, setDateMessage] = useState(""); // State for the date message
   const reportRef = useRef(); // Reference for printing
 
+  // Helper function to format dates
+  const formatDate = (date) => {
+    const locale = i18n.language === "ar" ? "ar" : "en-US";
+    return new Intl.DateTimeFormat(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(new Date(date));
+  };
+
+  // Fetch report data based on the selected start and end dates
   const fetchReport = async () => {
+    if (!startDate || !endDate) {
+      setDateMessage(t("select dates first")); // Show message if dates are not selected
+      return;
+    }
+
+    setDateMessage(""); // Clear the message if both dates are selected
+
     try {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
-      const response = await axios.get('http://127.0.0.1:8000/api/financial-report', {
-        params: {
-          start_date: startDate,
-          end_date: endDate
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${localStorage.getItem("token")}`;
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/financial-report",
+        {
+          params: {
+            start_date: startDate,
+            end_date: endDate,
+          },
         }
-      });
+      );
       setReport(response.data);
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Failed to load financial report. Please try again.');
-      console.error('Error fetching financial report:', err);
+      setError(t("fetchError"));
+      console.error("Error fetching financial report:", err);
     }
   };
 
@@ -39,13 +65,16 @@ const FinancialReport = () => {
   };
 
   return (
-    <div className="flex-1 overflow-auto relative z-10 ">
-      < Header title="Financial Report" />
-      <div className="container mx-auto p-6  ">
-        <h2 className="text-2xl font-semibold text-gray-100 mb-4">Generate Financial Report</h2>
-
+    <div className="flex-1 overflow-auto relative z-10">
+      <Header title={t("FinancialReports")} />
+      <div className="container mx-auto p-6">
+        <h2 className="text-2xl font-semibold text-gray-100 mb-4">
+          {t("GenerateReport")}
+        </h2>
         <div className="mb-4">
-          <label className="block text-gray-300 mb-2">Start Date</label>
+          <label className="block text-gray-300 mb-2">
+            {t("StartDate")}
+          </label>
           <input
             type="date"
             value={startDate}
@@ -53,9 +82,10 @@ const FinancialReport = () => {
             className="w-full p-2 bg-gray-700 text-white rounded"
           />
         </div>
-
         <div className="mb-4">
-          <label className="block text-gray-300 mb-2">End Date</label>
+          <label className="block text-gray-300 mb-2">
+            {t("EndDate")}
+          </label>
           <input
             type="date"
             value={endDate}
@@ -63,37 +93,60 @@ const FinancialReport = () => {
             className="w-full p-2 bg-gray-700 text-white rounded"
           />
         </div>
-
+        {dateMessage && <p className="text-red-500 mb-4">{dateMessage}</p>}{" "}
+        {/* Display the date message */}
         <button
           onClick={fetchReport}
           className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg mt-4 transition duration-200"
         >
-          Generate Report
+          {t("GenerateFinancialReport")}
         </button>
-
         {error && <p className="text-red-500 mt-4">{error}</p>}
-
         {report && (
-          <div ref={reportRef} className="bg-white p-6 rounded-lg shadow-lg mt-4 text-gray-900 ">
-            <h3 className="text-xl font-semibold mb-4 text-center">Monthly Financial Summary for October 2024</h3>
-            <p className="text-center"><strong>Report Period:</strong> October 1, 2024 - October 31, 2024</p>
+          <div
+            ref={reportRef}
+            className="bg-white p-6 rounded-lg shadow-lg mt-4 text-gray-900"
+          >
+            <h3 className="text-xl font-semibold mb-4 text-center">
+              {t("monthlySummary", {
+                month: new Date(startDate).toLocaleString(i18n.language, {
+                  month: "long",
+                }), // Get the full month name
+                year: new Date(startDate).getFullYear(), // Get the year
+              })}
+            </h3>
+
+            <p className="text-center">
+              <strong>{t("reportPeriod")}:</strong> {formatDate(startDate)} -{" "}
+              {formatDate(endDate)}
+            </p>
 
             <div className="my-4">
-              <h4 className="text-lg font-semibold">Income</h4>
-              <p><strong>Total Income:</strong> ${parseFloat(report.total_income || 0).toFixed(2)}</p>
+              <h4 className="text-lg font-semibold">{t("income")}</h4>
+              <p>
+                <strong>{t("totalIncome")}:</strong> $
+                {parseFloat(report.total_income || 0).toFixed(2)}
+              </p>
               <ul className="pl-4">
                 {report.income_breakdown.map((item) => (
                   <li key={item.payment_method}>
-                    {item.payment_method}: ${parseFloat(item.total || 0).toFixed(2)}
+                    {item.payment_method}: $
+                    {parseFloat(item.total || 0).toFixed(2)}
                   </li>
                 ))}
               </ul>
-              <p><strong>Total Number of Bookings:</strong> {report.total_bookings || 0}</p>
+              <p>
+                <strong>{t("totalBookings")}:</strong>{" "}
+                {report.total_bookings || 0}
+              </p>
             </div>
 
             <div className="my-4">
-              <h4 className="text-lg font-semibold">Expenses</h4>
-              <p><strong>Total Expenses:</strong> ${parseFloat(report.total_expenses || 0).toFixed(2)}</p>
+              <h4 className="text-lg font-semibold">{t("expenses")}</h4>
+              <p>
+                <strong>{t("totalExpenses")}:</strong> $
+                {parseFloat(report.total_expenses || 0).toFixed(2)}
+              </p>
               <ul className="pl-4">
                 {report.expense_breakdown.map((item) => (
                   <li key={item.category}>
@@ -104,28 +157,38 @@ const FinancialReport = () => {
             </div>
 
             <div className="my-4">
-              <h4 className="text-lg font-semibold">Profit Analysis</h4>
-              <p><strong>Net Profit:</strong> ${parseFloat(report.net_profit || 0).toFixed(2)}</p>
-              <p><strong>Profit Margin:</strong> {parseFloat(report.profit_margin || 0).toFixed(2)}%</p>
+              <h4 className="text-lg font-semibold">{t("profitAnalysis")}</h4>
+              <p>
+                <strong>{t("netProfit")}:</strong> $
+                {parseFloat(report.net_profit || 0).toFixed(2)}
+              </p>
+              <p>
+                <strong>{t("profitMargin")}:</strong>{" "}
+                {parseFloat(report.profit_margin || 0).toFixed(2)}%
+              </p>
             </div>
 
             <div className="my-4">
-              <h4 className="text-lg font-semibold">Date & Time</h4>
-              <p><strong>Date Created:</strong> {new Date().toLocaleDateString()}</p>
-              <p><strong>Time Created:</strong> {new Date().toLocaleTimeString()}</p>
+              <h4 className="text-lg font-semibold">{t("dateTime")}</h4>
+              <p>
+                <strong>{t("dateCreated")}:</strong> {formatDate(new Date())}
+              </p>
+              <p>
+                <strong>{t("timeCreated")}:</strong>{" "}
+                {new Date().toLocaleTimeString(i18n.language)}
+              </p>
             </div>
 
             <button
               onClick={handlePrint}
               className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mt-4 transition duration-200"
             >
-              Print Report
+              {t("printReport")}
             </button>
           </div>
         )}
-
       </div>
-    </div >
+    </div>
   );
 };
 

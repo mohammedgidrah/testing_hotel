@@ -3,9 +3,11 @@ import { initReactI18next } from "react-i18next";
 import enDashboard from "../../locales/en/dashboard.json";
 import enBookings from "../../locales/en/bookings.json";
 import enExpenses from "../../locales/en/Expenses.json";
+import enFinancialReports from "../../locales/en/FinancialReports.json";
 import arDashboard from "../../locales/ar/dashboard.json";
 import arBookings from "../../locales/ar/bookings.json";
 import arExpenses from "../../locales/ar/Expenses.json";
+import arFinancialReports from "../../locales/ar/FinancialReports.json";
 
 
 i18n.use(initReactI18next).init({
@@ -13,12 +15,14 @@ i18n.use(initReactI18next).init({
     en: {
       dashboard: enDashboard,
       bookings: enBookings,
-      expenses: enExpenses
+      expenses: enExpenses,
+      financialReports: enFinancialReports
     },
     ar: {
       dashboard: arDashboard,
       bookings: arBookings,
-      expenses: arExpenses
+      expenses: arExpenses,
+      financialReports: arFinancialReports  
     },
   },
   lng: "en", // Default language

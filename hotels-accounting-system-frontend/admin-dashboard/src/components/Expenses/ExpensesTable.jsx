@@ -112,6 +112,7 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
+      style={ {direction: "ltr"} }
     >
       <StatCard
         name={t("totalExpenses")}
@@ -208,7 +209,7 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
       </div>
 
       {/* Bootstrap Modal for confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
         <Modal.Header closeButton>
           <Modal.Title>{t("DeleteExpense")}</Modal.Title>
         </Modal.Header>

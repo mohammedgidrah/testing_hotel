@@ -1,0 +1,22 @@
+{
+    "FinancialReports": "التقارير المالية",
+    "GenerateFinancialReport": "إنشاء تقرير مالي",
+    "StartDate": "تاريخ البدء",
+    "EndDate": "تاريخ النهاية",
+    "GenerateReport": "إنشاء التقرير",
+    "monthlySummary": "الملخص المالي الشهري للشهر {{month}} {{year}}",
+    "reportPeriod": "فترة التقرير",
+    "income": "دخل",
+    "totalIncome": "إجمالي الدخل",
+    "totalBookings": "إجمالي الحجوزات",
+    "expenses": "مصاريف",
+    "totalExpenses": "إجمالي المصاريف",
+    "profitAnalysis": "تحليل الربح",
+    "netProfit": "ربح مسبق",
+    "profitMargin": "نسبة الربح",
+    "dateTime": "التاريخ والوقت",
+    "dateCreated": "تاريخ الإنشاء",
+    "timeCreated": "وقت الإنشاء",
+    "months": ["يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "اغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر"],
+    "printReport": "طباعة التقرير"
+}
