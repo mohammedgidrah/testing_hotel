@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next'
 
 const PaymentsTable = () => {
+    const { t } = useTranslation("payments");
     const [payments, setPayments] = useState([]);
     const [filteredPayments, setFilteredPayments] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -41,14 +43,14 @@ const PaymentsTable = () => {
 
     return (
         <div className="container mx-auto p-6">
-            <h2 className="text-2xl font-semibold text-gray-100 mb-4">Payments List</h2>
+            <h2 className="text-2xl font-semibold text-gray-100 mb-4">{t("PaymentsList")}</h2>
 
             {error && <p className="text-red-500 mb-4">{error}</p>}
 
             <div className="flex justify-between items-center mb-4">
                 <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder={t("Search")}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="bg-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-2 w-full max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -58,10 +60,10 @@ const PaymentsTable = () => {
                     onChange={(e) => setFilterBy(e.target.value)}
                     className="bg-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-2 mr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    <option value="booking_id">Booking ID</option>
-                    <option value="payment_method">Payment Method</option>
-                    <option value="amount_paid">Amount Paid</option>
-                    <option value="all">All Fields</option>
+                    <option value="booking_id">{t("BookingID")}</option>
+                    <option value="payment_method">{t("PaymentMethod")}</option>
+                    <option value="amount_paid">{t("AmountPaid")}</option>
+                    <option value="all">{t("AllFields")}</option>
                 </select>
 
             </div>
@@ -71,16 +73,16 @@ const PaymentsTable = () => {
                     <thead className="bg-gray-700">
                         <tr>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Booking ID
+                                {t("BookingID")}
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Amount Paid
+                               {t("AmountPaid")}
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Payment method
+                                {t("PaymentMethod")}
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Payment Date
+                               {t("PaymentDate")}
                             </th>
                         </tr>
                     </thead>
@@ -97,7 +99,7 @@ const PaymentsTable = () => {
                         ) : (
                             <tr>
                                 <td colSpan="4" className="px-4 py-2 text-center text-gray-400">
-                                    No payments found
+                                    {t("NoPaymentsFound")}
                                 </td>
                             </tr>
                         )}

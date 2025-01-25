@@ -69,7 +69,7 @@ function Bookings() {
 
   return (
     <div className='flex-1 overflow-auto relative z-10'>
-      <Header title='Bookings' />
+      <Header title={t('title')} />
       {error && <p>{error}</p>}
       {loading ? <p>Loading...</p> : (
         <>

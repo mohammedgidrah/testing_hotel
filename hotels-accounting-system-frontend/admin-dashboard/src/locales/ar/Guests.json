@@ -1,0 +1,19 @@
+{
+
+    "Guests": "ضيوف",
+    "GuestsList": "قائمة الضيوف",
+    "AddGuest": "إضافة ضيف",
+    "Search": "ابحث",
+    "GuestName": "اسم الضيف",
+    "GuestID": "رقم الضيف",
+    "Email": "البريد الإلكتروني",
+    "PhoneNumber": "رقم الهاتف",
+    "Address": "العنوان",
+    "Actions": "الاجراءات",
+    "HideForm": "اخفاء النموذج",
+    "UpdateGuest": "تحديث الضيف",
+    "AllFields": "جميع الحقول ",
+    "FirstName": "الاسم الاول",
+    "LastName": "اسم العائلة",
+    "NoGuestsFound": "لا يوجد ضيفون"
+}

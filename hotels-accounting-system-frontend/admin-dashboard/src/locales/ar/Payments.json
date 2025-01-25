@@ -1,0 +1,14 @@
+{
+  "Payments": "الدفعات",
+  "PaymentsList": "قائمة الدفعات",
+  "BookingID": "رقم الحجز",
+  "Search": "ابحث",
+  "PaymentMethod": "طريقة الدفع",
+  "AmountPaid": "المبلغ المدفوع",
+  "Actions": "الاجراءات",
+  "HideForm": "اخفاء النموذج",
+  "UpdatePayment": "تحديث الدفعات",
+  "AllFields": "جميع الحقول ",
+  "PaymentDate": "تاريخ الدفع",
+  "NoPaymentsFound": "لا يوجد دفعات"
+ }

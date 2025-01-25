@@ -1,0 +1,18 @@
+{
+"Guests": "Guests",
+"GuestsList": "Guests List",
+"AddGuest": "Add Guest",
+"Search": "Search Guests",
+"GuestName": "Guest Name",
+"GuestID": "Guest ID",
+"Email": "Email",
+"PhoneNumber": "Phone Number",
+"Address": "Address",
+"Actions": "Actions",
+"HideForm": "Hide Form",
+"UpdateGuest": "Update Guest",
+"AllFields": "All Fields ",
+"FirstName": "First Name",
+"LastName": "Last Name",
+"NoGuestsFound": "No guests found"
+}

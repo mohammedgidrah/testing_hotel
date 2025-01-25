@@ -3,8 +3,10 @@ import Header from "../components/Header";
 import RoomsTable from "../components/Rooms/RoomsTable";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
+import { useTranslation } from "react-i18next";
 
 function Rooms() {
+  const { t } = useTranslation("rooms");
   const [rooms, setRooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editRoom, setEditRoom] = useState(null);
@@ -119,13 +121,13 @@ function Rooms() {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Rooms" />
+      <Header title={t("Rooms")} />
       <div className="flex justify-end items-center mt-4 mr-4 ml-4">
         <button
           onClick={toggleForm}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
-          {showForm ? "Hide Form" : editRoom ? "Edit Room" : "Add Room"}
+          {showForm ? t("HideForm")  : editRoom ? t("UpdateRoom") : t("AddRoom")}
         </button>
       </div>
 
@@ -134,11 +136,11 @@ function Rooms() {
         <p className="text-green-500 mb-4">{successMessage}</p>
       )}
       {showForm && (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mt-4 mr-4 ml-4 mx-auto">
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mt-4 mr-4 ml-4 mx-auto" >
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <form onSubmit={editRoom ? handleUpdateRoom : handleAddRoom}>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Room Number</label>
+              <label className="block text-gray-300 mb-2">{t("RoomNumber")}</label>
               <input
                 type="text"
                 value={roomNumber}
@@ -148,21 +150,21 @@ function Rooms() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Room Type</label>
+              <label className="block text-gray-300 mb-2">{t("RoomType")}</label>
               <select
                 value={roomType}
                 onChange={(e) => setRoomType(e.target.value)}
                 className="w-full p-2 bg-gray-700 text-white rounded"
                 required
               >
-                <option value="single">Single</option>
-                <option value="double">Double</option>
-                <option value="suite">Suite</option>
+                <option value="single">{t("Single")}</option>
+                <option value="double">{t("Double")}</option>
+                <option value="suite">{t("Suite")}</option>
               </select>
             </div>
             <div className="mb-4">
               <label className="block text-gray-300 mb-2">
-                Room Price Per Night
+                {t("PricePerNight")}
               </label>
               <input
                 type="number"
@@ -173,40 +175,40 @@ function Rooms() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">Room Status</label>
+              <label className="block text-gray-300 mb-2">{t("RoomStatus")}</label>
               <select
                 value={roomStatus}
                 onChange={(e) => setRoomStatus(e.target.value)}
                 className="w-full p-2 bg-gray-700 text-white rounded"
                 required
               >
-                <option value="available">Available</option>
-                <option value="occupied">Occupied</option>
-                <option value="maintenance">Maintenance</option>
+                <option value="available">{t("Available")}</option>
+                <option value="occupied">{t("Occupied")}</option>
+                <option value="maintenance">{t("Maintenance")}</option>
               </select>
             </div>
             <button
               type="submit"
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg mt-4 transition duration-200"
             >
-              {editRoom ? "Update Room" : "Add Room"}
+              {editRoom ? t("UpdateRoom") : t("AddRoom")}
             </button>
           </form>
         </div>
       )}
 
       {/* Bootstrap Modal for deletion confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} style={{direction:"ltr"}}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete Room</Modal.Title>
+          <Modal.Title>{t("DeleteRoom")}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this room?</Modal.Body>
+        <Modal.Body>{t("DeleteConfirmation")}</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button variant="danger" onClick={handleDelete}>
-            Delete
+            {t("delete")}
           </Button>
         </Modal.Footer>
       </Modal>

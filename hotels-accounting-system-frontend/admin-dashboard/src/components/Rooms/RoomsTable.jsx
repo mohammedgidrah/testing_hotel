@@ -1,8 +1,10 @@
 import React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 function RoomsTable({ rooms, onEdit, onDelete, refreshRooms }) {
+    const { t } = useTranslation("rooms");
     const handleStatusChange = async (roomId, newStatus) => {
         try {
             await axios.put(`http://127.0.0.1:8000/api/rooms/${roomId}`, { status: newStatus }, {
@@ -15,16 +17,16 @@ function RoomsTable({ rooms, onEdit, onDelete, refreshRooms }) {
     };
 
     return (
-        <div className='m-10 border border-gray-700 rounded-md bg-gray-800'>
+        <div className='m-10 border border-gray-700 rounded-md bg-gray-800' style={{direction:"ltr"}}>
             <div className='overflow-x-auto'>
                 <table className='min-w-full divide-y divide-gray-700'>
                     <thead>
                         <tr>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Room Number</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Type</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Price Per Night</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Status</th>
-                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>Action</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>{t("RoomNumber")}</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>{t("RoomType")}</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>{t("PricePerNight")}</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>{t("RoomStatus")}</th>
+                            <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>{t("Actions")}</th>
                         </tr>
                     </thead>
                     <tbody className='divide-y divide-gray-700'>
@@ -39,9 +41,9 @@ function RoomsTable({ rooms, onEdit, onDelete, refreshRooms }) {
                                         onChange={(e) => handleStatusChange(room.id, e.target.value)}
                                         className="bg-gray-700 text-white rounded"
                                     >
-                                        <option value="available">Available</option>
-                                        <option value="occupied">Occupied</option>
-                                        <option value="maintenance">Maintenance</option>
+                                        <option value="available">{t("Available")}</option>
+                                        <option value="occupied">{t("Occupied")}</option>
+                                        <option value="maintenance">{t("Maintenance")}</option>
                                     </select>
                                 </td>
                                 <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100'>

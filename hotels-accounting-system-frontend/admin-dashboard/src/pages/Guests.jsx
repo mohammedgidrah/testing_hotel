@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
+import { useTranslation } from 'react-i18next';
 
 function Guests() {
+    const { t } = useTranslation("guests");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [guests, setGuests] = useState([]);
@@ -38,7 +40,7 @@ function Guests() {
 
     return (
         <div className='flex-1 overflow-auto relative z-10'>
-            <Header title='Guests' />
+            <Header title={t('Guests')} />
 
             <div className='flex-1 max-w-7xl mx-auto py-4 px-4 lg:px-8'>
                 {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -47,7 +49,7 @@ function Guests() {
                 <div className="flex items-center mb-4">
                     <input
                         type="text"
-                        placeholder="Search guests..."
+                        placeholder={t('Search')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="bg-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-2 mr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -57,30 +59,30 @@ function Guests() {
                         onChange={(e) => setFilterBy(e.target.value)}
                         className="bg-gray-700 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                        <option value="all">All Fields</option>
-                        <option value="first_name">First Name</option>
-                        <option value="last_name">Last Name</option>
-                        <option value="email">Email</option>
-                        <option value="phone_number">Phone Number</option>
+                        <option value="all">{t('AllFields')}</option>
+                        <option value="first_name">{t('FirstName')}</option>
+                        <option value="last_name">{t('LastName')}</option>
+                        <option value="email">{t('Email')}</option>
+                        <option value="phone_number">{t('PhoneNumber')}</option>
                     </select>
                 </div>
 
                 {!loading && filteredGuests.length > 0 && (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto" style={{direction: 'ltr'}}>
                         <table className="min-w-full bg-gray-800 text-gray-100 rounded-lg">
                             <thead className="bg-gray-700">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        First Name
+                                        {t('FirstName')}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Last Name
+                                        {t('LastName')}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Email
+                                        {t('Email')}
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                        Phone Number
+                                        {t('PhoneNumber')}
                                     </th>
                                 </tr>
                             </thead>

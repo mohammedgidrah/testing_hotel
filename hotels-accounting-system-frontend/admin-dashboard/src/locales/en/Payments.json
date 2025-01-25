@@ -1,0 +1,17 @@
+{
+    "Payments": "Payments",
+    "PaymentsList": "Payments List",
+    "BookingID": "Booking ID",
+    "Search": "Search...",
+    "Payment Method": "Payment Method",
+    "AmountPaid": "Amount Paid",
+    "Actions": "Actions",
+    "HideForm": "Hide Form",
+    "PaymentList": "Payment List",
+    "UpdatePayment": "Update Payment",
+    "AllFields": "All Fields",
+    "PaymentID": "Payment ID",
+    "PaymentMethod": "Payment Method",
+    "PaymentDate": "Payment Date",
+    "NoPaymentsFound": "No payments found"
+}
