@@ -3,59 +3,60 @@ import React from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../Context/AuthContext'
+import { useTranslation } from 'react-i18next';
 
 const SIDEBAR_ITEMS = [
     {
-        name: "Dashboard",
+        name: "dashboard",
         icon: BarChart2,
         color: "#6366f1",
         path: "/",
         roles: ["admin", "manager"]
     },
     {
-        name: "Bookings",
+        name: "bookings",
         icon: FileText,
         color: "#34d399",
         path: "/bookings",
         roles: ["admin", "manager", "accountant"]
     },
     {
-        name: "Expenses",
+        name: "expenses",
         icon: DollarSign,
         color: "red",
         path: "/expenses",
         roles: ["admin", "manager", "accountant"]
     },
     {
-        name: "Financial Reports",
+        name: "financialReports",
         icon: FileText,
         color: "#f87171",
         path: "/financial-reports",
         roles: ["admin", "manager"]
     },
     {
-        name: "Guests",
+        name: "guests",
         icon: Users,
         color: "#f87171",
         path: "/guests",
         roles: ["admin", "manager", "accountant"]
     },
     {
-        name: "Payments",
+        name: "payments",
         icon: CreditCard,
         color: "#f472b6",
         path: "/payments",
         roles: ["admin", "manager", "accountant"]
     },
     {
-        name: "Rooms",
+        name: "rooms",
         icon: Home,
         color: "#818cf8",
         path: "/rooms",
         roles: ["admin", "manager"]
     },
     {
-        name: "Users",
+        name: "users",
         icon: User,
         color: "#4ade80",
         path: "/users",
@@ -64,6 +65,7 @@ const SIDEBAR_ITEMS = [
 ];
 
 const Sidebar = ({ allowedRoles }) => {
+    const { t } = useTranslation("sidebar");
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
     const { isAuthenticated, role } = useAuth();
     
@@ -105,7 +107,7 @@ const Sidebar = ({ allowedRoles }) => {
                                                 transition={{ duration: 0.2, delay: 0.3 }}
                                                 className='ml-4 whitespace-nowrap'
                                             >
-                                                {item.name}
+                                                {t(item.name)}
                                             </motion.span>
                                         )}
                                     </AnimatePresence>

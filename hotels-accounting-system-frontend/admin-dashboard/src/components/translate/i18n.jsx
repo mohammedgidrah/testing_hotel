@@ -7,6 +7,8 @@ import enFinancialReports from "../../locales/en/FinancialReports.json";
 import enPayments from "../../locales/en/Payments.json";
 import enGuests from "../../locales/en/Guests.json";
 import enRooms from "../../locales/en/Rooms.json";
+import enusers from "../../locales/en/users.json";
+import ensidebar from "../../locales/en/sidebar.json";
 import arDashboard from "../../locales/ar/dashboard.json";
 import arBookings from "../../locales/ar/bookings.json";
 import arExpenses from "../../locales/ar/Expenses.json";
@@ -14,6 +16,8 @@ import arFinancialReports from "../../locales/ar/FinancialReports.json";
 import arPayments from "../../locales/ar/Payments.json";
 import arGuests from "../../locales/ar/Guests.json";
 import arRooms from "../../locales/ar/Rooms.json";
+import arusers from "../../locales/ar/users.json";
+import arsidebar from "../../locales/ar/sidebar.json";
 
 
 
@@ -26,7 +30,9 @@ i18n.use(initReactI18next).init({
       financialReports: enFinancialReports,
       payments: enPayments,
       guests: enGuests,
-      rooms: enRooms
+      rooms: enRooms,
+      users: enusers,
+      sidebar: ensidebar
     },
     ar: {
       dashboard: arDashboard,
@@ -35,7 +41,9 @@ i18n.use(initReactI18next).init({
       financialReports: arFinancialReports ,
       payments: arPayments,
       guests: arGuests,
-      rooms: arRooms
+      rooms: arRooms,
+      users: arusers,
+      sidebar: arsidebar
     },
   },
   lng: "en", // Default language

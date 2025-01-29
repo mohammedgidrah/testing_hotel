@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 function AddUserForm({ onUserAdded, editUser }) {
+    const { t } = useTranslation("users");
     const [showForm, setShowForm] = useState(false);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -75,7 +77,7 @@ function AddUserForm({ onUserAdded, editUser }) {
                     onClick={toggleForm}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
                 >
-                    {showForm ? 'Hide Form' : editUser ? 'Edit User' : 'Add User'}
+                    {showForm ? t("HideForm") : editUser ? t("UpdateUser") :  t("addUser") }
                 </button>
             </div>
             {showForm && (
@@ -85,7 +87,7 @@ function AddUserForm({ onUserAdded, editUser }) {
 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label className="block text-gray-300 mb-2">Name</label>
+                            <label className="block text-gray-300 mb-2">{t("Name")}</label>
                             <input
                                 type="text"
                                 value={name}
@@ -95,7 +97,7 @@ function AddUserForm({ onUserAdded, editUser }) {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-gray-300 mb-2">Email</label>
+                            <label className="block text-gray-300 mb-2">{t("Email")}</label>
                             <input
                                 type="email"
                                 value={email}
@@ -106,7 +108,7 @@ function AddUserForm({ onUserAdded, editUser }) {
                         </div>
                         {!editUser && (
                             <div className="mb-4">
-                                <label className="block text-gray-300 mb-2">Password</label>
+                                <label className="block text-gray-300 mb-2">{t("password")}</label>
                                 <input
                                     type="password"
                                     value={password}
@@ -117,24 +119,24 @@ function AddUserForm({ onUserAdded, editUser }) {
                             </div>
                         )}
                         <div className="mb-4">
-                            <label className="block text-gray-300 mb-2">Role</label>
+                            <label className="block text-gray-300 mb-2">{t("Role")}</label>
                             <select
                                 value={role}
                                 onChange={(e) => setRole(e.target.value)}
                                 className="w-full p-2 bg-gray-700 text-white rounded"
                                 required
                             >
-                                <option value="" disabled>Select a Role</option>
-                                <option value="admin">Admin</option>
-                                <option value="accountant">Accountant</option>
-                                <option value="manager">Manager</option>
+                                <option value="" disabled>{t("SelectaRole")}</option>
+                                <option value="admin">{t("Admin")}</option>
+                                <option value="accountant">{t("Accountant")}</option>
+                                <option value="manager">{t("Manager")}</option>
                             </select>
                         </div>
                         <button
                             type="submit"
                             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg mt-4 transition duration-200"
                         >
-                            {editUser ? 'Update User' : 'Add User'}
+                            {editUser ? t("UpdateUser") :t("addUser")}
                         </button>
                     </form>
                 </div>

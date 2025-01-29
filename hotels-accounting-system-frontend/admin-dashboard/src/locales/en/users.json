@@ -1,0 +1,19 @@
+{
+  "Users": "Users",
+  "UserList": "User List",
+  "Search": "Search users by name...",
+  "ID": "User ID",
+  "Name": "Name",
+  "Email": "Email",
+  "Role": "Role",
+  "Actions": "Actions",
+  "HideForm": "Hide Form",
+  "UpdateUser": "Update User",
+  "addUser": "Add User",
+  "password": "Password",
+  "SelectaRole": "Select a Role",
+  "Admin": "Admin",
+  "Accountant": "Accountant",
+  "Manager": "Manager",
+  "UserInformation": "User Information"
+}

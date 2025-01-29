@@ -20,5 +20,7 @@
   "DeleteConfirmation": "Are you sure you want to delete this room?",
   "Single": "Single",
   "Double": "Double",
-  "Suite": "Suite"
+  "Triple": "Triple",
+  "Suite4Bed": "Suite 4 Bed",
+  "Suite5Bed": "Suite 5 Bed"
 }

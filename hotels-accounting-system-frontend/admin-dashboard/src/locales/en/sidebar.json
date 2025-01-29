@@ -1,0 +1,10 @@
+{
+    "dashboard": "Dashboard",
+    "bookings": "Bookings",
+    "rooms": "Rooms",
+    "payments": "Payments",
+    "expenses": "Expenses",
+    "financialReports": "Financial Reports",
+    "guests": "Guests",
+    "users": "Users"
+}

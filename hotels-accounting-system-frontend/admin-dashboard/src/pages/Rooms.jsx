@@ -159,7 +159,9 @@ function Rooms() {
               >
                 <option value="single">{t("Single")}</option>
                 <option value="double">{t("Double")}</option>
-                <option value="suite">{t("Suite")}</option>
+                <option value="triple">{t("Triple")}</option>
+                <option value="suite 4 bed">{t("Suite4Bed")}</option>
+                <option value="suite 5 bed">{t("Suite5Bed")}</option>
               </select>
             </div>
             <div className="mb-4">
