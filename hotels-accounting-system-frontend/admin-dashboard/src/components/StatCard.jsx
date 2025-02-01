@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 
-function StatCard({ name, value, color, icon: Icon }) {
+function StatCard({ name, value, color, icon: Icon ,onButtonClick, buttonLabel}) {
     return (
         <motion.div
             className='bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg overflow-hidden rounded-xl border border-gray-700'
@@ -15,6 +15,14 @@ function StatCard({ name, value, color, icon: Icon }) {
                     {name}
                 </span>
                 <p className='mt-1 text-3xl font-semibold text-gray-100'>{value}</p>
+                {onButtonClick && (
+                <button
+                    onClick={onButtonClick}
+                    className="mt-4 bg-blue-500 text-white p-2 rounded-md w-full"
+                >
+                    {buttonLabel}
+                </button>
+            )}
             </div>
         </motion.div>
     )

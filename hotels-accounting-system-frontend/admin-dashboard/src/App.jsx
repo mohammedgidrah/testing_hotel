@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import Unauthorized from "./components/Unauthorized";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Reception from "./pages/Reception";
 
 
 function App() {
@@ -33,6 +34,14 @@ function App() {
         {/* Public Route for Login */}
         <Route path="/" element={<Login />} />
         {/* Private Routes */}
+        <Route
+        path="/Reception"
+        element={
+          <PrivateRoute allowedRoles={['admin', 'manager', 'accountant']}>
+            <Reception />
+          </PrivateRoute>
+        }
+        />
         <Route
           path="/dashboard"
           element={

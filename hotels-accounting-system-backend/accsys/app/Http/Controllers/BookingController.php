@@ -11,6 +11,11 @@ use App\Models\Room;
 
 class BookingController extends Controller
 {
+    public function __construct()
+{
+    $this->middleware('auth:api'); // Ensure authentication middleware is used
+}
+
     public function index()
     {
         $bookings = Booking::with('guest', 'room')->get();
@@ -19,9 +24,37 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        $booking = Booking::create($request->all());
-        return response()->json($booking);
+        $validated = $request->validate([
+            'guest_id' => 'required|exists:guests,id',
+            'room_id' => 'required|exists:rooms,id',
+            'check_in_date' => 'required|date',
+            'check_out_date' => 'required|date',
+            'email' => 'required|email',
+            'phone_number' => 'required|string',
+            'payment_status' => 'required|in:Pending,Completed',
+            'total_amount' => 'required|numeric|min:0',
+        ]);
+    
+        // Create a new booking
+        $booking = Booking::create([
+            'guest_id' => $validated['guest_id'],
+            'room_id' => $validated['room_id'],
+            'check_in_date' => $validated['check_in_date'],
+            'check_out_date' => $validated['check_out_date'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'],
+            'payment_status' => $validated['payment_status'],
+            'total_amount' => $validated['total_amount'],
+        ]);
+    
+        // Update the room status
+        $room = Room::findOrFail($validated['room_id']);
+        $room->update(['status' => 'occupied']);
+        $room->save();
+    
+        return response()->json($booking, 201);
     }
+    
 
     public function show($id)
     {

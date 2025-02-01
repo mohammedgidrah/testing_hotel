@@ -4,8 +4,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../Context/AuthContext'
 import { useTranslation } from 'react-i18next';
+import { ConciergeBell } from "lucide-react";
+
 
 const SIDEBAR_ITEMS = [
+    {
+        name: "reception",
+        icon: ConciergeBell,
+        color: "#F59E0B",
+        path: "/Reception",
+        roles: ["admin", "manager"]
+    },
     {
         name: "dashboard",
         icon: BarChart2,

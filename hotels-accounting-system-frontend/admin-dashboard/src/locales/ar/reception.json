@@ -1,0 +1,11 @@
+{
+ "reception": "الاستقبال",
+ "TotalRooms": "إجمالي الغرف",
+ "AvailableRooms": "غرف متاحة",
+ "OccupiedRooms": "غرف محجوزة",
+ "MaintenanceRooms": "غرف الصيانة",
+ "available": "متاح",
+ "occupied": "محجوز",
+ "maintenance": "صيانة",
+ "room": "غرفة"
+}

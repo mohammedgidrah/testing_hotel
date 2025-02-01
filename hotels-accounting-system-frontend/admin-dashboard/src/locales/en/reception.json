@@ -1,0 +1,11 @@
+{
+    "reception": "Reception",
+    "TotalRooms": "Total Rooms",
+    "AvailableRooms": "Available Rooms",
+    "OccupiedRooms": "Occupied Rooms",
+    "MaintenanceRooms": "Maintenance Rooms",
+    "available": "Available",
+    "occupied": "Occupied",
+    "maintenance": "Maintenance",
+    "room": "Room"
+}

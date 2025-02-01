@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Models\Guest;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +25,19 @@ use App\Http\Controllers\{
     FinancialReportController,
     LoginController
 };
+
+Route::get('/guests/{id}', function ($id) {
+    $guest = Guest::find($id); // Find the guest by ID
+
+    if ($guest) {
+        return response()->json([
+            'email' => $guest->email,
+            'phone_number' => $guest->phone_number,
+        ]);
+    } else {
+        return response()->json(['message' => 'Guest not found'], 404);
+    }
+});
 
 // API Login
 Route::post('/login', [LoginController::class, 'login']);
@@ -61,6 +75,8 @@ Route::middleware(['auth:api'])->group(function () {
         Route::apiResource('financial-reports', FinancialReportController::class); // CRUD for Manager
     });
 });
+
+
 // API for Translations
 Route::get('/translations/{lang}', function ($lang) {
     $translations = [
