@@ -10,16 +10,15 @@ use Illuminate\Database\Eloquent\Model;
 class Booking extends Model
 {
     use HasFactory;
-    protected $garded = [];
-
-    // protected $fillable = [
-    //     'guest_id',
-    //     'room_id',
-    //     'check_in_date',
-    //     'check_out_date',
-    //     'total_amount',
-    //     'payment_status',
-    // ];
+ 
+    protected $fillable = [
+        'guest_id',
+        'room_id',
+        'check_in_date',
+        'check_out_date',
+        'total_amount',
+        'payment_status',
+    ];
 
     public function guest()
     {

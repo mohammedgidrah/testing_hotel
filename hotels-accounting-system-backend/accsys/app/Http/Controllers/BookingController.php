@@ -1,20 +1,17 @@
 <?php
-
-
-
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\Room;
+use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
     public function __construct()
-{
-    $this->middleware('auth:api'); // Ensure authentication middleware is used
-}
+    {
+        $this->middleware('auth:api'); // Ensure authentication middleware is used
+    }
 
     public function index()
     {
@@ -24,37 +21,35 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        // Validate incoming data
         $validated = $request->validate([
-            'guest_id' => 'required|exists:guests,id',
-            'room_id' => 'required|exists:rooms,id',
-            'check_in_date' => 'required|date',
-            'check_out_date' => 'required|date',
-            'email' => 'required|email',
-            'phone_number' => 'required|string',
+            'guest_id'       => 'required|exists:guests,id',
+            'room_id'        => 'required|exists:rooms,id',
+            'check_in_date'  => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
             'payment_status' => 'required|in:Pending,Completed',
-            'total_amount' => 'required|numeric|min:0',
+            'total_amount'   => 'required|numeric',
         ]);
-    
-        // Create a new booking
-        $booking = Booking::create([
-            'guest_id' => $validated['guest_id'],
-            'room_id' => $validated['room_id'],
-            'check_in_date' => $validated['check_in_date'],
-            'check_out_date' => $validated['check_out_date'],
-            'email' => $validated['email'],
-            'phone_number' => $validated['phone_number'],
-            'payment_status' => $validated['payment_status'],
-            'total_amount' => $validated['total_amount'],
-        ]);
-    
-        // Update the room status
-        $room = Room::findOrFail($validated['room_id']);
-        $room->update(['status' => 'occupied']);
-        $room->save();
-    
-        return response()->json($booking, 201);
+
+        try {
+            // Create a new booking
+            $booking = Booking::create($validated);
+
+            return response()->json([
+                'message' => 'Booking created successfully!',
+                'data'    => $booking,
+            ], 201);
+
+        } catch (\Exception $e) {
+            // Log the exception for debugging
+            \Log::error('Error creating booking: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Error creating booking.',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
-    
 
     public function show($id)
     {
@@ -79,11 +74,10 @@ class BookingController extends Controller
         return response()->json($booking);
     }
 
-
-    public function destroy( $id)
+    public function destroy($id)
     {
         $booking = Booking::findOrFail($id);
-        $room = Room::findOrFail($booking->room_id);
+        $room    = Room::findOrFail($booking->room_id);
         $room->update(['status' => 'available']);
         $booking->delete();
 
@@ -91,16 +85,15 @@ class BookingController extends Controller
     }
     public function getBookingsToday()
     {
-       
-        $today = date('Y-m-d');
+
+        $today    = date('Y-m-d');
         $bookings = Booking::whereDate('check_in_date', $today)->get();
         if ($bookings->isEmpty()) {
             return response()->json([
                 'message' => 'No bookings found for today',
-                'data' => [],
+                'data'    => [],
             ], 200);
         }
         return response()->json($bookings);
     }
 }
-

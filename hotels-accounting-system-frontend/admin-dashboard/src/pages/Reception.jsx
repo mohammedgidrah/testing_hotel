@@ -11,13 +11,6 @@ export default function Reception() {
   const { t } = useTranslation("reception");
   const [rooms, setRooms] = useState([]);
   const [guests, setGuests] = useState([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    available: 0,
-    occupied: 0,
-    maintenance: 0,
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [bookingData, setBookingData] = useState({
     checkInDate: "",
@@ -28,6 +21,13 @@ export default function Reception() {
     address: "",
     paymenttype: "",
   });
+  const [stats, setStats] = useState({
+    total: 0,
+    available: 0,
+    occupied: 0,
+    maintenance: 0,
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchRooms();
@@ -88,27 +88,26 @@ export default function Reception() {
   };
 
   const handleBooking = async () => {
-    // Calculate the total amount
     const checkIn = new Date(bookingData.checkInDate);
     const checkOut = new Date(bookingData.checkOutDate);
     const totalAmount =
-      (selectedRoom.price * (checkOut - checkIn)) / (1000 * 60 * 60 * 24); // Calculate total amount based on days
+      (selectedRoom.price_per_night * (checkOut - checkIn)) / (1000 * 60 * 60 * 24); // Calculate total amount based on days
 
-    // Prepare the data to send for booking
     const bookingDataToSend = {
-      guest_id: bookingData.guestId, // Use guestId instead of guestName
+      guest_id: bookingData.guestId,
       room_id: selectedRoom.id,
       check_in_date: bookingData.checkInDate,
       check_out_date: bookingData.checkOutDate,
       email: bookingData.email,
+      price_per_night: selectedRoom.price_per_night,
       address: bookingData.address,
-      phone_number: bookingData.phoneNumber, // Ensure consistency
-      totalAmount: totalAmount, // Use the pre-calculated value
+      phone_number: bookingData.phoneNumber,
+      totalAmount: totalAmount,
     };
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/api/book-room",
+        "http://127.0.0.1:8000/api/bookings",
         bookingDataToSend,
         {
           headers: {
@@ -117,14 +116,12 @@ export default function Reception() {
         }
       );
 
-      // Update the room list and stats after successful booking
       const updatedRooms = rooms.map((room) =>
         room.id === selectedRoom.id ? { ...room, status: "occupied" } : room
       );
       setRooms(updatedRooms);
       calculateStats(updatedRooms); // Recalculate stats based on updated room status
 
-      // Close the modal and reset the booking form
       closeModal();
       console.log("Room booked successfully:", response.data);
     } catch (error) {
@@ -186,7 +183,6 @@ export default function Reception() {
                 ? "red"
                 : "orange"
             }
-            // Show "Book Now" button only if room is available
             onButtonClick={
               room.status === "available" ? () => openModal(room) : null
             }

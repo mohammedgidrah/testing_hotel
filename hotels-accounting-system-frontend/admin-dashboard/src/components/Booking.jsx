@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 
-const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
-  const [selectedGuestId, setSelectedGuestId] = useState(""); // ID of the selected guest
+const BookingModal = ({ show, handleClose, room, guests, handleBooking, setRoom }) => {
+  const [selectedGuestId, setSelectedGuestId] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
   const [checkInDate, setCheckInDate] = useState("");
   const [checkOutDate, setCheckOutDate] = useState("");
   const [isRoomAvailable, setIsRoomAvailable] = useState(true);
-  const [paymentStatus, setPaymentStatus] = useState("Pending"); // Payment status
-  const [totalAmount, setTotalAmount] = useState(0); // Total amount for the booking
+  const [paymentStatus, setPaymentStatus] = useState("Pending");
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch guest details when a guest is selected
   useEffect(() => {
     if (selectedGuestId) {
-      // Fetch guest details from the Laravel API
       fetch(`http://localhost:8000/api/guests/${selectedGuestId}`)
         .then((response) => {
           if (!response.ok) {
@@ -23,16 +23,14 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
           return response.json();
         })
         .then((data) => {
-          if (data.email && data.phone_number) {
-            setGuestEmail(data.email);
-            setGuestPhone(data.phone_number);
-          } else {
-            setGuestEmail("");
-            setGuestPhone("");
+          if (data) {
+            setGuestEmail(data.email || "");
+            setGuestPhone(data.phone_number || "");
           }
         })
         .catch((error) => {
-          console.error("Error fetching guest details:", error);
+          console.error("Fetch error:", error);
+          setError(error.message);
         });
     } else {
       setGuestEmail("");
@@ -40,73 +38,115 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
     }
   }, [selectedGuestId]);
 
-  // Check room availability based on the selected check-in/check-out dates
   useEffect(() => {
     if (checkInDate && checkOutDate) {
-      // Here we can check for availability by comparing the dates to room bookings.
-      // You should ideally call an API to check room availability, for now we assume the room is available.
-      setIsRoomAvailable(true);  // Assume the room is available, implement actual check if necessary.
-
-      // Calculate total amount based on room price and duration
       const checkIn = new Date(checkInDate);
       const checkOut = new Date(checkOutDate);
-      const diffTime = checkOut - checkIn; // Difference in milliseconds
-      const diffDays = diffTime / (1000 * 3600 * 24); // Convert to days
 
-      // Assuming room.price holds the price per night
-      const total = room.price * diffDays;
+      if (isNaN(checkIn) || isNaN(checkOut)) {
+        setError("Invalid date format.");
+        setIsRoomAvailable(false);
+        return;
+      }
+
+      if (checkIn >= checkOut) {
+        setError("Check-out date must be after the check-in date.");
+        setIsRoomAvailable(false);
+        return;
+      }
+
+      setIsRoomAvailable(true);
+      const diffTime = checkOut - checkIn;
+      const diffDays = diffTime / (1000 * 3600 * 24);
+      const total = room?.price_per_night * diffDays || 0;
       setTotalAmount(total);
+      setError("");
     }
   }, [checkInDate, checkOutDate, room]);
 
   const handleBookingClick = () => {
-    if (!selectedGuestId || !checkInDate || !checkOutDate) {
-      alert("Please select a guest, check-in date, and check-out date.");
+    setIsLoading(true);
+    setError("");
+  
+    if (!checkInDate || !checkOutDate) {
+      setError("Please provide check-in date and check-out date.");
+      setIsLoading(false);
       return;
     }
-
+  
+    if (!selectedGuestId) {
+      setError("Please select a guest.");
+      setIsLoading(false);
+      return;
+    }
+  
     if (new Date(checkInDate) >= new Date(checkOutDate)) {
-      alert("Check-out date must be after the check-in date.");
+      setError("Check-out date must be after the check-in date.");
+      setIsLoading(false);
       return;
     }
-
+  
     const bookingDetails = {
       guest_id: selectedGuestId,
-      room_id: room.id, // Assuming the room has an 'id' property
+      room_id: room.id,
       check_in_date: checkInDate,
       check_out_date: checkOutDate,
       email: guestEmail,
       phone_number: guestPhone,
-      payment_type: "Cash",
-      payment_status: paymentStatus, // Adding payment status
-      total_amount: totalAmount, // Adding total amount
+      payment_status: paymentStatus,
+      total_amount: totalAmount,
     };
-
-    // Send booking details to the Laravel API
+    
+    console.log(bookingDetails); // Add this line to check the data being sent
+    
+  
     fetch("http://localhost:8000/api/bookings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
-        body: JSON.stringify(bookingDetails),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(bookingDetails),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error creating booking");
+        }
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error creating booking");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log("Booking created successfully:", data);
-          handleBooking(data); // Call the parent component to update the state
-        })
-        .catch((error) => {
-          console.error("Error:", error);
+      .then((data) => {
+        console.log("Booking created successfully:", data);
+  
+        // Step 2: Update the room status to "occupied"
+        return fetch(`http://localhost:8000/api/rooms/${room.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ status: "occupied" })
         });
-      
-
-    handleClose();
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error updating room status");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Room status updated successfully:", data);
+  
+        // Notify parent component and close the modal
+        handleBooking(bookingDetails); // Pass booking details to the parent
+        handleClose();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setError(error.message || "Failed to create booking. Please try again.");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -115,7 +155,7 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
         <Modal.Title>Book Room: {room?.room_number || "Room"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form>
+        <Form onSubmit={(e) => e.preventDefault()}>
           <Form.Group controlId="guestName">
             <Form.Label>Guest Name</Form.Label>
             <Form.Control
@@ -132,11 +172,14 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
             </Form.Control>
           </Form.Group>
 
-          {/* Conditionally render email and phone if a guest is selected */}
           {selectedGuestId && (
             <>
-              <p className="p-1"><strong>Email:</strong> {guestEmail}</p>
-              <p className="p-1"><strong>Phone Number:</strong> {guestPhone}</p>
+              <p className="p-1">
+                <strong>Email:</strong> {guestEmail}
+              </p>
+              <p className="p-1">
+                <strong>Phone Number:</strong> {guestPhone}
+              </p>
             </>
           )}
 
@@ -158,13 +201,6 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
             />
           </Form.Group>
 
-          {/* Display room availability status */}
-          {!isRoomAvailable && <p style={{ color: "red" }}>Room is not available for the selected dates.</p>}
-
-          {/* Display total amount */}
-          {totalAmount > 0 && <p><strong>Total Amount:</strong> ${totalAmount.toFixed(2)}</p>}
-
-          {/* Payment status */}
           <Form.Group controlId="paymentStatus">
             <Form.Label>Payment Status</Form.Label>
             <Form.Control
@@ -177,13 +213,25 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
             </Form.Control>
           </Form.Group>
         </Form>
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </Modal.Body>
       <Modal.Footer>
+        {totalAmount > 0 && (
+          <p>
+            <strong>Total Amount:</strong> ${totalAmount.toFixed(2)}
+          </p>
+        )}
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleBookingClick}>
-          Book Now
+        <Button
+          variant="primary"
+          type="button"
+          onClick={handleBookingClick}
+          disabled={isLoading}
+        >
+          {isLoading ? "Booking..." : "Book Now"}
         </Button>
       </Modal.Footer>
     </Modal>
@@ -191,3 +239,4 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
 };
 
 export default BookingModal;
+
