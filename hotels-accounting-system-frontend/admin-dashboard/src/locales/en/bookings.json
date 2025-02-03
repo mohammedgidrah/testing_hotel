@@ -12,7 +12,20 @@
      "CheckOutDate": "Check-out Date",  
      "TotalAmount": "Total Amount",
      "Status": "Payment Status",
-     "Actions": "Actions"
-
+     "Actions": "Actions",
+     "EditBooking": "Edit Booking",
+     "Check-in Date": "Check-in Date",
+     "Check-out Date": "Check-out Date",
+     "Payment Status": "Payment Status",
+     "pending": "Pending",
+     "paid": "Paid",
+     "PaymentStatus": "Payment Status",
+     "totalAmount": "Total Amount",
+     "Update": "Update Booking",
+     "DeleteBooking": "Delete Booking",
+     "Delete": "Delete",
+     "AreYouSure": "Are you sure you want to delete this booking?",
+     "Cancel": "Cancel"
+  
   }
   

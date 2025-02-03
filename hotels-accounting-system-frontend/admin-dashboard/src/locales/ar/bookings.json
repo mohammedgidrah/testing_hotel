@@ -12,5 +12,17 @@
   "CheckOutDate": "تاريخ الخروج",
   "TotalAmount": "المبلغ الكلي",
   "Status": " حالة الدفع",
-  "Actions": "الاجراءات"
+  "Actions": "الاجراءات",
+  "EditBooking": "تحديث الحجز",
+  "Check-inDate": "تاريخ الوصول",
+  "Check-outDate": "تاريخ الخروج",
+  "PaymentStatus": "حالة الدفع",
+  "pending": "قيد الانتظار",
+  "paid": "مدفوع",
+  "totalAmount": "المبلغ الكلي",
+  "Update": "تحديث الحجز",
+  "DeleteBooking": "حذف الحجز",
+  "Delete": "حذف",
+  "AreYouSure": "هل أنت متأكد من حذف هذا الحجز؟",
+  "Cancel": "إلغاء"
 }

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
+import { useTranslation } from 'react-i18next';
 
 const EditBooking = () => {
+    const { t } = useTranslation("bookings");
     const { id } = useParams();
     const navigate = useNavigate();
     const [booking, setBooking] = useState(null);
@@ -77,12 +79,12 @@ const EditBooking = () => {
 
         <div className='container mx-auto  flex-1 overflow-auto relative z-10 text-gray-700'>
 
-            <Header title='Edit Booking' />
+            <Header title={t('EditBooking')} />
             <div className='p-6'>
 
                 <form onSubmit={handleSubmit}>
 
-                    <div className='mb-4'>
+                    {/* <div className='mb-4'>
                         <label className='block text-gray-100'>Room Number</label>
                         <select
                             name='room_id'
@@ -98,10 +100,10 @@ const EditBooking = () => {
                                 </option>
                             ))}
                         </select>
-                    </div>
+                    </div> */}
 
                     <div className='mb-4 '>
-                        <label className='block text-gray-100'>Check-in Date</label>
+                        <label className='block text-gray-100'>{t('Check-inDate')}</label>
                         <input
                             type='date'
                             name='check_in_date'
@@ -113,7 +115,7 @@ const EditBooking = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-gray-100'>Check-out Date</label>
+                        <label className='block text-gray-100'>{t('Check-outDate')}</label>
                         <input
                             type='date'
                             name='check_out_date'
@@ -125,7 +127,7 @@ const EditBooking = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-gray-100'>Payment Status</label>
+                        <label className='block text-gray-100'>{t('PaymentStatus')}</label>
                         <select
                             name='payment_status'
                             value={formData.payment_status}
@@ -133,13 +135,13 @@ const EditBooking = () => {
                             className='border p-2 rounded w-full'
                             required
                         >
-                            <option value='paid'>Paid</option>
-                            <option value='pending'>Pending</option>
+              <option value="Pending">{t("pending")}</option>
+              <option value="paid">{t("paid")}</option>
                         </select>
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-gray-100'>Total Amount</label>
+                        <label className='block text-gray-100'>{t('totalAmount')}</label>
                         <input
                             type='number'
                             name='total_amount'
@@ -150,7 +152,7 @@ const EditBooking = () => {
                         />
                     </div>
 
-                    <button type='submit' className='bg-blue-500 text-white p-2 rounded'>Update Booking</button>
+                    <button type='submit' className='bg-blue-500 text-white p-2 rounded'>{t('Update')}</button>
                 </form>
             </div>
         </div>
