@@ -11,6 +11,13 @@ function Guests() {
     const [filteredGuests, setFilteredGuests] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterBy, setFilterBy] = useState('all');
+    const [editingGuest, setEditingGuest] = useState(null);
+    const [newGuest, setNewGuest] = useState({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone_number: '',
+    });
 
     useEffect(() => {
         const fetchGuests = async () => {
@@ -37,6 +44,61 @@ function Guests() {
         });
         setFilteredGuests(filtered);
     }, [searchTerm, filterBy, guests]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewGuest((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleAddGuest = async () => {
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/api/guests', newGuest, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            setGuests([...guests, response.data]);
+            setNewGuest({ first_name: '', last_name: '', email: '', phone_number: '' });
+        } catch (error) {
+            console.error(error);
+            setError('Failed to add guest');
+        }
+    };
+
+    const handleEditGuest = async () => {
+        try {
+            const response = await axios.put(`http://127.0.0.1:8000/api/guests/${editingGuest.id}`, editingGuest, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            const updatedGuests = guests.map((guest) =>
+                guest.id === response.data.id ? response.data : guest
+            );
+            setGuests(updatedGuests);
+            setEditingGuest(null);
+        } catch (error) {
+            console.error(error);
+            setError('Failed to update guest');
+        }
+    };
+
+    const handleDeleteGuest = async (id) => {
+        try {
+            await axios.delete(`http://127.0.0.1:8000/api/guests/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            setGuests(guests.filter((guest) => guest.id !== id));
+        } catch (error) {
+            console.error(error);
+            setError('Failed to delete guest');
+        }
+    };
 
     return (
         <div className='flex-1 overflow-auto relative z-10'>
@@ -65,10 +127,68 @@ function Guests() {
                         <option value="email">{t('Email')}</option>
                         <option value="phone_number">{t('PhoneNumber')}</option>
                     </select>
+
+                    <button onClick={() => setEditingGuest({ id: null })} className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        {t('AddGuest')}
+                    </button>
+                </div>
+
+                <div className="mb-4">
+                    {(editingGuest || newGuest) && (
+                        <div className="bg-gray-700 p-4 rounded-lg">
+                            <h2 className="text-xl text-white mb-4">{editingGuest ? t('EditGuest') : t('AddGuest')}</h2>
+                            <input
+                                type="text"
+                                name="first_name"
+                                value={editingGuest?.first_name || newGuest.first_name}
+                                onChange={handleInputChange}
+                                placeholder={t('FirstName')}
+                                className="bg-gray-600 text-white p-2 mb-2 w-full rounded-lg"
+                            />
+                            <input
+                                type="text"
+                                name="last_name"
+                                value={editingGuest?.last_name || newGuest.last_name}
+                                onChange={handleInputChange}
+                                placeholder={t('LastName')}
+                                className="bg-gray-600 text-white p-2 mb-2 w-full rounded-lg"
+                            />
+                            <input
+                                type="email"
+                                name="email"
+                                value={editingGuest?.email || newGuest.email}
+                                onChange={handleInputChange}
+                                placeholder={t('Email')}
+                                className="bg-gray-600 text-white p-2 mb-2 w-full rounded-lg"
+                            />
+                            <input
+                                type="text"
+                                name="phone_number"
+                                value={editingGuest?.phone_number || newGuest.phone_number}
+                                onChange={handleInputChange}
+                                placeholder={t('PhoneNumber')}
+                                className="bg-gray-600 text-white p-2 mb-2 w-full rounded-lg"
+                            />
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    onClick={editingGuest ? handleEditGuest : handleAddGuest}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                                >
+                                    {editingGuest ? t('SaveChanges') : t('AddGuest')}
+                                </button>
+                                <button
+                                    onClick={() => setEditingGuest(null)}
+                                    className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+                                >
+                                    {t('Cancel')}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {!loading && filteredGuests.length > 0 && (
-                    <div className="overflow-x-auto" style={{direction: 'ltr'}}>
+                    <div className="overflow-x-auto" style={{ direction: 'ltr' }}>
                         <table className="min-w-full bg-gray-800 text-gray-100 rounded-lg">
                             <thead className="bg-gray-700">
                                 <tr>
@@ -84,22 +204,31 @@ function Guests() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                         {t('PhoneNumber')}
                                     </th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        {t('Actions')}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-700">
                                 {filteredGuests.map((guest) => (
                                     <tr key={guest.id} className="hover:bg-gray-700 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.first_name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.last_name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.email}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.phone_number}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                            {guest.first_name}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                            {guest.last_name}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                            {guest.email}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                            {guest.phone_number}
+                                            <button
+                                                onClick={() => setEditingGuest(guest)}
+                                                className="text-blue-500 mr-2"
+                                            >
+                                                {t('Edit')}
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteGuest(guest.id)}
+                                                className="text-red-500"
+                                            >
+                                                {t('Delete')}
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}

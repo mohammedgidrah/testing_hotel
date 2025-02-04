@@ -129,7 +129,7 @@ export default function Reception() {
         {rooms.map((room) => (
           <StatCard
             key={room.id}
-            name={t("room") + " " + room.room_number}
+            name={t("room") + " " + room.room_number + " ( " + t(room.type)+" )"}
             value={t(room.status)}
             icon={
               room.status === "available"
@@ -145,6 +145,8 @@ export default function Reception() {
                 ? "red"
                 : "orange"
             }
+
+            
             onButtonClick={
               room.status === "available" ? () => openModal(room) : null
             }

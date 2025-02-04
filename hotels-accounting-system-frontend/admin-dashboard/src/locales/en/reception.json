@@ -21,5 +21,10 @@
   "Booking": "Booking...",
   "close": "close",
   "email": "Email",
-  "phone": "Phone Number"
+  "phone": "Phone Number",
+  "Single": "Single",
+  "Double": "Double",
+  "Triple": "Triple",
+  "Suite4Bed": "Suite 4 Bed",
+  "Suite5Bed": "Suite 5 Bed"
 }
