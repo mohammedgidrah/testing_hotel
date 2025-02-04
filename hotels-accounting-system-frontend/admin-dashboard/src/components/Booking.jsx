@@ -14,6 +14,7 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [roomStatus, setRoomStatus] = useState(room?.status || "Available");
 
   useEffect(() => {
     if (selectedGuestId) {
@@ -55,13 +56,13 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
   const handleBookingClick = () => {
     setIsLoading(true);
     setError("");
-
+  
     if (!checkInDate || !checkOutDate || !selectedGuestId) {
       setError(t("Fill All Fields"));
       setIsLoading(false);
       return;
     }
-
+  
     const bookingDetails = {
       guest_id: selectedGuestId,
       room_id: room?.id,
@@ -72,7 +73,7 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
       payment_status: paymentStatus,
       total_amount: totalAmount,
     };
-
+  
     fetch("http://localhost:8000/api/bookings", {
       method: "POST",
       headers: {
@@ -85,7 +86,28 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
         if (!response.ok) throw new Error("Failed to book room");
         return response.json();
       })
+      .then((data) => {
+        console.log("Booking successful:", data);
+
+        // Update the room status locally
+        setRoomStatus("Occupied");
+
+        // Also update the room status on the server if necessary
+        return fetch(`http://localhost:8000/api/rooms/${room?.id}`, {
+          method: "PATCH", // Use PATCH to update only one field
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ status: "Occupied" }),
+        });
+      })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to update room status");
+        return response.json();
+      })
       .then(() => {
+        console.log("Room status updated to Occupied");
         handleBooking(bookingDetails);
         handleClose();
       })
@@ -94,27 +116,27 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose}  >
-<Modal.Header
-   style={{
-    justifyContent: "space-between",
-  }}
->
-  <Modal.Title>{t("BookRoom")}: {room?.room_number || "Room"}</Modal.Title>
-  <button
-    type="button"
-    className="btn-close"
-    onClick={handleClose}
-    aria-label="Close"
-    style={i18n.language === "ar" ? { margin: 0 } : {}}
-  />
-</Modal.Header>
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header style={{ justifyContent: "space-between" }}>
+        <Modal.Title>{t("BookRoom")}: {room?.room_number || "Room"}</Modal.Title>
+        <button
+          type="button"
+          className="btn-close"
+          onClick={handleClose}
+          aria-label="Close"
+          style={i18n.language === "ar" ? { margin: 0 } : {}}
+        />
+      </Modal.Header>
 
       <Modal.Body>
         <Form>
           <Form.Group>
             <Form.Label>{t("guestname")}</Form.Label>
-            <Form.Control as="select" value={selectedGuestId} onChange={(e) => setSelectedGuestId(e.target.value)}>
+            <Form.Control
+              as="select"
+              value={selectedGuestId}
+              onChange={(e) => setSelectedGuestId(e.target.value)}
+            >
               <option value="">{t("SelectGuest")}</option>
               {guests?.map((guest) => (
                 <option key={guest.id} value={guest.id}>
@@ -133,17 +155,29 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
 
           <Form.Group>
             <Form.Label>{t("check-in-date")}</Form.Label>
-            <Form.Control type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} />
+            <Form.Control
+              type="date"
+              value={checkInDate}
+              onChange={(e) => setCheckInDate(e.target.value)}
+            />
           </Form.Group>
           <Form.Group>
             <Form.Label>{t("check-out-date")}</Form.Label>
-            <Form.Control type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} />
+            <Form.Control
+              type="date"
+              value={checkOutDate}
+              onChange={(e) => setCheckOutDate(e.target.value)}
+            />
           </Form.Group>
           <Form.Group>
             <Form.Label>{t("PaymentStatus")}</Form.Label>
-            <Form.Control as="select" value={paymentStatus} onChange={(e) => setPaymentStatus(e.target.value)}>
+            <Form.Control
+              as="select"
+              value={paymentStatus}
+              onChange={(e) => setPaymentStatus(e.target.value)}
+            >
               <option value="Pending">{t("pending")}</option>
-              <option value="Completed">{t("completed")}</option>
+              <option value="paid">{t("paid")}</option>
             </Form.Control>
           </Form.Group>
         </Form>
@@ -151,7 +185,9 @@ const BookingModal = ({ show, handleClose, room, guests, handleBooking }) => {
         {error && <p style={{ color: "red" }}>{error}</p>}
       </Modal.Body>
       <Modal.Footer>
-        {totalAmount > 0 && <p><strong>{t("TotalAmount")}:</strong> ${totalAmount.toFixed(2)}</p>}
+        {totalAmount > 0 && (
+          <p><strong>{t("TotalAmount")}:</strong> ${totalAmount.toFixed(2)}</p>
+        )}
         <Button variant="secondary" onClick={handleClose}>{t("close")}</Button>
         <Button variant="primary" onClick={handleBookingClick} disabled={isLoading}>
           {isLoading ? t("Booking") : t("BookNow")}

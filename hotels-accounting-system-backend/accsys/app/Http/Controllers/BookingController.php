@@ -20,36 +20,15 @@ class BookingController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // Validate incoming data
-        $validated = $request->validate([
-            'guest_id'       => 'required|exists:guests,id',
-            'room_id'        => 'required|exists:rooms,id',
-            'check_in_date'  => 'required|date',
-            'check_out_date' => 'required|date|after:check_in_date',
-            'payment_status' => 'required|in:Pending,Completed',
-            'total_amount'   => 'required|numeric',
-        ]);
-
-        try {
-            // Create a new booking
-            $booking = Booking::create($validated);
-
-            return response()->json([
-                'message' => 'Booking created successfully!',
-                'data'    => $booking,
-            ], 201);
-
-        } catch (\Exception $e) {
-            // Log the exception for debugging
-            \Log::error('Error creating booking: ' . $e->getMessage());
-
-            return response()->json([
-                'message' => 'Error creating booking.',
-                'error'   => $e->getMessage(),
-            ], 500);
-        }
+{
+    try {
+        $booking = Booking::create($request->all());
+        return response()->json(['message' => 'Booking successful', 'booking' => $booking]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
+
 
     public function show($id)
     {

@@ -5,33 +5,24 @@ import axios from "axios";
 import StatCard from "../components/StatCard";
 import { Zap, Users, User, Wrench } from "lucide-react";
 import { motion } from "framer-motion";
-import Bookingmodel from "../components/Booking.jsx";
+import BookingModal from "../components/Booking";
 
 export default function Reception() {
   const { t } = useTranslation("reception");
   const [rooms, setRooms] = useState([]);
   const [guests, setGuests] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [bookingData, setBookingData] = useState({
-    checkInDate: "",
-    checkOutDate: "",
-    guestId: "",  // Store guest ID instead of guest name
-    phoneNumber: "",
-    email: "",
-    address: "",
-    paymenttype: "",
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     available: 0,
     occupied: 0,
     maintenance: 0,
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchRooms();
-    fetchGuests(); // Fetch guests when the component loads
+    fetchGuests();
   }, []);
 
   const fetchGuests = async () => {
@@ -59,73 +50,44 @@ export default function Reception() {
 
   const calculateStats = (roomsData) => {
     const total = roomsData.length;
-    const available = roomsData.filter((room) => room.status === "available")
-      .length;
-    const occupied = roomsData.filter((room) => room.status === "occupied")
-      .length;
-    const maintenance = roomsData.filter((room) => room.status === "maintenance")
-      .length;
+    const available = roomsData.filter(
+      (room) => room.status === "available"
+    ).length;
+    const occupied = roomsData.filter(
+      (room) => room.status === "occupied"
+    ).length;
+    const maintenance = roomsData.filter(
+      (room) => room.status === "maintenance"
+    ).length;
     setStats({ total, available, occupied, maintenance });
   };
 
   const openModal = (room) => {
-    setSelectedRoom(room); // Store the room details
-    setIsModalOpen(true); // Open the modal
+    setSelectedRoom(room);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal
-    setSelectedRoom(null); // Reset the selected room
-    setBookingData({
-      checkInDate: "",
-      checkOutDate: "",
-      guestId: "",  // Reset guest ID
-      phoneNumber: "",
-      email: "",
-      address: "",
-      paymenttype: "",
-    });
+    setIsModalOpen(false);
+    setSelectedRoom(null);
   };
-
-  const handleBooking = async () => {
-    const checkIn = new Date(bookingData.checkInDate);
-    const checkOut = new Date(bookingData.checkOutDate);
-    const totalAmount =
-      (selectedRoom.price_per_night * (checkOut - checkIn)) / (1000 * 60 * 60 * 24); // Calculate total amount based on days
-
-    const bookingDataToSend = {
-      guest_id: bookingData.guestId,
-      room_id: selectedRoom.id,
-      check_in_date: bookingData.checkInDate,
-      check_out_date: bookingData.checkOutDate,
-      email: bookingData.email,
-      price_per_night: selectedRoom.price_per_night,
-      address: bookingData.address,
-      phone_number: bookingData.phoneNumber,
-      totalAmount: totalAmount,
-    };
-
+  const handleRoomStatusChange = async (roomId, newStatus) => {
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/api/bookings",
-        bookingDataToSend,
+      await axios.put(
+        `http://127.0.0.1:8000/api/rooms/${roomId}`,
+        { status: newStatus },
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
-
-      const updatedRooms = rooms.map((room) =>
-        room.id === selectedRoom.id ? { ...room, status: "occupied" } : room
-      );
-      setRooms(updatedRooms);
-      calculateStats(updatedRooms); // Recalculate stats based on updated room status
-
-      closeModal();
-      console.log("Room booked successfully:", response.data);
+      fetchRooms();
     } catch (error) {
-      console.error("Error booking the room:", error);
+      console.error("Failed to update room status:", error);
+    }
+  };
+  const handleBooking = () => {
+    if (selectedRoom) {
+      openModal(selectedRoom);
     }
   };
 
@@ -190,15 +152,15 @@ export default function Reception() {
           />
         ))}
       </motion.div>
-      {/* Modal */}
-      <Bookingmodel
+
+      {/* Booking Modal */}
+      <BookingModal
         show={isModalOpen}
         handleClose={closeModal}
-        room={selectedRoom} // This should be the room you're booking
-        guests={guests} // This should be the list of guests for selection
-        handleBooking={handleBooking} // Function to handle the booking
-        bookingData={bookingData} // Pass bookingData to Bookingmodel
-        setBookingData={setBookingData} // Function to update bookingData
+        room={selectedRoom}
+        guests={guests}
+        fetchRooms={fetchRooms}
+        handleBooking={handleBooking} // Add this
       />
     </div>
   );

@@ -16,7 +16,7 @@
   "chick-out-date": "Check-out Date",
   "PaymentStatus": "Payment Status",
   "pending": "Pending",
-  "completed": "Completed",
+  "paid": "paid",
   "TotalAmount": "Total Amount",
   "Booking": "Booking...",
   "close": "close",
