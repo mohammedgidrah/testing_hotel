@@ -54,9 +54,12 @@ function Bookings() {
 
     axios.get('http://127.0.0.1:8000/api/bookingsQuery/today')
       .then(response => {
+        console.log(response.data);
         if (response.data.data && response.data.data.length === 0) {
           setTotalBookingsToday(0);
+          
         } else {
+          
           setTotalBookingsToday(response.data.length);
         }
         setLoading(false);

@@ -17,6 +17,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Reception from "./pages/Reception";
 
 
+
 function App() {
   const { isAuthenticated } = useAuth();
 

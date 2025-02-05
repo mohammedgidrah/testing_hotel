@@ -2,7 +2,7 @@
 
     "Guests": "الضيوف",
     "GuestsList": "قائمة الضيوف",
-    "AddGuest": "إضافة ضيف",
+    "AddGuest": " إضافة ضيف جديد",
     "Search": "ابحث",
     "GuestName": "اسم الضيف",
     "GuestID": "رقم الضيف",
@@ -15,5 +15,9 @@
     "AllFields": "جميع الحقول ",
     "FirstName": "الاسم الاول",
     "LastName": "اسم العائلة",
-    "NoGuestsFound": "لا يوجد ضيفون"
-}
+    "NoGuestsFound": "لا يوجد ضيوف",
+    "DeleteGuest": "حذف الضيف",
+    "DeleteConfirmation": "هل أنت متأكد من حذف هذا الضيف؟",
+    "cancel": "الغاء",
+    "delete": "حذف"
+ }

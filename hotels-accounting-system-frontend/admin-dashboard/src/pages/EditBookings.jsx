@@ -90,7 +90,7 @@ const EditBooking = () => {
                             name='room_id'
                             value={formData.room_id}
                             onChange={handleInputChange}
-                            className='border p-2 rounded w-full'
+                            className='  p-2 rounded w-full'
                             required
                         >
                             <option value=''>Select a Room</option>
@@ -103,36 +103,36 @@ const EditBooking = () => {
                     </div> */}
 
                     <div className='mb-4 '>
-                        <label className='block text-gray-100'>{t('Check-inDate')}</label>
+                        <label className='block text-gray-100 pb-2'>{t('Check-inDate')}</label>
                         <input
                             type='date'
                             name='check_in_date'
                             value={formData.check_in_date}
                             onChange={handleInputChange}
-                            className='border p-2 rounded w-full'
+                            className='  p-2 rounded w-full text-white bg-gray-700'
                             required
                         />
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-gray-100'>{t('Check-outDate')}</label>
+                        <label className='block text-gray-100 pb-2'>{t('Check-outDate')}</label>
                         <input
                             type='date'
                             name='check_out_date'
                             value={formData.check_out_date}
                             onChange={handleInputChange}
-                            className='border p-2 rounded w-full'
+                            className='  p-2 rounded w-full text-white bg-gray-700'
                             required
                         />
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-gray-100'>{t('PaymentStatus')}</label>
+                        <label className='block text-gray-100 pb-2'>{t('PaymentStatus')}</label>
                         <select
                             name='payment_status'
                             value={formData.payment_status}
                             onChange={handleInputChange}
-                            className='border p-2 rounded w-full'
+                            className='  p-2 rounded w-full text-white bg-gray-700'
                             required
                         >
               <option value="Pending">{t("pending")}</option>
@@ -141,13 +141,13 @@ const EditBooking = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-gray-100'>{t('totalAmount')}</label>
+                        <label className='block text-gray-100 pb-2'>{t('totalAmount')}</label>
                         <input
                             type='number'
                             name='total_amount'
                             value={formData.total_amount}
                             onChange={handleInputChange}
-                            className='border p-2 rounded w-full'
+                            className='  p-2 rounded w-full text-white bg-gray-700'
                             required
                         />
                     </div>

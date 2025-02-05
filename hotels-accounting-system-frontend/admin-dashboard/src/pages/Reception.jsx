@@ -129,8 +129,8 @@ export default function Reception() {
         {rooms.map((room) => (
           <StatCard
             key={room.id}
-            name={t("room") + " " + room.room_number + " ( " + t(room.type)+" )"}
-            value={t(room.status)}
+            value={t("room") + " " + room.room_number + " ( " + t(room.type)+" )"}
+            // value={t("room"+ " " +room.room_number +" ( " + t(room.type)+" )")}
             icon={
               room.status === "available"
                 ? User

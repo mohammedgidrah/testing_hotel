@@ -13,7 +13,7 @@ const SIDEBAR_ITEMS = [
         icon: ConciergeBell,
         color: "#F59E0B",
         path: "/Reception",
-        roles: ["admin", "manager"]
+        roles: ["admin", "manager", "accountant"]
     },
     {
         name: "dashboard",

@@ -14,5 +14,9 @@
 "AllFields": "All Fields ",
 "FirstName": "First Name",
 "LastName": "Last Name",
-"NoGuestsFound": "No guests found"
+"NoGuestsFound": "No guests found",
+"DeleteGuest": "Delete Guest",
+"DeleteConfirmation": "Are you sure you want to delete this guest?",
+"cancel": "Cancel",
+"delete": "Delete"
 }

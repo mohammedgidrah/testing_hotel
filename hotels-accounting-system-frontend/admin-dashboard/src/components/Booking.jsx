@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import BookingCalendar from "./BookingCalendar";
 
 const BookingModal = ({
   show,
@@ -14,50 +15,41 @@ const BookingModal = ({
   const [selectedGuestId, setSelectedGuestId] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
-  const [checkInDate, setCheckInDate] = useState("");
-  const [checkOutDate, setCheckOutDate] = useState("");
-  const [isRoomAvailable, setIsRoomAvailable] = useState(true);
+  const [checkInDate, setCheckInDate] = useState(null);
+  const [checkOutDate, setCheckOutDate] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("Pending");
   const [totalAmount, setTotalAmount] = useState(0);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [roomStatus, setRoomStatus] = useState(room?.status || "available");
 
   useEffect(() => {
     if (checkInDate && checkOutDate) {
-      const checkIn = new Date(checkInDate);
-      const checkOut = new Date(checkOutDate);
-
-      if (checkIn >= checkOut) {
+      if (checkInDate >= checkOutDate) {
         setError(t("Check Out After Check In"));
-        setIsRoomAvailable(false);
         setTotalAmount(0);
         return;
       }
 
-      setIsRoomAvailable(true);
-      const diffDays = (checkOut - checkIn) / (1000 * 3600 * 24);
-      setTotalAmount(
-        room?.price_per_night ? room.price_per_night * diffDays : 0
-      );
+      const diffDays = (checkOutDate - checkInDate) / (1000 * 3600 * 24);
+      setTotalAmount(room?.price_per_night * diffDays);
       setError("");
     }
+  }, [checkInDate, checkOutDate, room, t]);
+
+  useEffect(() => {
     if (selectedGuestId) {
       fetch(`http://localhost:8000/api/guests/${selectedGuestId}`)
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to fetch guest details");
-          return response.json();
-        })
+        .then((response) => response.json())
         .then((data) => {
           setGuestEmail(data.email || "");
           setGuestPhone(data.phone_number || "");
         })
-        .catch((error) => setError(error.message));
+        .catch(() => setError("Failed to fetch guest details"));
     } else {
       setGuestEmail("");
       setGuestPhone("");
     }
-  }, [checkInDate, checkOutDate, room, t, selectedGuestId]);
+  }, [selectedGuestId]);
 
   const handleBookingClick = () => {
     setIsLoading(true);
@@ -72,8 +64,8 @@ const BookingModal = ({
     const bookingDetails = {
       guest_id: selectedGuestId,
       room_id: room?.id,
-      check_in_date: checkInDate,
-      check_out_date: checkOutDate,
+      check_in_date: checkInDate.toISOString().split("T")[0],
+      check_out_date: checkOutDate.toISOString().split("T")[0],
       email: guestEmail,
       phone_number: guestPhone,
       payment_status: paymentStatus,
@@ -88,54 +80,38 @@ const BookingModal = ({
       },
       body: JSON.stringify(bookingDetails),
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to book room");
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Booking successful:", data);
-
-        // Update the room status locally
-        setRoomStatus("occupied");
-
-        // Also update the room status on the server if necessary
-        return fetch(`http://localhost:8000/api/rooms/${room?.id}`, {
-          method: "PATCH", // Use PATCH to update only one field
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({ status: "occupied" }),
-        });
-      })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to update room status");
-        return response.json();
-      })
+      .then((response) => response.json())
       .then(() => {
-        console.log("Room status updated to occupied");
         handleBooking(bookingDetails);
-        fetchRooms(); // Fetch updated room list
+        fetchRooms();
         handleClose();
-
-        setSelectedGuestId("");
-        setGuestPhone("");
-        setCheckInDate("");
-        setCheckOutDate("");
-        setTotalAmount(0);
+        resetForm();
       })
-      .catch((error) => setError(error.message))
+      .catch(() => setError("Booking failed"))
       .finally(() => setIsLoading(false));
+  };
+
+  const resetForm = () => {
+    setSelectedGuestId("");
+    setGuestEmail("");
+    setGuestPhone("");
+    setCheckInDate(null);
+    setCheckOutDate(null);
+    setTotalAmount(0);
   };
 
   return (
     <Modal show={show} onHide={handleClose}>
-      <Modal.Header style={{ justifyContent: "space-between" }}>
-      <Modal.Title>
-  {t("BookRoom")}: {room?.room_number} {room?.type && `(${t(room.type)})`}
-</Modal.Title>
-
-
+ 
+      <Modal.Header
+        style={{
+          justifyContent: "space-between",
+        }}
+      >
+        <Modal.Title>
+          {t("BookRoom")}: {room?.room_number || "Room"}
+          {room?.type && `(${t(room.type)})`}
+        </Modal.Title>
         <button
           type="button"
           className="btn-close"
@@ -147,6 +123,7 @@ const BookingModal = ({
 
       <Modal.Body>
         <Form>
+          {/* Select Guest */}
           <Form.Group>
             <Form.Label>{t("guestname")}</Form.Label>
             <Form.Control
@@ -163,6 +140,7 @@ const BookingModal = ({
             </Form.Control>
           </Form.Group>
 
+          {/* Guest Details */}
           {selectedGuestId && (
             <div>
               <p>
@@ -174,22 +152,26 @@ const BookingModal = ({
             </div>
           )}
 
-          <Form.Group>
-            <Form.Label>{t("check-in-date")}</Form.Label>
-            <Form.Control
-              type="date"
-              value={checkInDate}
-              onChange={(e) => setCheckInDate(e.target.value)}
+          {/* Booking Dates */}
+          <Form.Group className="mb-3">
+            <Form.Label>{t("chick-in-date")}</Form.Label>
+            <BookingCalendar
+              roomId={room?.id}
+              onDateChange={setCheckInDate}
+              setSelectedDate={setCheckInDate}
             />
           </Form.Group>
+
           <Form.Group>
-            <Form.Label>{t("check-out-date")}</Form.Label>
-            <Form.Control
-              type="date"
-              value={checkOutDate}
-              onChange={(e) => setCheckOutDate(e.target.value)}
+            <Form.Label>{t("chick-out-date")}</Form.Label>
+            <BookingCalendar
+              roomId={room?.id}
+              selectedDate={checkOutDate}
+              setSelectedDate={setCheckOutDate}
             />
           </Form.Group>
+
+          {/* Payment Status */}
           <Form.Group>
             <Form.Label>{t("PaymentStatus")}</Form.Label>
             <Form.Control
@@ -201,27 +183,28 @@ const BookingModal = ({
               <option value="paid">{t("paid")}</option>
             </Form.Control>
           </Form.Group>
-        </Form>
 
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </Modal.Body>
-      <Modal.Footer>
-        {totalAmount > 0 && (
-          <p>
-            <strong>{t("TotalAmount")}:</strong> ${totalAmount.toFixed(2)}
+          {/* Total Amount */}
+          <div className="flex flex-col  pt-2">
+
+          <p className="pb-2">
+            <strong>{t("TotalAmount")}:</strong> {totalAmount} JOD
           </p>
-        )}
-        <Button variant="secondary" onClick={handleClose}>
-          {t("close")}
-        </Button>
-        <Button
-          variant="primary"
-          onClick={handleBookingClick}
-          disabled={isLoading}
-        >
-          {isLoading ? t("Booking") : t("BookNow")}
-        </Button>
-      </Modal.Footer>
+
+          {/* Error Message */}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
+          {/* Booking Button */}
+          <Button
+            variant="primary"
+            onClick={handleBookingClick}
+            disabled={isLoading}
+          >
+            {isLoading ? t("Loading") : t("Book Now")}
+          </Button>
+          </div>
+        </Form>
+      </Modal.Body>
     </Modal>
   );
 };

@@ -20,22 +20,22 @@ class BookingController extends Controller
     }
 
     public function store(Request $request)
-{
-    try {
-        $booking = Booking::create($request->all());
-        return response()->json(['message' => 'Booking successful', 'booking' => $booking]);
-    } catch (\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 500);
-    }
-}
-
-
-    public function show($id)
     {
-        $booking = Booking::with('guest', 'room')->findOrFail($id);
-        return response()->json($booking);
+        try {
+            $booking = Booking::create($request->all());
+            return response()->json(['message' => 'Booking successful', 'booking' => $booking]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
+    public function show($roomId)
+    {
+        $bookings = Booking::where('room_id', $roomId)->get(['check_in_date', 'check_out_date']);
+        return response()->json([
+            'bookings' => $bookings
+        ]);
+    }
     public function update(Request $request, $id)
     {
         $booking = Booking::findOrFail($id);
@@ -67,10 +67,12 @@ class BookingController extends Controller
 
         $today    = date('Y-m-d');
         $bookings = Booking::whereDate('check_in_date', $today)->get();
+
         if ($bookings->isEmpty()) {
+
             return response()->json([
                 'message' => 'No bookings found for today',
-                'data'    => [],
+                'data'    => [$today],
             ], 200);
         }
         return response()->json($bookings);

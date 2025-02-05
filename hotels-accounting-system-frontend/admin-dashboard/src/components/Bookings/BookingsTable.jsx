@@ -33,7 +33,8 @@ function BookingsTable() {
         const filtered = bookings.filter((booking) => {
             const guestName = `${booking.guest.first_name} ${booking.guest.last_name}`.toLowerCase();
             const roomNumber = booking.room.room_number.toLowerCase();
-            return guestName.includes(term) || roomNumber.includes(term);
+            const bookingid = booking.id.toString().toLowerCase();
+            return guestName.includes(term) || roomNumber.includes(term) || bookingid.includes(term);
         });
         setFilteredBookings(filtered);
     };
