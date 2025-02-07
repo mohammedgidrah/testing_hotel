@@ -102,7 +102,6 @@ const BookingModal = ({
 
   return (
     <Modal show={show} onHide={handleClose}>
- 
       <Modal.Header
         style={{
           justifyContent: "space-between",
@@ -153,7 +152,7 @@ const BookingModal = ({
           )}
 
           {/* Booking Dates */}
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-1 flex flex-col  pt-1">
             <Form.Label>{t("chick-in-date")}</Form.Label>
             <BookingCalendar
               roomId={room?.id}
@@ -162,7 +161,7 @@ const BookingModal = ({
             />
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-2 flex flex-col  pt-1">
             <Form.Label>{t("chick-out-date")}</Form.Label>
             <BookingCalendar
               roomId={room?.id}
@@ -186,22 +185,21 @@ const BookingModal = ({
 
           {/* Total Amount */}
           <div className="flex flex-col  pt-2">
+            <p className="pb-2">
+              <strong>{t("TotalAmount")}:</strong> {totalAmount} JOD
+            </p>
 
-          <p className="pb-2">
-            <strong>{t("TotalAmount")}:</strong> {totalAmount} JOD
-          </p>
+            {/* Error Message */}
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
-          {/* Error Message */}
-          {error && <p style={{ color: "red" }}>{error}</p>}
-
-          {/* Booking Button */}
-          <Button
-            variant="primary"
-            onClick={handleBookingClick}
-            disabled={isLoading}
-          >
-            {isLoading ? t("Loading") : t("Book Now")}
-          </Button>
+            {/* Booking Button */}
+            <Button
+              variant="primary"
+              onClick={handleBookingClick}
+              disabled={isLoading}
+            >
+              {isLoading ? t("Loading") : t("Book Now")}
+            </Button>
           </div>
         </Form>
       </Modal.Body>
