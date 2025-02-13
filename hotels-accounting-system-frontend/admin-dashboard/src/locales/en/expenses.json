@@ -18,9 +18,9 @@
     "Are you sure you want to delete this expense?": "Are you sure you want to delete this expense?",
     "delete": "Delete",
     "SelectCategory": "Select a category",
-    "Utilities": "Utilities",
-    "Maintenance": "Maintenance",
-    "Supplies": "Supplies",
+    "utilities": "Utilities",
+    "maintenance": "Maintenance",
+    "supplies": "Supplies",
     "other": "Other",
     "UpdateExpense": "Update Expense"
     

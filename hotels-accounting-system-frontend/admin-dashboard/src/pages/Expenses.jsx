@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import axios from "axios";
 import ExpensesTable from "../components/Expenses/ExpensesTable";
 import { useTranslation } from "react-i18next";
+
 function Expenses() {
   const { t } = useTranslation("expenses");
   const [description, setDescription] = useState("");
@@ -30,32 +31,43 @@ function Expenses() {
       });
   }, [successMessage, editExpense]);
 
+  // Custom date formatter
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0"); // Get day with leading zero if necessary
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // Get month (zero-indexed) and add leading zero
+    const year = String(d.getFullYear()).slice(-2); // Get last two digits of the year
+    return `${day}/${month}/${year}`;
+  };
+
   const handleEdit = (expense) => {
     setEditExpense(expense);
     setDescription(expense.description);
     setAmount(expense.amount);
-    setExpenseDate(expense.expense_date);
+    
+    // Set the date in the input's format (yyyy-mm-dd)
+    setExpenseDate(expense.expense_date); // Directly use the date format as it is from the API
     setCategory(expense.category);
     setShowForm(true);
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editExpense) {
       setSuccessMessage("");
       setErrorMessage("");
-
+  
       try {
         axios.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${localStorage.getItem("token")}`;
-
+  
         await axios.put(
           `http://127.0.0.1:8000/api/expenses/${editExpense.id}`,
           {
             description,
             amount,
-            expense_date: expenseDate,
+            expense_date: expenseDate, // Send the date in the correct format (yyyy-mm-dd)
             category,
           }
         );
@@ -72,12 +84,15 @@ function Expenses() {
     } else {
       setSuccessMessage("");
       setErrorMessage("");
-
+  
       try {
+        axios.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${localStorage.getItem("token")}`;
         await axios.post("http://127.0.0.1:8000/api/expenses", {
           description,
           amount,
-          expense_date: expenseDate,
+          expense_date: expenseDate, // Send the date in the correct format (yyyy-mm-dd)
           category,
         });
         setSuccessMessage("Expense added successfully!");
@@ -91,15 +106,16 @@ function Expenses() {
       }
     }
   };
+  
 
   const toggleForm = () => {
     setShowForm(!showForm);
   };
 
   return (
-    <div className="flex-1 overflow-auto relative z-10 ">
+    <div className="flex-1 overflow-auto relative z-10">
       <Header title={t("title")} />
-      <div className="flex-1  mx-auto py-4 px-4  ">
+      <div className="flex-1 mx-auto py-4 px-4">
         <div className="flex justify-end items-center mt-4 mr-4 ml-4">
           <button
             onClick={toggleForm}
@@ -134,7 +150,7 @@ function Expenses() {
 
               <div className="mb-4">
                 <label className="block text-gray-300 mb-2">
-                  {t("Amount")}{" "}
+                  {t("Amount")}
                 </label>
                 <input
                   type="number"
@@ -151,9 +167,10 @@ function Expenses() {
                 </label>
                 <input
                   type="date"
-                  value={expenseDate}
+                  value={expenseDate} // Use formatted date here
                   onChange={(e) => setExpenseDate(e.target.value)}
                   className="w-full p-2 bg-gray-700 text-white rounded"
+                  
                   required
                 />
               </div>
@@ -169,12 +186,12 @@ function Expenses() {
                   required
                 >
                   <option value="" disabled>
-                    {t("SelectCategory")}{" "}
+                    {t("SelectCategory")}
                   </option>
-                  <option value={t("Utilities")}>{t("Utilities")}</option>
-                  <option value={t("Maintenance")}>{t("Maintenance")}</option>
-                  <option value={t("Supplies")}>{t("Supplies")}</option>
-                  <option value={t("other")}>{t("other")}</option>
+                  <option value="Utilities">{t("utilities")}</option>
+                  <option value="Maintenance">{t("maintenance")}</option>
+                  <option value="Supplies">{t("supplies")}</option>
+                  <option value="Other">{t("other")}</option>
                 </select>
               </div>
 
@@ -187,10 +204,8 @@ function Expenses() {
             </form>
           </div>
         )}
-        <ExpensesTable
-          handleEdit={handleEdit}
-          successMessage={successMessage}
-        />
+
+        <ExpensesTable handleEdit={handleEdit} successMessage={successMessage} />
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ const FinancialReport = () => {
     const locale = i18n.language === "ar" ? "ar" : "en-US";
     return new Intl.DateTimeFormat(locale, {
       year: "numeric",
-      month: "long",
+      month: "numeric",
       day: "numeric",
     }).format(new Date(date));
   };

@@ -19,5 +19,9 @@
 "day": "numeric",
 "RoomsBookedbyType": "الغرف المحجوزة حسب النوع",
 "PaymentsOverview": "نظرة عامة على الدفعات",
-"ExpensesOverview": "نظرة عامة على المصاريف"
+"ExpensesOverview": "نظرة عامة على المصاريف",
+"other": "اخرى",
+"maintenance": "صيانة",
+"supplies": "مواد",
+"utilities": "استخدامات"
 }

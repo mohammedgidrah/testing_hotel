@@ -157,6 +157,7 @@ const BookingModal = ({
             <BookingCalendar
               roomId={room?.id}
               onDateChange={setCheckInDate}
+              selectedDate={checkInDate}
               setSelectedDate={setCheckInDate}
             />
           </Form.Group>

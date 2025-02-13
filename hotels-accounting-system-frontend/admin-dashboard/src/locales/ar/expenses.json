@@ -18,9 +18,9 @@
   "Are you sure you want to delete this expense?": "هل أنت متأكد من حذف هذه المصاريف؟",
   "delete": "حذف",
   "SelectCategory": "اختر تصنيف",
-  "Utilities": "استخدامات",
-  "Maintenance": "صيانة",
-  "Supplies": "مواد",
+  "utilities": "استخدامات",
+  "maintenance": "صيانة",
+  "supplies": "مواد",
   "other": "اخرى",
   "UpdateExpense": "تحديث المصاريف"
  }

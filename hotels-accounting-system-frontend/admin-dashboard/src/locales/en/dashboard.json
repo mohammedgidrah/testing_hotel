@@ -15,6 +15,10 @@
     "failedToLoadData": "Failed to load data",
     "RoomsBookedbyType": "Rooms Booked by Type",
     "PaymentsOverview": "Payments Overview",
-    "ExpensesOverview": "Expenses Overview"
+    "ExpensesOverview": "Expenses Overview",
+    "other": "Other",
+    "maintenance": "Maintenance",
+    "supplies": "Supplies",
+    "utilities": "Utilities"
   }
   

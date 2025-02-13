@@ -180,7 +180,7 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
                   {new Date(expense.expense_date).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {expense.category}
+                  {t(expense.category)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   {getUserName(expense.created_by)}

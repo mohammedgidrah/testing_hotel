@@ -71,20 +71,23 @@ export default function Reception() {
     setIsModalOpen(false);
     setSelectedRoom(null);
   };
-  const handleRoomStatusChange = async (roomId, newStatus) => {
-    try {
-      await axios.put(
-        `http://127.0.0.1:8000/api/rooms/${roomId}`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-      fetchRooms();
-    } catch (error) {
-      console.error("Failed to update room status:", error);
-    }
-  };
+  // the function does not exist
+  // ????????????????????????????????????????
+  // const handleRoomStatusChange = async (roomId, newStatus) => {
+  //   try {
+  //     await axios.put(
+  //       `http://127.0.0.1:8000/api/rooms/${roomId}`,
+  //       { status: newStatus },
+  //       {
+  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //       }
+  //     );
+  //     fetchRooms();
+  //   } catch (error) {
+  //     console.error("Failed to update room status:", error);
+  //   }
+  // };
+  // ????????????????????????????????????????????????????
   const handleBooking = () => {
     if (selectedRoom) {
       openModal(selectedRoom);
@@ -94,7 +97,7 @@ export default function Reception() {
   return (
     <div className="flex-1 overflow-auto relative z-10">
       <Header title={t("reception")} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 p-4">
         <StatCard
           name={t("TotalRooms")}
           value={stats.total}
@@ -107,12 +110,12 @@ export default function Reception() {
           icon={User}
           color="#34d399"
         />
-        <StatCard
+        {/* <StatCard
           name={t("OccupiedRooms")}
           value={stats.occupied}
           icon={Zap}
           color="red"
-        />
+        /> */}
         <StatCard
           name={t("MaintenanceRooms")}
           value={stats.maintenance}

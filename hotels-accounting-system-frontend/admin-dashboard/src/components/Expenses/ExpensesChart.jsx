@@ -28,7 +28,7 @@ const calculateExpensesByCategory = (expenses) => {
 const COLORS = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
 
 function ExpensePieChart({ expenses = [] }) {
-    const { t } = useTranslation("dashboard");
+    const { t, i18n } = useTranslation("dashboard");
     const chartData = calculateExpensesByCategory(expenses);
 
     return (
@@ -44,7 +44,8 @@ function ExpensePieChart({ expenses = [] }) {
                 <ResponsiveContainer width={"100%"} height={"100%"}>
                     <PieChart>
                         <Pie
-                            data={chartData}
+                        style={ i18n.language === "ar" ? {  direction: "ltr"  } : {  } }
+                        data={chartData}
                             dataKey="value"
                             nameKey="name"
                             cx="50%"
@@ -66,7 +67,9 @@ function ExpensePieChart({ expenses = [] }) {
                                 marginTop: "20px",
                                 fontSize: "14px",
                                 color: "#E5E7EB",
+                                direction: i18n.language === "ar" ? "ltr" : "ltr",
                             }}
+                            formatter={(value) => t(value)} // Using translation for each legend item
                         />
                     </PieChart>
                 </ResponsiveContainer>

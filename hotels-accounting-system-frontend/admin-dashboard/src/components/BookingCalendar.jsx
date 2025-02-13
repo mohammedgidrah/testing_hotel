@@ -65,6 +65,23 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showCalendar]);
 
+  const formatDate = (date) => {
+    return date ? date.toISOString().split("T")[0] : ""; // Formats as 'YYYY-MM-DD'
+  };
+
+  // Force the date to be set to midnight UTC
+  const normalizeToUTC = (date) => {
+    const utcDate = new Date(date);
+    utcDate.setUTCHours(0, 0, 0, 0); // Set the time to midnight UTC
+    return utcDate;
+  };
+
+  const handleDateChange = (date) => {
+    const normalizedDate = normalizeToUTC(date);
+    setSelectedDate(normalizedDate);
+    setShowCalendar(false);
+  };
+
   return (
     <div
       style={{
@@ -90,6 +107,17 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
         <FaCalendarAlt />
       </button>
 
+      {/* Selected Date Display */}
+      <div style={{ marginTop: "5px" }}>
+        {selectedDate ? (
+          <span>
+            Selected Date: {formatDate(selectedDate)} {/* Display selected date */}
+          </span>
+        ) : (
+          <span>No date selected</span>
+        )}
+      </div>
+
       {/* Calendar Popup */}
       {showCalendar && (
         <div
@@ -112,10 +140,7 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
           ) : (
             <DatePicker
               selected={selectedDate}
-              onChange={(date) => {
-                setSelectedDate(date);
-                setShowCalendar(false);
-              }}
+              onChange={handleDateChange}
               minDate={new Date()}
               filterDate={(date) => !isDateBooked(date)}
               dateFormat="yyyy-MM-dd"

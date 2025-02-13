@@ -9,7 +9,7 @@ function StatCard({ name, value, color, icon: Icon ,onButtonClick, buttonLabel})
             <div className='px-4  flex flex-col max-h-60'>
                 <div>
 
-                <span className='flex items-center text-sm font-medium text-gray-400 h-10'>
+                <span className='flex items-center text-sm font-medium   h-10 '>
                     <Icon
                         className="mr-2"
                         size={20}
