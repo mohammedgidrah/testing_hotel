@@ -71,23 +71,6 @@ export default function Reception() {
     setIsModalOpen(false);
     setSelectedRoom(null);
   };
-  // the function does not exist
-  // ????????????????????????????????????????
-  // const handleRoomStatusChange = async (roomId, newStatus) => {
-  //   try {
-  //     await axios.put(
-  //       `http://127.0.0.1:8000/api/rooms/${roomId}`,
-  //       { status: newStatus },
-  //       {
-  //         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  //       }
-  //     );
-  //     fetchRooms();
-  //   } catch (error) {
-  //     console.error("Failed to update room status:", error);
-  //   }
-  // };
-  // ????????????????????????????????????????????????????
   const handleBooking = () => {
     if (selectedRoom) {
       openModal(selectedRoom);
@@ -110,12 +93,6 @@ export default function Reception() {
           icon={User}
           color="#34d399"
         />
-        {/* <StatCard
-          name={t("OccupiedRooms")}
-          value={stats.occupied}
-          icon={Zap}
-          color="red"
-        /> */}
         <StatCard
           name={t("MaintenanceRooms")}
           value={stats.maintenance}

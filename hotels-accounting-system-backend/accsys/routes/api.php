@@ -53,7 +53,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/expenses', [ExpenseController::class, 'index']); // Add this line for GET requests
     Route::post('/expenses', [ExpenseController::class, 'store']); // Existing POST route
     Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
-    Route::apiResource('payments', PaymentController::class); // View Payments
+    Route::apiResource('payments', PaymentController::class);
     Route::apiResource('users', UserController::class);
     Route::prefix('bookingsQuery')->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);

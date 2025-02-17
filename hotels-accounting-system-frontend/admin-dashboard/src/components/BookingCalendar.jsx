@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
 
-const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
+const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => {
   const [bookedDates, setBookedDates] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -65,21 +65,34 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showCalendar]);
 
+  // Format the date using local time values
   const formatDate = (date) => {
-    return date ? date.toISOString().split("T")[0] : ""; // Formats as 'YYYY-MM-DD'
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
-  // Force the date to be set to midnight UTC
-  const normalizeToUTC = (date) => {
-    const utcDate = new Date(date);
-    utcDate.setUTCHours(0, 0, 0, 0); // Set the time to midnight UTC
-    return utcDate;
+  // Parse the date manually if it's a string, so it's interpreted in local time
+  const normalizeDate = (date) => {
+    let d;
+    if (typeof date === "string") {
+      const [year, month, day] = date.split("-").map(Number);
+      d = new Date(year, month - 1, day); // Create date in local timezone
+    } else {
+      d = new Date(date);
+    }
+    d.setHours(0, 0, 0, 0);
+    return d;
   };
 
   const handleDateChange = (date) => {
-    const normalizedDate = normalizeToUTC(date);
-    setSelectedDate(normalizedDate);
-    setShowCalendar(false);
+    const normalizedDate = normalizeDate(date);
+    setSelectedDate(normalizedDate); // Update the selected date
+    setTimeout(() => {
+      setShowCalendar(false); // Close the calendar after state update
+    }, 0);
   };
 
   return (
@@ -110,9 +123,7 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
       {/* Selected Date Display */}
       <div style={{ marginTop: "5px" }}>
         {selectedDate ? (
-          <span>
-            Selected Date: {formatDate(selectedDate)} {/* Display selected date */}
-          </span>
+          <span>Selected Date: {formatDate(selectedDate)}</span>
         ) : (
           <span>No date selected</span>
         )}
@@ -141,7 +152,7 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate }) => {
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
-              minDate={new Date()}
+              minDate={minDate || new Date()} // Use passed minDate or default to today
               filterDate={(date) => !isDateBooked(date)}
               dateFormat="yyyy-MM-dd"
               inline
