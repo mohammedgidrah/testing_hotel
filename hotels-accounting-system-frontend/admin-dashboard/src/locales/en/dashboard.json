@@ -19,6 +19,13 @@
     "other": "Other",
     "maintenance": "Maintenance",
     "supplies": "Supplies",
-    "utilities": "Utilities"
-  }
+    "utilities": "Utilities",
+    "credit_card": "Credit Card",
+    "cash": "Cash",
+    "suite 4 bed": "Suite 4 Bed",
+    "suite 5 bed": "Suite 5 Bed",
+    "single": "Single",
+    "double": "Double",
+    "triple": "Triple"
+   }
   

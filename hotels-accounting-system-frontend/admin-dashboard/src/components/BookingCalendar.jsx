@@ -103,6 +103,9 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
         border: "1px solid #dee2e6",
         borderRadius: "0.375rem",
         padding: ".375rem .75rem",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}
     >
       {/* Calendar Icon */}
@@ -123,7 +126,7 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
       {/* Selected Date Display */}
       <div style={{ marginTop: "5px" }}>
         {selectedDate ? (
-          <span>Selected Date: {formatDate(selectedDate)}</span>
+          <span>{formatDate(selectedDate)}</span>
         ) : (
           <span>No date selected</span>
         )}

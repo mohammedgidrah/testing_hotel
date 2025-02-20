@@ -23,5 +23,12 @@
 "other": "اخرى",
 "maintenance": "صيانة",
 "supplies": "مواد",
-"utilities": "استخدامات"
+"utilities": "استخدامات",
+"credit_card": "بطاقة ائتمان",
+"cash": "نقدي",
+"single": "غرفة واحدة",
+"double": "غرفة مزدوجة",
+"triple": "غرفة ثلاثية",
+"suite 4 bed": "جناح بأربعة أسرة",
+"suite 5 bed": "جناح بخمسة اسرة"
 }

@@ -291,11 +291,19 @@ function Dashboard() {
                   color="#34d399"
                 />
               </motion.div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <BookingChart bookings={bookings} />
-                <PaymentChart payments={payments} />
-                <ExpensePieChart expenses={expenses} />
-              </div>
+              <div className="grid grid-cols-1 gap-8">
+    {/* BookingChart displayed on its own row */}
+    <div>
+        <BookingChart bookings={bookings} />
+    </div>
+
+    {/* Group PaymentChart and ExpensePieChart together in a row */}
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <PaymentChart payments={payments} />
+        <ExpensePieChart expenses={expenses} />
+    </div>
+</div>
+
             </>
           )}
         </div>
