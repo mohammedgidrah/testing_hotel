@@ -19,5 +19,7 @@
     "timeCreated": "Time Created",
     "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     "printReport": "Print Report",
-    "downloadReport": "Download Report"
+    "downloadReport": "Download Report",
+    "cash": "Cash",
+    "credit_card": "Credit Card"
 }

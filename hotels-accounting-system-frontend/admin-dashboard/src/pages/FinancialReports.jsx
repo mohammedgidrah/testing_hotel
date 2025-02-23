@@ -232,9 +232,11 @@ const FinancialReport = () => {
         {error && <p className="text-red-500 mt-4">{error}</p>}
         {report && (
           <div
-            ref={reportRef}
+            
             className="bg-white p-6 rounded-lg shadow-lg mt-4 text-gray-900"
           >
+          <div id="toPrint" ref={reportRef}>
+  
             <h3 className="text-xl font-semibold mb-4 text-center">
               {t("monthlySummary", {
                 month: new Date(startDate).toLocaleString(i18n.language, {
@@ -306,23 +308,24 @@ const FinancialReport = () => {
                 {new Date().toLocaleTimeString(i18n.language)}
               </p>
             </div>
-
+                </div>
             <div className="flex space-x-4 mt-4" style={{ gap: "1rem" }}>
               <button
                 onClick={handlePrint}
                 className=" no-print flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition duration-200   "
-                 >
+                >
                 {t("printReport")}
               </button>
               <button
                 onClick={handleDownload}
                 className=" no-print flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition duration-200   "
- 
-              >
+                
+                >
                 {t("downloadReport")}
               </button>
             </div>
-          </div>
+              </div>
+          
         )}
       </div>
     </div>
