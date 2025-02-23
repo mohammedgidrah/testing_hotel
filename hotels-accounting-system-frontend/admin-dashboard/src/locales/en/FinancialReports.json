@@ -18,5 +18,6 @@
     "dateCreated": "Date Created",
     "timeCreated": "Time Created",
     "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-    "printReport": "Print Report"
+    "printReport": "Print Report",
+    "downloadReport": "Download Report"
 }

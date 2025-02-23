@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import { useTranslation } from "react-i18next";
+import jsPDF from "jspdf";
 
 const FinancialReport = () => {
   const { t, i18n } = useTranslation("financialReports");
@@ -11,6 +12,135 @@ const FinancialReport = () => {
   const [error, setError] = useState("");
   const [dateMessage, setDateMessage] = useState(""); // State for the date message
   const reportRef = useRef(); // Reference for printing
+
+  const printStyles = `
+  @media print {
+    .no-print {
+      color: white !important;
+    }
+  }
+`;
+
+
+  const handleDownload = () => {
+    if (report) {
+      const doc = new jsPDF();
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.text("Monthly Financial Summary for February 2025", 50, 20);
+
+      doc.setFontSize(12);
+      doc.text("Report Period:", 10, 30);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${formatDate(startDate)} - ${formatDate(endDate)}`, 40, 30);
+
+      // fix it to make it get the current date in the pdf
+
+      let y = 40; // Starting position
+
+      // Income Section
+      doc.setFont("helvetica", "bold");
+      doc.text("Income", 10, y);
+      y += 6;
+      doc.text("Total Income:", 10, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(`$${report.total_income || 0.0}`, 50, y);
+      y += 6;
+
+      // Initialize the variables to 0.0 by default
+      let cash = 0.0;
+      let credit_card = 0.0;
+
+      // Loop through the income_breakdown array and find the correct payment method totals
+      report.income_breakdown.forEach((item) => {
+        if (item.payment_method === "cash") {
+          cash = parseFloat(item.total) || 0.0; // Ensure it's a number
+        } else if (item.payment_method === "credit_card") {
+          credit_card = parseFloat(item.total) || 0.0; // Ensure it's a number
+        }
+      });
+
+      // Now, display the values in the PDF document
+      doc.text("cash:", 20, y);
+      doc.text(`$${cash.toFixed(2)}`, 50, y);
+      y += 6;
+
+      doc.text("credit_card:", 20, y);
+      doc.text(`$${credit_card.toFixed(2)}`, 50, y);
+      y += 6;
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Total Bookings:", 10, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${report.total_bookings || 0}`, 50, y);
+      y += 10;
+
+      // Expenses Section
+      doc.setFont("helvetica", "bold");
+      doc.text("Expenses", 10, y);
+      y += 6;
+      doc.text("Total Expenses:", 10, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(`$${report.total_expenses || 0.0}`, 50, y);
+      y += 6;
+
+      // Initialize the variables to 0.0 by default
+      let utilities = 0.0;
+      let supplies = 0.0;
+
+      // Check if report.utilities and report.supplies exist and get their values
+      report.expense_breakdown.forEach((item) => {
+        if (item.category === "utilities") {
+          utilities = parseFloat(item.total) || 0.0; // Ensure it's a number
+        } else if (item.category === "supplies") {
+          supplies = parseFloat(item.total) || 0.0; // Ensure it's a number
+        }
+      });
+
+      // Now, display the values in the PDF document
+      doc.text("utilities:", 20, y);
+      doc.text(`$${utilities.toFixed(2)}`, 50, y);
+      y += 6;
+
+      doc.text("supplies:", 20, y);
+      doc.text(`$${supplies.toFixed(2)}`, 50, y);
+      y += 10;
+
+      // Profit Analysis
+      doc.setFont("helvetica", "bold");
+      doc.text("Profit Analysis", 10, y);
+      y += 6;
+      doc.text("Net Profit:", 10, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(`$${(report.net_profit || 0.0).toFixed(2)}`, 50, y);
+      y += 6;
+
+      doc.setFont("helvetica", "bold");
+      doc.text("Profit Margin:", 10, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${(report.profit_margin || 0).toFixed(2)}%`, 50, y);
+      y += 10;
+
+      // Date Time
+      doc.setFont("helvetica", "bold");
+      doc.text("Date Time", 10, y);
+      y += 6;
+      doc.text("Date Created:", 10, y);
+      doc.setFont("helvetica", "normal");
+      const currentDate = new Date();
+      doc.text(`${formatDate(currentDate)}`, 50, y);
+      y += 6;
+
+      doc.text("Time Created:", 10, y);
+      doc.setFont("helvetica", "normal");
+
+      doc.text(`${currentDate.toLocaleTimeString()}`, 50, y);
+
+      // Save PDF
+      doc.save("Financial_Report.pdf");
+    }
+  };
 
   // Helper function to format dates
   const formatDate = (date) => {
@@ -66,15 +196,15 @@ const FinancialReport = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
+<style>{printStyles}</style>
+
       <Header title={t("FinancialReports")} />
       <div className="container mx-auto p-6">
         <h2 className="text-2xl font-semibold text-gray-100 mb-4">
           {t("GenerateReport")}
         </h2>
         <div className="mb-4">
-          <label className="block text-gray-300 mb-2">
-            {t("StartDate")}
-          </label>
+          <label className="block text-gray-300 mb-2">{t("StartDate")}</label>
           <input
             type="date"
             value={startDate}
@@ -83,9 +213,7 @@ const FinancialReport = () => {
           />
         </div>
         <div className="mb-4">
-          <label className="block text-gray-300 mb-2">
-            {t("EndDate")}
-          </label>
+          <label className="block text-gray-300 mb-2">{t("EndDate")}</label>
           <input
             type="date"
             value={endDate}
@@ -179,12 +307,21 @@ const FinancialReport = () => {
               </p>
             </div>
 
-            <button
-              onClick={handlePrint}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg mt-4 transition duration-200"
-            >
-              {t("printReport")}
-            </button>
+            <div className="flex space-x-4 mt-4" style={{ gap: "1rem" }}>
+              <button
+                onClick={handlePrint}
+                className=" no-print flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition duration-200   "
+                 >
+                {t("printReport")}
+              </button>
+              <button
+                onClick={handleDownload}
+                className=" no-print flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition duration-200   "
+ 
+              >
+                {t("downloadReport")}
+              </button>
+            </div>
           </div>
         )}
       </div>
