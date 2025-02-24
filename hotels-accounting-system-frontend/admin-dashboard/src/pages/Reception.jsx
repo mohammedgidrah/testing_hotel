@@ -110,8 +110,7 @@ export default function Reception() {
           <StatCard
             key={room.id}
             value={t("room") + " " + room.room_number + " ( " + t(room.type)+" )"}
-            // value={t("room"+ " " +room.room_number +" ( " + t(room.type)+" )")}
-            icon={
+             icon={
               room.status === "available"
                 ? User
                 : room.status === "occupied"

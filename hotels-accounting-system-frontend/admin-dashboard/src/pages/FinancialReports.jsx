@@ -3,6 +3,7 @@ import axios from "axios";
 import Header from "../components/Header";
 import { useTranslation } from "react-i18next";
 import jsPDF from "jspdf";
+import { useAuth } from "../Context/AuthContext";
 
 const FinancialReport = () => {
   const { t, i18n } = useTranslation("financialReports");
@@ -12,15 +13,7 @@ const FinancialReport = () => {
   const [error, setError] = useState("");
   const [dateMessage, setDateMessage] = useState(""); // State for the date message
   const reportRef = useRef(); // Reference for printing
-
-  const printStyles = `
-  @media print {
-    .no-print {
-      color: white !important;
-    }
-  }
-`;
-
+  const { name } = useAuth();
 
   const handleDownload = () => {
     if (report) {
@@ -196,8 +189,6 @@ const FinancialReport = () => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-<style>{printStyles}</style>
-
       <Header title={t("FinancialReports")} />
       <div className="container mx-auto p-6">
         <h2 className="text-2xl font-semibold text-gray-100 mb-4">
@@ -231,101 +222,99 @@ const FinancialReport = () => {
         </button>
         {error && <p className="text-red-500 mt-4">{error}</p>}
         {report && (
-          <div
-            
-            className="bg-white p-6 rounded-lg shadow-lg mt-4 text-gray-900"
-          >
-          <div id="toPrint" ref={reportRef}>
-  
-            <h3 className="text-xl font-semibold mb-4 text-center">
-              {t("monthlySummary", {
-                month: new Date(startDate).toLocaleString(i18n.language, {
-                  month: "long",
-                }), // Get the full month name
-                year: new Date(startDate).getFullYear(), // Get the year
-              })}
-            </h3>
+          <div className="bg-white p-6 rounded-lg shadow-lg mt-4 text-gray-900">
+            <div id="toPrint" ref={reportRef}>
+              <h3 className="text-xl font-semibold mb-4 text-center">
+                {t("monthlySummary", {
+                  month: new Date(startDate).toLocaleString(i18n.language, {
+                    month: "long",
+                  }), // Get the full month name
+                  year: new Date(startDate).getFullYear(), // Get the year
+                })}
+              </h3>
 
-            <p className="text-center">
-              <strong>{t("reportPeriod")}:</strong> {formatDate(startDate)} -{" "}
-              {formatDate(endDate)}
-            </p>
+              <p className="text-center">
+                <strong>{t("reportPeriod")}:</strong> {formatDate(startDate)} -{" "}
+                {formatDate(endDate)}
+              </p>
 
-            <div className="my-4">
-              <h4 className="text-lg font-semibold">{t("income")}</h4>
-              <p>
-                <strong>{t("totalIncome")}:</strong> $
-                {parseFloat(report.total_income || 0).toFixed(2)}
-              </p>
-              <ul className="pl-4">
-                {report.income_breakdown.map((item) => (
-                  <li key={item.payment_method}>
-                    {item.payment_method}: $
-                    {parseFloat(item.total || 0).toFixed(2)}
-                  </li>
-                ))}
-              </ul>
-              <p>
-                <strong>{t("totalBookings")}:</strong>{" "}
-                {report.total_bookings || 0}
-              </p>
+              <div className="my-4">
+                <h4 className="text-lg font-semibold">{t("income")}</h4>
+                <p>
+                  <strong>{t("totalIncome")}:</strong> $
+                  {parseFloat(report.total_income || 0).toFixed(2)}
+                </p>
+                <ul className="pl-4">
+                  {report.income_breakdown.map((item) => (
+                    <li key={item.payment_method}>
+                      {t(item.payment_method)}: $
+                      {parseFloat(item.total || 0).toFixed(2)}
+                    </li>
+                  ))}
+                </ul>
+                <p>
+                  <strong>{t("totalBookings")}:</strong>{" "}
+                  {report.total_bookings || 0}
+                </p>
+              </div>
+
+              <div className="my-4">
+                <h4 className="text-lg font-semibold">{t("expenses")}</h4>
+                <p>
+                  <strong>{t("totalExpenses")}:</strong> $
+                  {parseFloat(report.total_expenses || 0).toFixed(2)}
+                </p>
+                <ul className="pl-4">
+                  {report.expense_breakdown.map((item) => (
+                    <li key={item.category}>
+                      {t(item?.category)}: $
+                      {parseFloat(item?.total || 0).toFixed(2)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="my-4">
+                <h4 className="text-lg font-semibold">{t("profitAnalysis")}</h4>
+                <p>
+                  <strong>{t("netProfit")}:</strong> $
+                  {parseFloat(report.net_profit || 0).toFixed(2)}
+                </p>
+                <p>
+                  <strong>{t("profitMargin")}:</strong>{" "}
+                  {parseFloat(report.profit_margin || 0).toFixed(2)}%
+                </p>
+              </div>
+
+              <div className="my-4">
+                <h4 className="text-lg font-semibold">{t("dateTime")}</h4>
+                <p>
+                  <strong>{t("dateCreated")}:</strong> {formatDate(new Date())}
+                </p>
+                <p>
+                  <strong>{t("timeCreated")}:</strong>{" "}
+                  {new Date().toLocaleTimeString(i18n.language)}
+                </p>
+                <p>
+                  <strong>{t("createdBy")}:</strong> {name}
+                </p>
+              </div>
             </div>
-
-            <div className="my-4">
-              <h4 className="text-lg font-semibold">{t("expenses")}</h4>
-              <p>
-                <strong>{t("totalExpenses")}:</strong> $
-                {parseFloat(report.total_expenses || 0).toFixed(2)}
-              </p>
-              <ul className="pl-4">
-                {report.expense_breakdown.map((item) => (
-                  <li key={item.category}>
-                    {item.category}: ${parseFloat(item.total || 0).toFixed(2)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="my-4">
-              <h4 className="text-lg font-semibold">{t("profitAnalysis")}</h4>
-              <p>
-                <strong>{t("netProfit")}:</strong> $
-                {parseFloat(report.net_profit || 0).toFixed(2)}
-              </p>
-              <p>
-                <strong>{t("profitMargin")}:</strong>{" "}
-                {parseFloat(report.profit_margin || 0).toFixed(2)}%
-              </p>
-            </div>
-
-            <div className="my-4">
-              <h4 className="text-lg font-semibold">{t("dateTime")}</h4>
-              <p>
-                <strong>{t("dateCreated")}:</strong> {formatDate(new Date())}
-              </p>
-              <p>
-                <strong>{t("timeCreated")}:</strong>{" "}
-                {new Date().toLocaleTimeString(i18n.language)}
-              </p>
-            </div>
-                </div>
             <div className="flex space-x-4 mt-4" style={{ gap: "1rem" }}>
               <button
                 onClick={handlePrint}
                 className=" no-print flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-lg transition duration-200   "
-                >
+              >
                 {t("printReport")}
               </button>
               <button
                 onClick={handleDownload}
                 className=" no-print flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg transition duration-200   "
-                
-                >
+              >
                 {t("downloadReport")}
               </button>
             </div>
-              </div>
-          
+          </div>
         )}
       </div>
     </div>

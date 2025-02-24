@@ -21,5 +21,10 @@
     "printReport": "Print Report",
     "downloadReport": "Download Report",
     "cash": "Cash",
-    "credit_card": "Credit Card"
+    "credit_card": "Credit Card",
+    "createdBy": "Created By",
+    "utilities": "Utilities",
+    "maintenance": "Maintenance",
+    "supplies": "Supplies",
+    "other": "Other"
 }

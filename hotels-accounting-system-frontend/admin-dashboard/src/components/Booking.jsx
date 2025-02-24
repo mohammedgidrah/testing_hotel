@@ -290,7 +290,7 @@ const handleBookingClick = async () => {
                 <Spinner animation="border" size="sm" /> {t("Loading")}
               </>
             ) : (
-              t("Book Now")
+              t("BookNow")
             )}
           </Button>
         </Form>

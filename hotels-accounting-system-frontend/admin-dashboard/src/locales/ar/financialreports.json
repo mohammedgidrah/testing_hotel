@@ -21,5 +21,10 @@
     "printReport": "طباعة التقرير",
     "downloadReport": "تحميل التقرير",
     "cash": "كاش",
-    "credit_card": "بطاقة إئتمان"
+    "credit_card": "بطاقة إئتمان",
+    "createdBy": "إنشئ بواسطة",
+    "utilities": "استخدامات",
+    "maintenance": "صيانة",
+    "supplies": "مواد",
+    "other": "آخرى"
 }
