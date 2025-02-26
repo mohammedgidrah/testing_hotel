@@ -13,7 +13,7 @@ const FinancialReport = () => {
   const [error, setError] = useState("");
   const [dateMessage, setDateMessage] = useState(""); // State for the date message
   const reportRef = useRef(); // Reference for printing
-  const { name } = useAuth();
+  const { name, role } = useAuth();
 
   const handleDownload = () => {
     if (report) {
@@ -296,7 +296,8 @@ const FinancialReport = () => {
                   {new Date().toLocaleTimeString(i18n.language)}
                 </p>
                 <p>
-                  <strong>{t("createdBy")}:</strong> {name}
+                  <strong>{t("createdBy")}:</strong> {role}{" "}
+                  <span>({name})</span>
                 </p>
               </div>
             </div>

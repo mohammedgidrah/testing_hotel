@@ -11,7 +11,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 const calculatePaymentsByMethod = (payments) => {
-   const paymentSummary = {};
+  const paymentSummary = {};
 
   payments.forEach((payment) => {
     const method = payment.payment_method;
@@ -33,7 +33,7 @@ const calculatePaymentsByMethod = (payments) => {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 function PaymentPieChart({ payments = [] }) {
-  const { t ,i18n} = useTranslation("dashboard");
+  const { t, i18n } = useTranslation("dashboard");
 
   const chartData = calculatePaymentsByMethod(payments);
 
@@ -83,7 +83,7 @@ function PaymentPieChart({ payments = [] }) {
                 direction: i18n.language === "ar" ? "ltr" : "ltr",
               }}
               formatter={(value) => t(value)} // Using translation for each legend item
-              />
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>

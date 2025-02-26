@@ -27,7 +27,8 @@
   "Triple": "Triple",
   "Suite4Bed": "Suite 4 Bed",
   "Suite5Bed": "Suite 5 Bed",
-  
+  "AddGuest": "Add Guest",
+  "cancel": "Cancel",
   "CheckOutAfterCheckIn": "Check-out must be after check-in",
   "FillAllFields": "Please fill all required fields",
   "BookingFailed": "Booking failed, please try again",
@@ -37,5 +38,7 @@
   "Cash": "Cash",
   "CreditCard": "Credit Card",
   "Loading": "Processing...",
-  "Room": "Room"
+  "Room": "Room",
+  "AmountwithoutTax": "Amount without tax",
+  "Tax": "Tax"
 }
