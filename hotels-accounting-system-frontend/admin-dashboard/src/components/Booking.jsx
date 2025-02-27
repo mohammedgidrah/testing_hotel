@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Button, Modal, Form, Spinner } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import BookingCalendar from "./BookingCalendar";
+import axios from "axios";
 
 // New Component: Modal to add a new guest if they do not exist
-const AddGuestModal = ({ show, onClose, onAddGuest, initialName ,handleClose }) => {
+const AddGuestModal = ({
+  show,
+  onClose,
+  onAddGuest,
+  initialName,
+  handleClose,
+}) => {
   const { t, i18n } = useTranslation("reception");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -12,7 +19,7 @@ const AddGuestModal = ({ show, onClose, onAddGuest, initialName ,handleClose }) 
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
   const [address, setAddress] = useState("");
-  
+
   handleClose = () => {
     onClose();
     resetForm();
@@ -23,7 +30,7 @@ const AddGuestModal = ({ show, onClose, onAddGuest, initialName ,handleClose }) 
     setEmail("");
     setPhone("");
     setAddress("");
-  }
+  };
 
   // If a name was already entered, split it to prefill the fields.
   useEffect(() => {
@@ -67,8 +74,20 @@ const AddGuestModal = ({ show, onClose, onAddGuest, initialName ,handleClose }) 
   };
 
   return (
-    <Modal show={show} onHide={() => { handleClose(); resetForm(); }}>
-      <Modal.Header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <Modal
+      show={show}
+      onHide={() => {
+        handleClose();
+        resetForm();
+      }}
+    >
+      <Modal.Header
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Modal.Title>{t("AddGuest")}</Modal.Title>
         <Button
           variant="close"
@@ -78,7 +97,6 @@ const AddGuestModal = ({ show, onClose, onAddGuest, initialName ,handleClose }) 
           }}
           aria-label="Close"
           style={i18n.language === "ar" ? { margin: 0 } : {}}
-
         />
       </Modal.Header>
 
@@ -140,7 +158,6 @@ const AddGuestModal = ({ show, onClose, onAddGuest, initialName ,handleClose }) 
   );
 };
 
-
 const BookingModal = ({
   show,
   handleClose,
@@ -159,19 +176,37 @@ const BookingModal = ({
   const [paymentStatus, setPaymentStatus] = useState("Pending");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [totalAmount, setTotalAmount] = useState(0);
-  const [taxAmount, setTaxAmount] = useState(0);  // New state for tax
+  const [taxAmount, setTaxAmount] = useState(0);
+  const [selectedServices, setSelectedServices] = useState([]);
+  const [servicesAmount, setServicesAmount] = useState(0); // Fix this to a number, not an array
+  const [services, setServices] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showAddGuestModal, setShowAddGuestModal] = useState(false);
 
-  const TAX_RATE = 0.07;  // 10%
+  useEffect(() => {
+    if (show) {
+      fetchServices();
+    }
+  }, [show]);
+
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/services", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      // console.log(response.data);
+      setServices(response.data);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
+  const TAX_RATE = 0.1; // 10%
 
   // Update guest details when a valid guest is selected.
   useEffect(() => {
     if (selectedGuestId) {
-      const selectedGuest = guests.find(
-        (guest) => guest.id == selectedGuestId
-      );
+      const selectedGuest = guests.find((guest) => guest.id == selectedGuestId);
       if (selectedGuest) {
         setGuestEmail(selectedGuest.email || "");
         setGuestPhone(selectedGuest.phone_number || "");
@@ -189,23 +224,41 @@ const BookingModal = ({
         setError(t("CheckOutAfterCheckIn"));
         setTotalAmount(0);
         setTaxAmount(0);
+        setServicesAmount(0);
         return;
       }
       const diffDays = Math.ceil(
         (checkOutDate - checkInDate) / (1000 * 3600 * 24)
       );
- 
-      // Calculate tax amount (10% of total amount)
-      const calculatedTotalAmount = room?.price_per_night * diffDays;
+      const baseAmount = room?.price_per_night * diffDays;
+
+      // Calculate services amount
+      const servicesAmountCalculated = selectedServices.reduce(
+        (acc, service) => acc + (Number(service.price) || 0),
+        0
+      );
+      setServicesAmount(servicesAmountCalculated);
+
+      // Calculate total amount
+      const calculatedTotalAmount = baseAmount + servicesAmountCalculated;
       setTotalAmount(calculatedTotalAmount);
-      
+
       // Calculate tax based on the total amount
       const calculatedTax = calculatedTotalAmount * TAX_RATE;
       setTaxAmount(calculatedTax);
 
       setError("");
     }
-  }, [checkInDate, checkOutDate, room, t]);
+  }, [checkInDate, checkOutDate, room, selectedServices, t]);
+
+  const handleServiceChange = (service) => {
+    setSelectedServices((prevServices) => {
+      if (prevServices.includes(service)) {
+        return prevServices.filter((s) => s !== service);
+      }
+      return [...prevServices, service];
+    });
+  };
 
   const handleBookingClick = async () => {
     setIsLoading(true);
@@ -234,7 +287,6 @@ const BookingModal = ({
           checkOutDate.getDate()
         )
       );
-const finalAmount = totalAmount + taxAmount;
       const bookingDetails = {
         guest_id: selectedGuestId,
         room_id: room?.id,
@@ -244,6 +296,11 @@ const finalAmount = totalAmount + taxAmount;
         phone_number: guestPhone,
         payment_status: paymentStatus,
         total_amount: totalAmount,
+        services: selectedServices.map((service) => ({
+          id: service.id,
+          name: service.name,
+          price: service.price,
+        })),
       };
 
       // Create the booking
@@ -317,6 +374,7 @@ const finalAmount = totalAmount + taxAmount;
     setTotalAmount(0);
     setPaymentStatus("Pending");
     setPaymentMethod("Cash");
+    setSelectedServices([]);
   };
 
   // Called as the user types in the guest name field.
@@ -346,14 +404,6 @@ const finalAmount = totalAmount + taxAmount;
     ) {
       setShowAddGuestModal(true);
     }
-  };
-  
-
-  // When a new guest is successfully added, update the selection.
-  const handleNewGuestAdded = (newGuest) => {
-    setSelectedGuestId(newGuest.id);
-    setSelectedGuestName(`${newGuest.first_name} ${newGuest.last_name}`);
-    // Optionally, you could also update the guest list if desired.
   };
 
   return (
@@ -439,6 +489,21 @@ const finalAmount = totalAmount + taxAmount;
                 disabled={isLoading}
               />
             </Form.Group>
+            {/* Additional Services */}
+
+            <Form.Group className="mb-3">
+              <Form.Label>{t("AdditionalServices")}</Form.Label>
+              {services.map((service) => (
+                <Form.Check
+                  key={service.id}
+                  type="checkbox"
+                  label={`${service.name} (${service.price} JOD)`}
+                  checked={selectedServices.includes(service)}
+                  onChange={() => handleServiceChange(service)}
+                  disabled={isLoading}
+                />
+              ))}
+            </Form.Group>
 
             {/* Payment Section */}
             <Form.Group className="mb-3">
@@ -470,15 +535,25 @@ const finalAmount = totalAmount + taxAmount;
 
             {/* Total Amount */}
             <div>
-              <strong>{t("AmountwithoutTax")}</strong>: {totalAmount.toFixed(2)}{" "}JOD
-               
+              <strong>{t("AmountwithoutTax")}</strong>:
+              {!isNaN(totalAmount) ? totalAmount.toFixed(2) : "0.00"} JOD
             </div>
             <div>
-              <strong>{t("Tax")}</strong>: {taxAmount.toFixed(2)}  JOD
+              <strong>{t("service")}</strong>:
+              {!isNaN(servicesAmount) ? servicesAmount.toFixed(2) : "0.00"} JOD
+            </div>
+            <div>
+              <strong>{t("Tax")}</strong>:
+              {!isNaN(taxAmount) ? taxAmount.toFixed(2) : "0.00"} JOD
             </div>
             <div>
               <strong>{t("TotalAmount")}</strong>:{" "}
-              {(totalAmount + taxAmount).toFixed(2)} JOD
+              {!isNaN(totalAmount) &&
+              !isNaN(taxAmount) &&
+              !isNaN(servicesAmount)
+                ? (totalAmount + taxAmount).toFixed(2)
+                : "0.00"}{" "}
+              JOD
             </div>
 
             {/* Error Message */}
@@ -504,18 +579,16 @@ const finalAmount = totalAmount + taxAmount;
       </Modal>
       {/* Render the AddGuestModal */}
       <AddGuestModal
-    show={showAddGuestModal}
-    onClose={() => setShowAddGuestModal(false)}
-    onAddGuest={(newGuest) => {
-      setSelectedGuestId(newGuest.id);
-      setSelectedGuestName(`${newGuest.first_name} ${newGuest.last_name}`);
-      setGuestEmail(newGuest.email);
-      setGuestPhone(newGuest.phone_number);
-    }}
-    initialName={selectedGuestName}
-  />
-
-
+        show={showAddGuestModal}
+        onClose={() => setShowAddGuestModal(false)}
+        onAddGuest={(newGuest) => {
+          setSelectedGuestId(newGuest.id);
+          setSelectedGuestName(`${newGuest.first_name} ${newGuest.last_name}`);
+          setGuestEmail(newGuest.email);
+          setGuestPhone(newGuest.phone_number);
+        }}
+        initialName={selectedGuestName}
+      />
     </>
   );
 };

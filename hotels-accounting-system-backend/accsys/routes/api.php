@@ -23,7 +23,9 @@ use App\Http\Controllers\{
     ExpenseController,
     PaymentController,
     FinancialReportController,
-    LoginController
+    LoginController,
+    ServiceController
+
 };
 
 Route::get('/guests/{id}', function ($id) {
@@ -55,10 +57,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::put('/expenses/{id}', [ExpenseController::class, 'update']);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('users', UserController::class);
+    Route::apiResource('services', ServiceController::class);
     Route::prefix('bookingsQuery')->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);
     });
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
+
 
 
     // Route for generating financial report
