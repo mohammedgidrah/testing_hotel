@@ -84,7 +84,7 @@ function Bookings() {
           >
             <StatCard name={t('Rooms')} value={totalRooms} icon={School} color="#34d399" />
             <StatCard name={t('title')} value={totalBookings} icon={Users} color="#34d399" />
-            <StatCard name={t('BookingsToday')} value={totalBookingsToday} icon={Book} color="#34d399" />
+            <StatCard name={t('BookingsToday')} value={totalBookingsToday?totalBookingsToday : 0} icon={Book} color="#34d399" />
             <StatCard name={t('TotalGuests')} value={totalGuests} icon={User} color="#34d399" />
           </motion.div>
           <BookingsTable/>

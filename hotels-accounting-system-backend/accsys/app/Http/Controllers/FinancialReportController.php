@@ -72,6 +72,8 @@ class FinancialReportController extends Controller
         $netProfit = $totalIncome - $totalExpenses;
         $profitMargin = $totalIncome > 0 ? ($netProfit / $totalIncome) * 100 : 0;
 
+        $totalBookings = DB::table('bookings')->whereBetween('check_in_date', [$startDate, $endDate])->count();
+
         // Create a response to return the financial report
         $report = [
             'total_income' => $totalIncome,
@@ -80,6 +82,7 @@ class FinancialReportController extends Controller
             'expense_breakdown' => $expenseBreakdown,
             'net_profit' => $netProfit,
             'profit_margin' => $profitMargin,
+            'total_bookings'=> $totalBookings
         ];
 
         return response()->json($report);
