@@ -1,0 +1,22 @@
+{
+    "Services": "خدمات",
+    "ServicesList": "قائمة الخدمات",
+    "AddService": "إضافة خدمة جديدة",
+    "Search": "ابحث",
+    "ServiceName": "اسم الخدمة",
+    "ServiceID": "رقم الخدمة",
+    "Price": "السعر",
+    "Actions": "الاجراءات",
+    "HideForm": "اخفاء النموذج",
+    "UpdateService": "تحديث الخدمة",
+    "AllFields": "جميع الحقول ",
+     "ServiceStatus": "حالة الخدمة",
+    "NoServicesFound": "لا يوجد خدمات",
+    "delete": "حذف",
+    "DeleteService": "حذف الخدمة",
+    "cancel": "الغاء",
+    "DeleteConfirmation": "هل أنت متأكد أنك تريد حذف هذه الخدمة؟",
+    "Lunch": "غداء",
+    "Dinner": "عشاء",
+    "Breakfast": "فطور"
+}

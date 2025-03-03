@@ -7,15 +7,23 @@ import {
   Home,
   Users,
   Menu,
+  ConciergeBell,
+  Package  ,
 } from "lucide-react";
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useTranslation } from "react-i18next";
-import { ConciergeBell } from "lucide-react";
-
+ 
 const SIDEBAR_ITEMS = [
+  {
+    name: "dashboard",
+    icon: BarChart2,
+    color: "#6366f1",
+    path: "/",
+    roles: ["admin", "manager"],
+  },
   {
     name: "reception",
     icon: ConciergeBell,
@@ -24,11 +32,11 @@ const SIDEBAR_ITEMS = [
     roles: ["admin", "manager", "accountant"],
   },
   {
-    name: "dashboard",
-    icon: BarChart2,
-    color: "#6366f1",
-    path: "/",
-    roles: ["admin", "manager"],
+    name:"service",
+    icon: Package ,
+    color: "#F59E0B", 
+    path: "/Services",
+    roles: ["admin"],
   },
   {
     name: "bookings",

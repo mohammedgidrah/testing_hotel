@@ -1,0 +1,19 @@
+{
+    "Services": "Services",
+    "ServicesList": "Services List",
+    "AddService": "Add Service",
+    "Search": "Search",
+    "ServiceName": "Service Name",
+    "ServiceID": "Service ID",
+    "Price": "Price",
+    "Actions": "Actions",
+    "HideForm": "Hide Form",
+    "UpdateService": "Update Service",
+    "AllFields": "All Fields",
+    "ServiceStatus": "Service Status",
+    "NoServicesFound": "No Services Found",
+    "delete": "Delete",
+    "DeleteService": "Delete Service",
+    "cancel": "Cancel",
+    "DeleteConfirmation": "Are you sure you want to delete this service?"
+}

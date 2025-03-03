@@ -15,6 +15,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Unauthorized from "./components/Unauthorized";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Reception from "./pages/Reception";
+import Services from "./pages/services";
 
 
 
@@ -48,6 +49,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={['admin', 'manager']}>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/Services"
+          element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <Services />
             </PrivateRoute>
           }
         />

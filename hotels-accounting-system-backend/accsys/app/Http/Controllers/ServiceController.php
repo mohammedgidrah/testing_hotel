@@ -12,16 +12,9 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::all(); // Fetch all services
-        return response()->json($services);
-    }
+        $services = Service::all();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json($services);
     }
 
     /**
@@ -29,31 +22,49 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+        ]);
+
+        $service = Service::create($request->all());
+
+        return response()->json($service, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+    // public function show(string $id)
+    // {
+    //     $service = Service::find($id);
+    //
+    //     if (!$service) {
+    //         return response()->json(['error' => 'Service not found'], 404);
+    //     }
+    //
+    //     return response()->json($service, 200);
+    // }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+        ]);
+
+        // Find service by id or fail
+        $service = Service::findOrFail($id);
+
+        // Update the service
+        $service->update($request->all());
+
+        return response()->json($service);
     }
 
     /**
@@ -61,6 +72,12 @@ class ServiceController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Find service by id or fail
+        $service = Service::findOrFail($id);
+
+        // Delete the service
+        $service->delete();
+
+        return response()->json(['message' => 'Service deleted successfully']);
     }
 }

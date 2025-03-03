@@ -10,6 +10,7 @@ import enRooms from "../../locales/en/Rooms.json";
 import enusers from "../../locales/en/users.json";
 import ensidebar from "../../locales/en/sidebar.json";
 import enreception from "../../locales/en/reception.json";
+import enservices from "../../locales/en/services.json";
 import arDashboard from "../../locales/ar/dashboard.json";
 import arBookings from "../../locales/ar/bookings.json";
 import arExpenses from "../../locales/ar/Expenses.json";
@@ -20,6 +21,8 @@ import arRooms from "../../locales/ar/Rooms.json";
 import arusers from "../../locales/ar/users.json";
 import arsidebar from "../../locales/ar/sidebar.json";
 import arreception from "../../locales/ar/reception.json";
+import arservices from "../../locales/ar/services.json";
+import Services from "../../pages/services";
 
 
 
@@ -35,7 +38,8 @@ i18n.use(initReactI18next).init({
       rooms: enRooms,
       users: enusers,
       sidebar: ensidebar,
-      reception: enreception
+      reception: enreception,
+      services:enservices
     },
     ar: {
       dashboard: arDashboard,
@@ -47,7 +51,8 @@ i18n.use(initReactI18next).init({
       rooms: arRooms,
       users: arusers,
       sidebar: arsidebar,
-      reception: arreception
+      reception: arreception,
+      services:arservices
     },
   },
   lng: "en", // Default language
