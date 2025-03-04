@@ -25,7 +25,12 @@
      "DeleteBooking": "Delete Booking",
      "Delete": "Delete",
      "AreYouSure": "Are you sure you want to delete this booking?",
-     "Cancel": "Cancel"
+     "Cancel": "Cancel",
+     "ShowDetails": "Show Details",
+     "BookingDetails": "Booking Details",
+     "close": "Close",
+     "Services": "Services",
+     "NoServicesSelected": "No services selected"
   
   }
   

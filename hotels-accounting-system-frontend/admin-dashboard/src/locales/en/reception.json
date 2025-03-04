@@ -40,5 +40,9 @@
   "Loading": "Processing...",
   "Room": "Room",
   "AmountwithoutTax": "Amount without tax",
-  "Tax": "Tax"
+  "Tax": "Tax",
+  "AdditionalServices": "Additional Services",
+  "Subtotal:": "Subtotal:",
+  "Total:": "Total:",
+  "Services": "Services"
 }

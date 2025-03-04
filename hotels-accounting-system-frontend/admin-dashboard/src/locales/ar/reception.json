@@ -42,5 +42,10 @@
   "CreditCard": "بطاقة ائتمان",
   "Loading": "جاري المعالجة...",
   "AmountwithoutTax": "المبلغ بدون ضريبة",
-  "Tax": "ضريبة"
+  "Tax": "ضريبة",
+  "AdditionalServices": "خدمات اضافية",
+  "Total": "المجموع",
+  "Services": "خدمات",
+  "Subtotal": "المجموع الفرعي"
+
 }

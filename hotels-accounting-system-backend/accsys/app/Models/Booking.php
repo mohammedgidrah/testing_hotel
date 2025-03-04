@@ -34,5 +34,10 @@ class Booking extends Model
     {
         return $this->hasOne(Payment::class);
     }
+    // app/Models/Booking.php
+public function services()
+{
+    return $this->belongsToMany(Service::class, 'booking_service');
+}
 }
 

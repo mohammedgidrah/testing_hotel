@@ -24,5 +24,10 @@
   "DeleteBooking": "حذف الحجز",
   "Delete": "حذف",
   "AreYouSure": "هل أنت متأكد من حذف هذا الحجز؟",
-  "Cancel": "إلغاء"
+  "Cancel": "إلغاء",
+  "ShowDetails": "عرض التفاصيل",
+  "BookingDetails": "تفاصيل الحجز",
+  "close": "إغلاق",
+  "Services": "خدمات",
+  "NoServicesSelected": "لم يتم اختيار خدمات"
 }

@@ -1,170 +1,153 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
+import PropTypes from "prop-types";
+import "./bookingcalender.css";
 
 const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => {
-  const [bookedDates, setBookedDates] = useState([]);
+  const [bookedRanges, setBookedRanges] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
   const calendarRef = useRef(null);
 
-  useEffect(() => {
-    const fetchBookedDates = async () => {
-      if (!roomId) return;
-      setIsLoading(true);
-      setError("");
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/bookings/${roomId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+  // Memoized date formatting function
+  const formatDate = useCallback((date) => {
+    if (!date) return "";
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }, []);
 
-        if (!response.data || !Array.isArray(response.data.bookings)) {
-          throw new Error("Invalid API response format");
+  // Date normalization with proper timezone handling
+  const normalizeDate = useCallback((date) => {
+    // If date is string (from API), parse as local date
+    if (typeof date === 'string') {
+      const [year, month, day] = date.split('-').map(Number);
+      return new Date(year, month - 1, day); // Local time
+    }
+    
+    // If Date object, reset time components
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  // Fetch booked dates with error handling
+  const fetchBookedDates = useCallback(async () => {
+    if (!roomId) return;
+    
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/api/bookings/${roomId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
+      );
 
-        const bookedRanges = response.data.bookings.map((booking) => ({
-          start: new Date(booking.check_in_date),
-          end: new Date(booking.check_out_date),
-        }));
-        setBookedDates(bookedRanges);
-      } catch (err) {
-        console.error("Error fetching booked dates:", err);
-        setError("Failed to load booked dates.");
-      } finally {
-        setIsLoading(false);
+      if (!response?.data?.bookings) {
+        throw new Error("Invalid response structure");
       }
-    };
-    fetchBookedDates();
-  }, [roomId]);
 
-  const isDateBooked = (date) => {
-    return bookedDates.some(({ start, end }) => date >= start && date <= end);
-  };
+      const ranges = response.data.bookings.map(booking => ({
+        start: normalizeDate(booking.check_in_date),
+        end: normalizeDate(booking.check_out_date)
+      }));
+      
+      setBookedRanges(ranges);
+    } catch (err) {
+      console.error("Booking dates fetch error:", err);
+      setError(err.response?.data?.message || "Failed to load booking data");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [roomId, normalizeDate]);
 
-  const handleClickOutside = (event) => {
+  // Click outside handler
+  const handleClickOutside = useCallback((event) => {
     if (calendarRef.current && !calendarRef.current.contains(event.target)) {
       setShowCalendar(false);
     }
-  };
+  }, []);
+
+  // Date selection handler
+  const handleDateChange = useCallback((date) => {
+    const normalizedDate = normalizeDate(date);
+    setSelectedDate(normalizedDate);
+    setShowCalendar(false);
+  }, [setSelectedDate, normalizeDate]);
+
+  // Date validation
+  const isDateBooked = useCallback((date) => {
+    const testDate = normalizeDate(date);
+    return bookedRanges.some(({ start, end }) => 
+      testDate >= start && testDate <= end
+    );
+  }, [bookedRanges, normalizeDate]);
+
+  useEffect(() => {
+    fetchBookedDates();
+  }, [fetchBookedDates]);
 
   useEffect(() => {
     if (showCalendar) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showCalendar]);
-
-  // Format the date using local time values
-  const formatDate = (date) => {
-    if (!date) return "";
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  // Parse the date manually if it's a string, so it's interpreted in local time
-  const normalizeDate = (date) => {
-    let d;
-    if (typeof date === "string") {
-      const [year, month, day] = date.split("-").map(Number);
-      d = new Date(year, month - 1, day); // Create date in local timezone
-    } else {
-      d = new Date(date);
-    }
-    d.setHours(0, 0, 0, 0);
-    return d;
-  };
-
-  const handleDateChange = (date) => {
-    const normalizedDate = normalizeDate(date);
-    setSelectedDate(normalizedDate); // Update the selected date
-    setTimeout(() => {
-      setShowCalendar(false); // Close the calendar after state update
-    }, 0);
-  };
+  }, [showCalendar, handleClickOutside]);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        display: "inline-block",
-        border: "1px solid #dee2e6",
-        borderRadius: "0.375rem",
-        padding: ".375rem .75rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      {/* Calendar Icon */}
-      <button
-        type="button"
-        onClick={() => setShowCalendar((prev) => !prev)}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "1.2rem",
-          marginRight: "10px",
-        }}
-      >
-        <FaCalendarAlt />
-      </button>
-
-      {/* Selected Date Display */}
-      <div style={{ marginTop: "5px" }}>
-        {selectedDate ? (
-          <span>{formatDate(selectedDate)}</span>
-        ) : (
-          <span>No date selected</span>
-        )}
-      </div>
-
-      {/* Calendar Popup */}
-      {showCalendar && (
-        <div
-          ref={calendarRef}
-          style={{
-            position: "absolute",
-            zIndex: 1000,
-            background: "#fff",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-            padding: "10px",
-            borderRadius: "10px",
-          }}
-        >
+    <div className="booking-calendar-container" ref={calendarRef}>
+    <div className="date-picker-trigger" onClick={() => setShowCalendar(!showCalendar)}>
+      <FaCalendarAlt className="calendar-icon" />
+      <span className="selected-date">
+        {selectedDate ? formatDate(selectedDate) : "Select date"}
+      </span>
+    </div>
+  
+    {showCalendar && (
+      <div className="calendar-popup">
           {isLoading ? (
-            <p className="loading-message">Loading booked dates...</p>
+            <div className="loading-overlay">
+              <p>Loading availability...</p>
+            </div>
           ) : error ? (
-            <p className="error-message" style={{ color: "red" }}>
-              {error}
-            </p>
+            <div className="error-message">
+              {error} <button onClick={fetchBookedDates}>Retry</button>
+            </div>
           ) : (
             <DatePicker
               selected={selectedDate}
               onChange={handleDateChange}
-              minDate={minDate || new Date()} // Use passed minDate or default to today
-              filterDate={(date) => !isDateBooked(date)}
-              dateFormat="yyyy-MM-dd"
+              minDate={minDate || normalizeDate(new Date())}
+              filterDate={date => !isDateBooked(date)}
               inline
+              popperPlacement="bottom-start"
+              dateFormat="yyyy-MM-dd"
+              dayClassName={date => 
+                isDateBooked(date) ? "booked-day" : undefined
+              }
             />
           )}
         </div>
       )}
     </div>
   );
+};
+
+BookingCalendar.propTypes = {
+  roomId: PropTypes.string.isRequired,
+  selectedDate: PropTypes.instanceOf(Date),
+  setSelectedDate: PropTypes.func.isRequired,
+  minDate: PropTypes.instanceOf(Date)
 };
 
 export default BookingCalendar;

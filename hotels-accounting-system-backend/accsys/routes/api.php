@@ -62,6 +62,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);
     });
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
+ Route::get('/bookings/{id}/services', [BookingController::class, 'getServices']);
 
 
 
