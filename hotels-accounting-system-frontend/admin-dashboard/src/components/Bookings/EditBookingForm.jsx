@@ -12,7 +12,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
     check_in_date: "",
     check_out_date: "",
     payment_status: "",
-    total_amount: "",
+    // total_amount: "",
     
   });
   const [errors, setErrors] = useState({});
@@ -26,7 +26,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
         check_in_date: booking.check_in_date.split("T")[0],
         check_out_date: booking.check_out_date.split("T")[0],
         payment_status: booking.payment_status,
-        total_amount: booking.total_amount,
+        // total_amount: booking.total_amount,
       });
     }
   }, [booking]);
@@ -41,7 +41,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.guest_id) newErrors.guest_id = t("GuestRequired");
+    // if (!formData.guest_id) newErrors.guest_id = t("GuestRequired");
     if (!formData.room_id) newErrors.room_id = t("RoomRequired");
     if (!formData.check_in_date) newErrors.check_in_date = t("CheckInRequired");
     if (!formData.check_out_date) newErrors.check_out_date = t("CheckOutRequired");
@@ -49,9 +49,9 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
       newErrors.check_out_date = t("CheckOutAfterCheckIn");
     }
     if (!formData.payment_status) newErrors.payment_status = t("StatusRequired");
-    if (!formData.total_amount || isNaN(formData.total_amount)) {
-      newErrors.total_amount = t("TotalAmountInvalid");
-    }
+    // if (!formData.total_amount || isNaN(formData.total_amount)) {
+    //   newErrors.total_amount = t("TotalAmountInvalid");
+    // }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -162,15 +162,14 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
             >
               {/* <option value="">{t("SelectStatus")}</option> */}
               <option value="paid">{t("paid")}</option>
-              <option value="unpaid">{t("unpaid")}</option>
-              <option value="partial">{t("partial")}</option>
-            </Form.Select>
+              <option value="pending">{t("pending")}</option>
+             </Form.Select>
             <Form.Control.Feedback type="invalid">
               {errors.payment_status}
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
+          {/* <Form.Group className="mb-3">
             <Form.Label>{t("TotalAmount")}</Form.Label>
             <Form.Control
               type="number"
@@ -183,7 +182,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
             <Form.Control.Feedback type="invalid">
               {errors.total_amount}
             </Form.Control.Feedback>
-          </Form.Group>
+          </Form.Group> */}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onHide} disabled={isSubmitting}>

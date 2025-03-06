@@ -2,11 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\Payment;
 use App\Models\Room;
-use DB;
 use App\Models\Service;
+use DB;
 use Illuminate\Http\Request;
+use Validator;
 
 class BookingController extends Controller
 {
@@ -22,67 +22,67 @@ class BookingController extends Controller
     }
 
 // app/Http/Controllers/BookingController.php
-public function store(Request $request)
-{
-    // Validate the request data
-    $request->validate([
-        'guest_id'       => 'required|exists:guests,id',
-        'room_id'        => 'required|exists:rooms,id',
-        'check_in_date'  => 'required|date',
-        'check_out_date' => 'required|date|after:check_in_date',
-        'email'          => 'nullable|email',
-        'phone_number'   => 'nullable|string',
-        'payment_status' => 'required|in:pending,paid',
-        'total_amount'   => 'required|numeric',
-        'services'       => 'nullable|array',     // Array of service IDs
-        'services.*'     => 'exists:services,id', // Validate each service ID
-    ]);
-
-    // Start a database transaction
-    DB::beginTransaction();
-
-    try {
-        // Create the booking
-        $booking = Booking::create([
-            'guest_id'       => $request->guest_id,
-            'room_id'        => $request->room_id,
-            'check_in_date'  => $request->check_in_date,
-            'check_out_date' => $request->check_out_date,
-            'email'          => $request->email,
-            'phone_number'   => $request->phone_number,
-            'payment_status' => $request->payment_status,
-            'total_amount'   => $request->total_amount,
+    public function store(Request $request)
+    {
+        // Validate the request data
+        $request->validate([
+            'guest_id'       => 'required|exists:guests,id',
+            'room_id'        => 'required|exists:rooms,id',
+            'check_in_date'  => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
+            'email'          => 'nullable|email',
+            'phone_number'   => 'nullable|string',
+            'payment_status' => 'required|in:pending,paid',
+            'total_amount'   => 'required|numeric',
+            'services'       => 'nullable|array',     // Array of service IDs
+            'services.*'     => 'exists:services,id', // Validate each service ID
         ]);
 
-        // Attach selected services to the booking with their prices
-        if ($request->has('services') && !empty($request->services)) {
-            $servicesWithPrices = [];
-            foreach ($request->services as $serviceId) {
-                // Fetch the service to get its price
-                $service = Service::findOrFail($serviceId);
-                $servicesWithPrices[$serviceId] = ['price' => $service->price];
+        // Start a database transaction
+        DB::beginTransaction();
+
+        try {
+            // Create the booking
+            $booking = Booking::create([
+                'guest_id'       => $request->guest_id,
+                'room_id'        => $request->room_id,
+                'check_in_date'  => $request->check_in_date,
+                'check_out_date' => $request->check_out_date,
+                'email'          => $request->email,
+                'phone_number'   => $request->phone_number,
+                'payment_status' => $request->payment_status,
+                'total_amount'   => $request->total_amount,
+            ]);
+
+            // Attach selected services to the booking with their prices
+            if ($request->has('services') && ! empty($request->services)) {
+                $servicesWithPrices = [];
+                foreach ($request->services as $serviceId) {
+                    // Fetch the service to get its price
+                    $service                        = Service::findOrFail($serviceId);
+                    $servicesWithPrices[$serviceId] = ['price' => $service->price];
+                }
+
+                // Attach services with their prices to the booking
+                $booking->services()->attach($servicesWithPrices);
             }
 
-            // Attach services with their prices to the booking
-            $booking->services()->attach($servicesWithPrices);
+            // Commit the transaction
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Booking created successfully',
+                'booking' => $booking,
+            ], 201);
+        } catch (\Exception $e) {
+            // Rollback the transaction on error
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to create booking',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        // Commit the transaction
-        DB::commit();
-
-        return response()->json([
-            'message' => 'Booking created successfully',
-            'booking' => $booking,
-        ], 201);
-    } catch (\Exception $e) {
-        // Rollback the transaction on error
-        DB::rollBack();
-        return response()->json([
-            'message' => 'Failed to create booking',
-            'error'   => $e->getMessage(),
-        ], 500);
     }
-}
 
     public function show($roomId)
     {
@@ -93,18 +93,17 @@ public function store(Request $request)
     }
     public function update(Request $request, $id)
     {
+        // Validate request data
+        $validator = Validator::make($request->all(), [
+            'room_id'        => 'required|exists:rooms,id', // Ensure room_id is provided
+            'booking_id'     => 'required|exists:bookings,id',
+            'payment_status' => 'required|in:pending,paid',
+            'check_in_date'  => 'required|date',
+            'check_out_date' => 'required|date|after:check_in_date',
+        ]);
+
         $booking = Booking::findOrFail($id);
         $booking->update($request->all());
-
-        $payment = Payment::where('booking_id', $id)->first();
-        if ($payment) {
-            $payment->update([
-                'amount_paid' => $request->input('total_amount'),
-            ]);
-        }
-
-        $room = Room::findOrFail($request->room_id);
-        $room->update(['status' => 'occupied']);
         return response()->json($booking);
     }
 

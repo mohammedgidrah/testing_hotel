@@ -5,7 +5,7 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { Modal, Button } from "react-bootstrap";
 import EditBookingForm from "./EditBookingForm";
- 
+
 function BookingsTable() {
   const { t, i18n } = useTranslation("bookings");
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,32 +21,76 @@ function BookingsTable() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [bookingsRes, roomsRes, guestsRes] = await Promise.all([
+  //         axios.get("http://127.0.0.1:8000/api/rooms", {
+  //           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //         }),
+  //         axios.get("http://127.0.0.1:8000/api/guests", {
+  //           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //         }),
+  //         axios.get("http://127.0.0.1:8000/api/bookings", {
+  //           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //         })
+          
+  //       ]);
+  //        setFilteredBookings(bookingsRes.data);
+  //       setRooms(roomsRes.data);
+  //       setGuests(guestsRes.data);
+  //     } catch (err) {
+  //       setError(t("fetchError"));
+  //     }
+  //   };
+  //   fetchData();
+  // }, []); // ✅ Dependency array ensures it runs only once
+  const fetchBookings = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/bookings", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setFilteredBookings(response.data);
+      setBookings(response.data);
+    } catch (err) {
+      setError(t("fetchError"));
+    }
+  }
+  const fetchguests = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/guests", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setGuests(response.data);
+    } catch (err) {
+      setError(t("fetchError"));
+    }
+  }
+  const fetchrooms = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/rooms", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setRooms(response.data);
+    } catch (err) {
+      setError(t("fetchError"));
+    }
+  }
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [bookingsRes, roomsRes, guestsRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/api/bookings"),
-          axios.get("http://127.0.0.1:8000/api/rooms"),
-          axios.get("http://127.0.0.1:8000/api/guests")
-        ]);
-        
-        setBookings(bookingsRes.data);
-        setFilteredBookings(bookingsRes.data);
-        setRooms(roomsRes.data);
-        setGuests(guestsRes.data);
-      } catch (err) {
-        setError(t("fetchError"));
-      }
-    };
-    fetchData();
-  }, [t]);
+    fetchBookings();
+    fetchguests();
+    fetchrooms();
+    // handleUpdateBooking();
+  }, []);
+
+
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
     setSearchTerm(term);
     const filtered = bookings.filter((booking) => {
       const guestName =
-        `${booking.guest.first_name} ${booking.guest.last_name}`.toLowerCase();
+        `${booking.guests.first_name} ${booking.guests.last_name}`.toLowerCase();
       const roomNumber = booking.room.room_number.toLowerCase();
       const bookingid = booking.id.toString().toLowerCase();
       return (
@@ -94,8 +138,9 @@ function BookingsTable() {
   };
 
   const handleUpdateBooking = (updatedBooking) => {
-    setBookings(prev => prev.map(b => b.id === updatedBooking.id ? updatedBooking : b));
-    setFilteredBookings(prev => prev.map(b => b.id === updatedBooking.id ? updatedBooking : b));
+    setBookings((prevBookings) =>
+      prevBookings.map((b) => (b.id === updatedBooking.id ? updatedBooking : b))
+    );
   };
 
   return (
@@ -186,13 +231,13 @@ function BookingsTable() {
                   </button>
                 </td>
                 <td className="flex px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                <button
+                  <button
                     onClick={() => {
                       setSelectedBooking(booking);
                       setShowEditModal(true);
                     }}
                     className="text-indigo-400 hover:text-indigo-300 mr-2"
-                    >
+                  >
                     <Edit size={18} />
                   </button>
                   <button
@@ -244,7 +289,7 @@ function BookingsTable() {
         </Modal.Footer>
       </Modal>
 
-       <Modal
+      <Modal
         show={showDetailsModal}
         onHide={() => setShowDetailsModal(false)}
         style={{ direction: "ltr" }}
@@ -258,7 +303,13 @@ function BookingsTable() {
               <p>
                 <strong>{t("ID")}:</strong> {selectedBookingDetails.id}
               </p>
-              <p  style={i18n.language === "ar" ? { direction: "rtl", textAlign: "left" } : {}}>
+              <p
+                style={
+                  i18n.language === "ar"
+                    ? { direction: "rtl", textAlign: "left" }
+                    : {}
+                }
+              >
                 <strong>{t("GuestName")}:</strong>{" "}
                 {`${selectedBookingDetails.guest.first_name} ${selectedBookingDetails.guest.last_name}`}
               </p>
