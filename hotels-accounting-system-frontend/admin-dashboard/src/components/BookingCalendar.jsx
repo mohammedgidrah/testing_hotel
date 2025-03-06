@@ -24,21 +24,28 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
 
   // Date normalization with proper timezone handling
   const normalizeDate = useCallback((date) => {
+    if (!date) return null;
+    
     // If date is string (from API), parse as local date
     if (typeof date === 'string') {
       const [year, month, day] = date.split('-').map(Number);
       return new Date(year, month - 1, day); // Local time
     }
     
-    // If Date object, reset time components
+    // Create a new date object and set to local midnight
     const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
+    // Important: Use UTC methods to avoid timezone issues
+    d.setUTCHours(12, 0, 0, 0); // Set to noon UTC to avoid any timezone shifting
     return d;
   }, []);
 
   // Fetch booked dates with error handling
   const fetchBookedDates = useCallback(async () => {
-    if (!roomId) return;
+    if (!roomId) {
+      setIsLoading(false);
+      setBookedRanges([]);
+      return;
+    }
     
     setIsLoading(true);
     setError("");
@@ -59,13 +66,15 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
 
       const ranges = response.data.bookings.map(booking => ({
         start: normalizeDate(booking.check_in_date),
-        end: normalizeDate(booking.check_out_date)
+        end: normalizeDate(booking.check_out_date),
+        bookingId: booking.id
       }));
       
       setBookedRanges(ranges);
     } catch (err) {
       console.error("Booking dates fetch error:", err);
       setError(err.response?.data?.message || "Failed to load booking data");
+      setBookedRanges([]);
     } finally {
       setIsLoading(false);
     }
@@ -80,23 +89,61 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
 
   // Date selection handler
   const handleDateChange = useCallback((date) => {
-    const normalizedDate = normalizeDate(date);
-    setSelectedDate(normalizedDate);
+    // Fix for the date issue: ensure the date is correctly set with proper day
+    const selectedDay = date.getDate();
+    const selectedMonth = date.getMonth();
+    const selectedYear = date.getFullYear();
+    
+    // Create a new date object at noon to avoid timezone issues
+    const correctedDate = new Date(Date.UTC(selectedYear, selectedMonth, selectedDay, 12, 0, 0));
+    
+    setSelectedDate(correctedDate);
     setShowCalendar(false);
-  }, [setSelectedDate, normalizeDate]);
+  }, [setSelectedDate]);
 
-  // Date validation
+  // Date validation - check if a date is booked
   const isDateBooked = useCallback((date) => {
+    if (!date || bookedRanges.length === 0) return false;
+    
     const testDate = normalizeDate(date);
-    return bookedRanges.some(({ start, end }) => 
-      testDate >= start && testDate <= end
-    );
+    return bookedRanges.some(({ start, end }) => {
+      // Skip null date ranges
+      if (!start || !end) return false;
+      
+      // Compare year, month, and day for date equality instead of time
+      return (
+        testDate.getFullYear() >= start.getFullYear() && 
+        testDate.getFullYear() <= end.getFullYear() &&
+        testDate.getMonth() >= start.getMonth() && 
+        testDate.getMonth() <= end.getMonth() &&
+        testDate.getDate() >= start.getDate() && 
+        testDate.getDate() <= end.getDate()
+      );
+    });
   }, [bookedRanges, normalizeDate]);
 
-  useEffect(() => {
-    fetchBookedDates();
-  }, [fetchBookedDates]);
+  // Convert displayed date back to correct format
+  const displayDate = useCallback((date) => {
+    if (!date) return null;
+    
+    // Ensure we're showing the correct day by creating a new date object
+    const d = new Date(date);
+    // No timezone adjustments since we want to display the actual day
+    return d;
+  }, []);
 
+  // Reset state when roomId changes
+  useEffect(() => {
+    if (roomId) {
+      fetchBookedDates();
+    } else {
+      setIsLoading(false);
+      setBookedRanges([]);
+      setError("");
+    }
+  }, [roomId, fetchBookedDates]);
+
+  // Add event listener for click outside
   useEffect(() => {
     if (showCalendar) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -106,15 +153,17 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
 
   return (
     <div className="booking-calendar-container" ref={calendarRef}>
-    <div className="date-picker-trigger" onClick={() => setShowCalendar(!showCalendar)}>
-      <FaCalendarAlt className="calendar-icon" />
-      <span className="selected-date">
-        {selectedDate ? formatDate(selectedDate) : "Select date"}
-      </span>
-    </div>
-  
-    {showCalendar && (
-      <div className="calendar-popup">
+      <div className="date-picker-trigger" onClick={() => setShowCalendar(!showCalendar)}>
+        <div className="date-display">
+          <FaCalendarAlt className="calendar-icon" />
+          <span className="selected-date">
+            {selectedDate ? formatDate(displayDate(selectedDate)) : "Select date"}
+          </span>
+        </div>
+      </div>
+    
+      {showCalendar && (
+        <div className="calendar-popup">
           {isLoading ? (
             <div className="loading-overlay">
               <p>Loading availability...</p>
@@ -125,9 +174,9 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
             </div>
           ) : (
             <DatePicker
-              selected={selectedDate}
+              selected={selectedDate ? displayDate(selectedDate) : null}
               onChange={handleDateChange}
-              minDate={minDate || normalizeDate(new Date())}
+              minDate={minDate ? displayDate(minDate) : new Date()}
               filterDate={date => !isDateBooked(date)}
               inline
               popperPlacement="bottom-start"
@@ -135,6 +184,13 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
               dayClassName={date => 
                 isDateBooked(date) ? "booked-day" : undefined
               }
+              calendarClassName="custom-datepicker"
+              showMonthDropdown
+              showYearDropdown
+              dropdownMode="select"
+              // Explicitly use UTC=false to prevent date shifting
+              utcOffset={0}
+              timeZone=""
             />
           )}
         </div>
@@ -144,7 +200,10 @@ const BookingCalendar = ({ roomId, selectedDate, setSelectedDate, minDate }) => 
 };
 
 BookingCalendar.propTypes = {
-  roomId: PropTypes.string.isRequired,
+  roomId: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ]),
   selectedDate: PropTypes.instanceOf(Date),
   setSelectedDate: PropTypes.func.isRequired,
   minDate: PropTypes.instanceOf(Date)

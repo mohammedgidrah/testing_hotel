@@ -1,36 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Edit, Trash2, Search,Eye } from "lucide-react";
+import { Edit, Trash2, Search, Eye } from "lucide-react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Modal, Button } from "react-bootstrap";
-
+import EditBookingForm from "./EditBookingForm";
+ 
 function BookingsTable() {
   const { t, i18n } = useTranslation("bookings");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [rooms, setRooms] = useState([]);
+  const [guests, setGuests] = useState([]);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
-    axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${localStorage.getItem("token")}`;
-    axios
-      .get("http://127.0.0.1:8000/api/bookings")
-      .then((response) => {
-        setBookings(response.data);
-        setFilteredBookings(response.data);
-      })
-      .catch(() => {
-        setError("Failed to load bookings");
-      });
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [bookingsRes, roomsRes, guestsRes] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/api/bookings"),
+          axios.get("http://127.0.0.1:8000/api/rooms"),
+          axios.get("http://127.0.0.1:8000/api/guests")
+        ]);
+        
+        setBookings(bookingsRes.data);
+        setFilteredBookings(bookingsRes.data);
+        setRooms(roomsRes.data);
+        setGuests(guestsRes.data);
+      } catch (err) {
+        setError(t("fetchError"));
+      }
+    };
+    fetchData();
+  }, [t]);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -63,27 +72,30 @@ function BookingsTable() {
           setShowModal(false);
         })
         .catch(() => {
-          setError("Failed to delete booking");
+          setError(t("deleteError"));
         });
     }
   };
 
   const handleShowDetails = async (booking) => {
     try {
-      // Fetch services for the selected booking
       const response = await axios.get(
         `http://localhost:8000/api/bookings/${booking.id}/services`
       );
       const bookingWithServices = {
         ...booking,
-        services: response.data, // Add services to the booking object
+        services: response.data,
       };
       setSelectedBookingDetails(bookingWithServices);
       setShowDetailsModal(true);
     } catch (error) {
-      console.error("Error fetching booking services:", error);
-      setError("Failed to fetch booking services");
+      setError(t("serviceFetchError"));
     }
+  };
+
+  const handleUpdateBooking = (updatedBooking) => {
+    setBookings(prev => prev.map(b => b.id === updatedBooking.id ? updatedBooking : b));
+    setFilteredBookings(prev => prev.map(b => b.id === updatedBooking.id ? updatedBooking : b));
   };
 
   return (
@@ -174,12 +186,15 @@ function BookingsTable() {
                   </button>
                 </td>
                 <td className="flex px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <Link
-                    to={`/bookings/edit/${booking.id}`}
+                <button
+                    onClick={() => {
+                      setSelectedBooking(booking);
+                      setShowEditModal(true);
+                    }}
                     className="text-indigo-400 hover:text-indigo-300 mr-2"
-                  >
+                    >
                     <Edit size={18} />
-                  </Link>
+                  </button>
                   <button
                     onClick={() => {
                       setSelectedBookingId(booking.id);
@@ -196,6 +211,20 @@ function BookingsTable() {
         </table>
       </div>
 
+      {selectedBooking && (
+        <EditBookingForm
+          booking={selectedBooking}
+          show={showEditModal}
+          onHide={() => {
+            setShowEditModal(false);
+            setSelectedBooking(null);
+          }}
+          onUpdate={handleUpdateBooking}
+          rooms={rooms}
+        />
+      )}
+
+      {/* Delete Confirmation Modal */}
       <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -215,7 +244,7 @@ function BookingsTable() {
         </Modal.Footer>
       </Modal>
 
-      <Modal
+       <Modal
         show={showDetailsModal}
         onHide={() => setShowDetailsModal(false)}
         style={{ direction: "ltr" }}

@@ -362,6 +362,16 @@ const BookingModal = ({
                   <option key={guest.id} value={`${guest.first_name} ${guest.last_name}`} />
                 ))}
               </datalist>
+        {selectedGuestId && (
+              <div className="mb-3">
+                <p>
+                  <strong>{t("email")}:</strong> {guestEmail}
+                </p>
+                <p>
+                  <strong>{t("phone")}:</strong> {guestPhone}
+                </p>
+              </div>
+            )}
             </Form.Group>
 
             {/* Date Pickers */}
