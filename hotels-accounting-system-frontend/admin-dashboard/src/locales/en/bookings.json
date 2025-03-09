@@ -30,7 +30,12 @@
      "BookingDetails": "Booking Details",
      "close": "Close",
      "Services": "Services",
-     "NoServicesSelected": "No services selected"
+     "NoServicesSelected": "No services selected",
+     "PaymentMethod": "Payment Method",
+     "CreditCard": "Credit Card",
+     "Cash": "Cash",
+     "room": "Room",
+     "slectpaymentmethod": "Select Payment Method"
   
   }
   

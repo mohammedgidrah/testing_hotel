@@ -5,35 +5,64 @@ import { useTranslation } from "react-i18next";
 import BookingCalendar from "../BookingCalendar";
 
 function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
-  const { t } = useTranslation("bookings");
+  const { t, i18n } = useTranslation("bookings");
   const [formData, setFormData] = useState({
     guest_id: "",
     room_id: "",
     check_in_date: "",
     check_out_date: "",
     payment_status: "",
-    // total_amount: "",
-    
+    payment_method: "",
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [taxAmount, setTaxAmount] = useState(0);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await axios.get(
+          "http://127.0.0.1:8000/api/payments",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setPaymentMethods(response.data); // assuming your backend sends payment methods in the response
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
 
   useEffect(() => {
     if (booking) {
       setFormData({
         guest_id: booking.guest_id || "",
-        room_id: booking.room_id?.id || booking.room_id || "",
-        check_in_date: booking.check_in_date.split("T")[0],
-        check_out_date: booking.check_out_date.split("T")[0],
-        payment_status: booking.payment_status,
-        // total_amount: booking.total_amount,
+        room_id: booking.room_id?.id || booking.room_id || "", // Handle case where room_id is an object
+        check_in_date: booking.check_in_date
+          ? booking.check_in_date.split("T")[0]
+          : "",
+        check_out_date: booking.check_out_date
+          ? booking.check_out_date.split("T")[0]
+          : "",
+        payment_status: booking.payment_status || "",
+        payment_method: booking.payment_method || "",  // Payment method from the API response
       });
+      setTotalAmount(booking.total_amount || 0);
+      setTaxAmount(booking.tax_amount || 0);
+      console.log(formData.payment_method);
     }
   }, [booking]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: null });
     }
@@ -41,34 +70,104 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
 
   const validateForm = () => {
     const newErrors = {};
-    // if (!formData.guest_id) newErrors.guest_id = t("GuestRequired");
     if (!formData.room_id) newErrors.room_id = t("RoomRequired");
     if (!formData.check_in_date) newErrors.check_in_date = t("CheckInRequired");
-    if (!formData.check_out_date) newErrors.check_out_date = t("CheckOutRequired");
+    if (!formData.check_out_date)
+      newErrors.check_out_date = t("CheckOutRequired");
     if (new Date(formData.check_out_date) <= new Date(formData.check_in_date)) {
       newErrors.check_out_date = t("CheckOutAfterCheckIn");
     }
-    if (!formData.payment_status) newErrors.payment_status = t("StatusRequired");
-    // if (!formData.total_amount || isNaN(formData.total_amount)) {
-    //   newErrors.total_amount = t("TotalAmountInvalid");
-    // }
+    if (!formData.payment_status)
+      newErrors.payment_status = t("StatusRequired");
+    if (formData.payment_status === "paid" && !formData.payment_method) {
+      newErrors.payment_method = t("PaymentMethodRequired");
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0];
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    if (!booking || !booking.id) {
+      setErrors({ submit: t("BookingNotFound") });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
+      // Update booking details
       const response = await axios.put(
         `http://127.0.0.1:8000/api/bookings/${booking.id}`,
-        formData
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
       );
+
+      // Handle payment logic
+      if (
+        booking.payment_status === "paid" &&
+        formData.payment_status === "pending"
+      ) {
+        // If payment status is changed from "paid" to "pending", delete the payment
+        await axios.delete(`http://localhost:8000/api/payments/${booking.id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+      } else if (formData.payment_status === "paid") {
+        // If payment status is "paid"
+        if (booking.payment_status === "paid") {
+          // If it was already paid but payment method changed
+          if (booking.payment_method !== formData.payment_method) {
+            // Update payment method
+            await axios.put(
+              `http://localhost:8000/api/payments/${booking.id}`,
+              {
+                payment_method: formData.payment_method.toLowerCase(),
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+          }
+        } else {
+          // If status changed from pending to paid, create a new payment record
+          await axios.post(
+            "http://localhost:8000/api/payments",
+            {
+              booking_id: booking.id,
+              payment_method: formData.payment_method.toLowerCase(),
+              amount_paid: totalAmount + taxAmount,
+              payment_date: formatDate(new Date()),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+        }
+      }
+
       onUpdate(response.data);
       onHide();
     } catch (error) {
+      console.error(
+        "Update error:",
+        error.response ? error.response.data : error
+      );
       setErrors({ submit: t("UpdateError") });
     } finally {
       setIsSubmitting(false);
@@ -77,7 +176,10 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
+      <Modal.Header
+        closeButton
+        style={i18n.language === "ar" ? { direction: "ltr" } : {}}
+      >
         <Modal.Title>{t("EditBooking")}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
@@ -87,14 +189,13 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
           )}
 
           <Form.Group className="mb-3">
-            <Form.Label>{t("Room")}</Form.Label>
+            <Form.Label>{t("room")}</Form.Label>
             <Form.Select
               name="room_id"
               value={formData.room_id}
               onChange={handleChange}
               isInvalid={!!errors.room_id}
             >
-              <option value="">{t("SelectRoom")}</option>
               {rooms.map((room) => (
                 <option key={room.id} value={room.id}>
                   {room.room_number} - {room.type} (${room.price_per_night})
@@ -106,50 +207,56 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
             </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>{t("CheckInDate")}</Form.Label>
-            <BookingCalendar
-              roomId={formData.room_id}
-              selectedDate={
-                formData.check_in_date ? new Date(formData.check_in_date) : null
-              }
-              setSelectedDate={(date) =>
-                setFormData({
-                  ...formData,
-                  check_in_date: date.toISOString().split("T")[0],
-                })
-              }
-              minDate={new Date()}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.check_in_date}
-            </Form.Control.Feedback>
-          </Form.Group>
+          <Form.Group className="mb-4">
+            <div className="d-flex flex-row gap-4">
+              <div className="d-flex flex-column col-md-6">
+                <Form.Label className="fw-bold">{t("CheckInDate")}</Form.Label>
+                <BookingCalendar
+                  roomId={formData.room_id}
+                  selectedDate={
+                    formData.check_in_date
+                      ? new Date(formData.check_in_date)
+                      : null
+                  }
+                  setSelectedDate={(date) =>
+                    setFormData({
+                      ...formData,
+                      check_in_date: formatDate(date),
+                    })
+                  }
+                  minDate={new Date()}
+                />
+                <Form.Control.Feedback type="invalid" className="mt-1">
+                  {errors.check_in_date}
+                </Form.Control.Feedback>
+              </div>
 
-          <Form.Group className="mb-3">
-            <Form.Label>{t("CheckOutDate")}</Form.Label>
-            <BookingCalendar
-              roomId={formData.room_id}
-              selectedDate={
-                formData.check_out_date
-                  ? new Date(formData.check_out_date)
-                  : null
-              }
-              setSelectedDate={(date) =>
-                setFormData({
-                  ...formData,
-                  check_out_date: date.toISOString().split("T")[0],
-                })
-              }
-              minDate={
-                formData.check_in_date
-                  ? new Date(formData.check_in_date)
-                  : new Date()
-              }
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.check_out_date}
-            </Form.Control.Feedback>
+              <div className="d-flex flex-column col-md-6">
+                <Form.Label className="fw-bold">{t("CheckOutDate")}</Form.Label>
+                <BookingCalendar
+                  roomId={formData.room_id}
+                  selectedDate={
+                    formData.check_out_date
+                      ? new Date(formData.check_out_date)
+                      : null
+                  }
+                  setSelectedDate={(date) =>
+                    setFormData({
+                      ...formData,
+                      check_out_date: formatDate(date),
+                    })
+                  }
+                  minDate={
+                    formData.check_in_date
+                      ? new Date(formData.check_in_date)
+                      : new Date()
+                  }
+                />
+                <Form.Control.Feedback type="invalid" className="mt-1">
+                  {errors.check_out_date}
+                </Form.Control.Feedback>
+              </div>
+            </div>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -160,36 +267,40 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
               onChange={handleChange}
               isInvalid={!!errors.payment_status}
             >
-              {/* <option value="">{t("SelectStatus")}</option> */}
               <option value="paid">{t("paid")}</option>
               <option value="pending">{t("pending")}</option>
-             </Form.Select>
+            </Form.Select>
             <Form.Control.Feedback type="invalid">
               {errors.payment_status}
             </Form.Control.Feedback>
           </Form.Group>
 
-          {/* <Form.Group className="mb-3">
-            <Form.Label>{t("TotalAmount")}</Form.Label>
-            <Form.Control
-              type="number"
-              step="0.01"
-              name="total_amount"
-              value={formData.total_amount}
-              onChange={handleChange}
-              isInvalid={!!errors.total_amount}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.total_amount}
-            </Form.Control.Feedback>
-          </Form.Group> */}
+          {formData.payment_status === "paid" && (
+            <Form.Group className="mb-3">
+              <Form.Label>{t("PaymentMethod")}</Form.Label>
+              <Form.Select
+                name="payment_method"
+                value={formData.payment_method || ""}
+                onChange={handleChange}
+                isInvalid={!!errors.payment_method}
+              >
+                <option value="">{t("slectpaymentmethod")}</option>
+                <option value="cash">{t("Cash")}</option>
+                <option value="credit_card">{t("CreditCard")}</option>
+      
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errors.payment_method}
+              </Form.Control.Feedback>
+            </Form.Group>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onHide} disabled={isSubmitting}>
             {t("Cancel")}
           </Button>
           <Button variant="primary" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? t("Saving...") : t("SaveChanges")}
+            {isSubmitting ? t("Saving...") : t("savchanges")}
           </Button>
         </Modal.Footer>
       </Form>

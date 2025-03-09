@@ -32,7 +32,7 @@ class Booking extends Model
 
     public function payment()
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(Payment::class, 'booking_id');   
     }
     // app/Models/Booking.php
 public function services()

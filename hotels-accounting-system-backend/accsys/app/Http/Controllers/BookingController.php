@@ -86,11 +86,25 @@ class BookingController extends Controller
 
     public function show($roomId)
     {
-        $bookings = Booking::where('room_id', $roomId)->get(['check_in_date', 'check_out_date']);
+        // Fetch bookings along with the related payment information
+        $bookings = Booking::where('room_id', $roomId)
+            ->with('payment')  // Eager load the related payment details
+            ->get(['check_in_date', 'check_out_date']);  // Adjust columns if needed
+    
+        // Format the response to include the payment method
+        $bookingsData = $bookings->map(function ($booking) {
+            return [
+                'check_in_date' => $booking->check_in_date,
+                'check_out_date' => $booking->check_out_date,
+                'payment_method' => $booking->payment ? $booking->payment->payment_method : null,  // Add payment method from the payment table
+            ];
+        });
+    
         return response()->json([
-            'bookings' => $bookings,
+            'bookings' => $bookingsData,
         ]);
     }
+    
     public function update(Request $request, $id)
     {
         // Validate request data

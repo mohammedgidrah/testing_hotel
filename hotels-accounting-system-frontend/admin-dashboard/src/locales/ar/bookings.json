@@ -29,5 +29,11 @@
   "BookingDetails": "تفاصيل الحجز",
   "close": "إغلاق",
   "Services": "خدمات",
-  "NoServicesSelected": "لم يتم اختيار خدمات"
+  "NoServicesSelected": "لم يتم اختيار خدمات",
+  "CreditCard": "بطاقة إئتمان",
+  "Cash": "نقدي",
+  "PaymentMethod": "طريقة الدفع",
+  "savchanges": "حفظ التغييرات",
+  "room": "غرفة",
+  "slectpaymentmethod": "حدد طريقة الدفع"
 }
