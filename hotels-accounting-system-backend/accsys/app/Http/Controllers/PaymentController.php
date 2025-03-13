@@ -97,4 +97,3 @@ class PaymentController extends Controller
         return response()->json(['message' => 'Payment deleted successfully']);
     }
 }
-
