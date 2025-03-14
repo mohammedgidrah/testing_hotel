@@ -10,5 +10,12 @@
   "UpdatePayment": "تحديث الدفعات",
   "AllFields": "جميع الحقول ",
   "PaymentDate": "تاريخ الدفع",
-  "NoPaymentsFound": "لا يوجد دفعات"
+  "NoPaymentsFound": "لا يوجد دفعات",
+  "DeletePayment": "حذف الدفعات",
+  "DeleteConfirmation": "هل أنت متأكد من حذف هذه الدفعة؟",
+  "cancel": "الغاء",
+  "delete": "حذف",
+  "editpayment": "تحديث الدفعات",
+  "PaymentAmount": "المبلغ المدفوع",
+  "save": "حفظ"
  }

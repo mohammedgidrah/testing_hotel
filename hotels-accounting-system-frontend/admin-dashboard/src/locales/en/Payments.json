@@ -13,5 +13,12 @@
     "PaymentID": "Payment ID",
     "PaymentMethod": "Payment Method",
     "PaymentDate": "Payment Date",
-    "NoPaymentsFound": "No payments found"
+    "NoPaymentsFound": "No payments found",
+    "DeletePayment": "Delete Payment",
+    "DeleteConfirmation": "Are you sure you want to delete this payment?",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "editpayment": "Edit Payment",
+    "PaymentAmount": "Payment Amount",
+    "save": "Save"
 }
