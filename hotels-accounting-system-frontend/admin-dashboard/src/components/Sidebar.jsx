@@ -8,14 +8,16 @@ import {
   Users,
   Menu,
   ConciergeBell,
-  Package  ,
+  Package,
+  Box,
+  ShoppingCart,
 } from "lucide-react";
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { useTranslation } from "react-i18next";
- 
+
 const SIDEBAR_ITEMS = [
   {
     name: "dashboard",
@@ -32,9 +34,9 @@ const SIDEBAR_ITEMS = [
     roles: ["admin", "manager", "accountant"],
   },
   {
-    name:"service",
-    icon: Package ,
-    color: "#F59E0B", 
+    name: "service",
+    icon: Package,
+    color: "#F59E0B",
     path: "/Services",
     roles: ["admin"],
   },
@@ -43,6 +45,20 @@ const SIDEBAR_ITEMS = [
     icon: FileText,
     color: "#34d399",
     path: "/bookings",
+    roles: ["admin", "manager", "accountant"],
+  },
+  {
+    name: "orders",
+    icon: ShoppingCart,
+    color: "#34d399", // Green
+    path: "/orders",
+    roles: ["admin", "manager", "accountant"],
+  },
+  {
+    name: "Ordersiteams",
+    icon: Box, // Box icon
+    color: "#60a5fa", // Light Blue
+    path: "/orders-items",
     roles: ["admin", "manager", "accountant"],
   },
   {
@@ -100,14 +116,13 @@ const Sidebar = ({ allowedRoles }) => {
 
   return (
     <motion.div
-    className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-scroll  
+      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-scroll  
         [&::-webkit-scrollbar]:w-0.5 [&::-webkit-scrollbar]:h-0
         [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full 
  
         ${isSidebarOpen ? "w-64" : "w-20"}`}
-        animate={{ width: isSidebarOpen ? "w-256" : "w-80" }}
+      animate={{ width: isSidebarOpen ? "w-256" : "w-80" }}
     >
-    
       <div className="bg-gray-800 bg-opacity-50   p-2 flex flex-col border-r border-gray-700 min-h-full">
         <motion.button
           whileHover={{ scale: 1.0 }}

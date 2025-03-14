@@ -17,5 +17,7 @@
   "delete": "حذف",
   "editpayment": "تحديث الدفعات",
   "PaymentAmount": "المبلغ المدفوع",
-  "save": "حفظ"
+  "save": "حفظ",
+  "creditcard": "بطاقة الائتمان",
+  "cash": "كاش"
  }

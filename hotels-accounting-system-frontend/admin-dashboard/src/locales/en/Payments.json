@@ -20,5 +20,7 @@
     "delete": "Delete",
     "editpayment": "Edit Payment",
     "PaymentAmount": "Payment Amount",
-    "save": "Save"
+    "save": "Save",
+    "creditcard": "Credit Card",
+    "cash": "Cash"
 }

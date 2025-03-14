@@ -111,8 +111,8 @@ export default function EditPayment({
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
             >
-              <option value="credit_card">{t("CreditCard")}</option>
-              <option value="cash">{t("Cash")}</option>
+              <option value="credit_card">{t("creditcard")}</option>
+              <option value="cash">{t("cash")}</option>
               {/* Add other payment methods as needed */}
             </Form.Control>
           </Form.Group>

@@ -16,6 +16,8 @@ import Unauthorized from "./components/Unauthorized";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Reception from "./pages/Reception";
 import Services from "./pages/services";
+import Orders from "./pages/Orders";
+import Ordersiteams from "./pages/Ordersiteams";
 
 
 
@@ -81,6 +83,22 @@ function App() {
           element={
             <PrivateRoute allowedRoles={['admin', 'manager', 'accountant']}>
               <Expenses />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <PrivateRoute allowedRoles={['admin', 'manager', 'accountant']}>
+              <Orders />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/orders-items"
+          element={
+            <PrivateRoute allowedRoles={['admin', 'manager', 'accountant']}>
+              <Ordersiteams />
             </PrivateRoute>
           }
         />

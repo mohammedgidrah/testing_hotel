@@ -8,5 +8,7 @@
     "guests": "Guests",
     "users": "Users",
     "reception": "Reception",
-    "service": "Service"
+    "service": "Service",
+    "Ordersiteams":"Order Items",
+    "orders":"Orders"
 }

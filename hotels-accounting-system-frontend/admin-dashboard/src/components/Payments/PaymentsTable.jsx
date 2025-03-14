@@ -41,7 +41,7 @@ const PaymentsTable = () => {
     useEffect(() => {
         const filtered = payments.filter((payment) => {
             const searchIn = filterBy === 'all'
-                ? `${payment.booking_id} ${payment.payment_method} ${payment.amount_paid}`
+                ? `${payment.booking_id} ${payment.payment_method} ${payment.amount_paid} ${payment.created_at}`
                 : payment[filterBy]?.toString() || '';
 
             return searchIn.toLowerCase().includes(searchTerm.toLowerCase());

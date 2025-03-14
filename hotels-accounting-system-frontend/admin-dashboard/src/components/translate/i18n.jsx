@@ -1,4 +1,6 @@
 import i18n from "i18next";
+
+// English
 import { initReactI18next } from "react-i18next";
 import enDashboard from "../../locales/en/dashboard.json";
 import enBookings from "../../locales/en/bookings.json";
@@ -11,6 +13,9 @@ import enusers from "../../locales/en/users.json";
 import ensidebar from "../../locales/en/sidebar.json";
 import enreception from "../../locales/en/reception.json";
 import enservices from "../../locales/en/services.json";
+import enorder from "../../locales/en/orders.json";
+import enorderitems from "../../locales/en/orderitems.json";
+// Arabic
 import arDashboard from "../../locales/ar/dashboard.json";
 import arBookings from "../../locales/ar/bookings.json";
 import arExpenses from "../../locales/ar/Expenses.json";
@@ -22,9 +27,8 @@ import arusers from "../../locales/ar/users.json";
 import arsidebar from "../../locales/ar/sidebar.json";
 import arreception from "../../locales/ar/reception.json";
 import arservices from "../../locales/ar/services.json";
-import Services from "../../pages/services";
-
-
+import arorder from "../../locales/ar/orders.json";
+import arorderitems from "../../locales/ar/orderitems.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -39,20 +43,24 @@ i18n.use(initReactI18next).init({
       users: enusers,
       sidebar: ensidebar,
       reception: enreception,
-      services:enservices
+      services: enservices,
+      orders: enorder,
+      orderitems: enorderitems
     },
     ar: {
       dashboard: arDashboard,
       bookings: arBookings,
       expenses: arExpenses,
-      financialReports: arFinancialReports ,
+      financialReports: arFinancialReports,
       payments: arPayments,
       guests: arGuests,
       rooms: arRooms,
       users: arusers,
       sidebar: arsidebar,
       reception: arreception,
-      services:arservices
+      services: arservices,
+      orders: arorder,
+      orderitems: arorderitems
     },
   },
   lng: "en", // Default language
