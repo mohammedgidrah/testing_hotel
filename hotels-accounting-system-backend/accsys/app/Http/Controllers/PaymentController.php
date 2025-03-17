@@ -80,8 +80,19 @@ class PaymentController extends Controller
 
     public function show($id)
     {
-        $payment = Payment::with('booking')->findOrFail($id);
-        return response()->json($payment);
+            // Fetch payments associated with the given booking ID
+        $payments = Payment::where('booking_id', $id)
+        ->get();
+
+        // Check if any payments exist
+        if ($payments->isEmpty()) {
+            return response()->json([
+                'message' => 'No payments found for this booking',
+            ], 404);
+        }
+
+        // Return the payments as a JSON response
+        return response()->json($payments);
     }
 
     public function update(Request $request, $id)

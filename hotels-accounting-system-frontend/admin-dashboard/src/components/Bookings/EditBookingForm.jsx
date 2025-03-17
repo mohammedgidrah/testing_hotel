@@ -22,14 +22,12 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/payments",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const response = await axios.get(`http://127.0.0.1:8000/api/payments/${booking.id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        console.log(response.data[0].payment_method);
         setPaymentMethods(response.data); // assuming your backend sends payment methods in the response
       } catch (error) {
         console.error("Error fetching payment methods:", error);
@@ -51,11 +49,12 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
           ? booking.check_out_date.split("T")[0]
           : "",
         payment_status: booking.payment_status || "",
-        payment_method: booking.payment_method || "",  // Payment method from the API response
+        payment_method: paymentMethods|| "", // Payment method from the API response
       });
-      setTotalAmount(booking.total_amount || 0);
-      setTaxAmount(booking.tax_amount || 0);
+
       console.log(formData.payment_method);
+      setTotalAmount(parseFloat(booking.total_amount) || 0);
+      setTaxAmount(parseFloat(booking.tax_amount) || 0);
     }
   }, [booking]);
 
@@ -95,63 +94,26 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
     e.preventDefault();
     if (!validateForm()) return;
 
-    if (!booking || !booking.id) {
-      setErrors({ submit: t("BookingNotFound") });
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      // Update booking details
-      const response = await axios.put(
+      // 1. First update booking details
+      const bookingResponse = await axios.put(
         `http://127.0.0.1:8000/api/bookings/${booking.id}`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
 
-      // Handle payment logic
-      if (
-        booking.payment_status === "paid" &&
-        formData.payment_status === "pending"
-      ) {
-        // If payment status is changed from "paid" to "pending", delete the payment
-        await axios.delete(`http://localhost:8000/api/payments/${booking.id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-      } else if (formData.payment_status === "paid") {
-        // If payment status is "paid"
-        if (booking.payment_status === "paid") {
-          // If it was already paid but payment method changed
-          if (booking.payment_method !== formData.payment_method) {
-            // Update payment method
-            await axios.put(
-              `http://localhost:8000/api/payments/${booking.id}`,
-              {
-                payment_method: formData.payment_method.toLowerCase(),
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-              }
-            );
-          }
-        } else {
-          // If status changed from pending to paid, create a new payment record
-          await axios.post(
-            "http://localhost:8000/api/payments",
-            {
-              booking_id: booking.id,
-              payment_method: formData.payment_method.toLowerCase(),
-              amount_paid: totalAmount + taxAmount,
-              payment_date: formatDate(new Date()),
-            },
+      // 2. Handle payment updates
+      let paymentData = null;
+      
+      // Check if changing from paid to pending
+      if (booking.payment_status === "paid" && formData.payment_status === "pending") {
+        // Delete existing payment
+        if (booking.payment?.id) {
+          await axios.delete(
+            `http://localhost:8000/api/payments/${booking.payment.id}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -159,21 +121,66 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
             }
           );
         }
+      } else if (formData.payment_status === "paid") {
+        // Handle payment creation/update
+        const paymentMethod = formData.payment_method.toLowerCase();
+        const amount = Number(
+          (parseFloat(totalAmount) + parseFloat(taxAmount)).toFixed(2)
+        );
+
+        if (booking.payment_status === "paid" && booking.payment?.id) {
+          // Update existing payment
+          const paymentResponse = await axios.put(
+            `http://localhost:8000/api/payments/${booking.payment.id}`,
+            {
+              payment_method: paymentMethod,
+              amount_paid: amount,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          paymentData = paymentResponse.data;
+        } else {
+          // Create new payment
+          const paymentResponse = await axios.post(
+            "http://localhost:8000/api/payments",
+            {
+              booking_id: booking.id,
+              payment_method: paymentMethod,
+              amount_paid: amount,
+              payment_date: new Date().toISOString().split("T")[0],
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          paymentData = paymentResponse.data;
+        }
       }
 
-      onUpdate(response.data);
+      // 3. Combine data for parent update
+      const completeData = {
+        ...bookingResponse.data,
+        payment_status: formData.payment_status,
+        payment: paymentData || null,
+      };
+
+      onUpdate(completeData);
       onHide();
     } catch (error) {
-      console.error(
-        "Update error:",
-        error.response ? error.response.data : error
-      );
-      setErrors({ submit: t("UpdateError") });
+      console.error("Update error:", error.response?.data || error);
+      setErrors({
+        submit: error.response?.data?.message || t("UpdateError"),
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header
@@ -287,7 +294,6 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                 <option value="">{t("slectpaymentmethod")}</option>
                 <option value="cash">{t("Cash")}</option>
                 <option value="credit_card">{t("CreditCard")}</option>
-      
               </Form.Select>
               <Form.Control.Feedback type="invalid">
                 {errors.payment_method}

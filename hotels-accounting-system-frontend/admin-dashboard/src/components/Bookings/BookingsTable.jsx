@@ -20,31 +20,21 @@ function BookingsTable() {
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [bookingsRes, roomsRes, guestsRes] = await Promise.all([
-  //         axios.get("http://127.0.0.1:8000/api/rooms", {
-  //           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  //         }),
-  //         axios.get("http://127.0.0.1:8000/api/guests", {
-  //           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  //         }),
-  //         axios.get("http://127.0.0.1:8000/api/bookings", {
-  //           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  //         })
-          
-  //       ]);
-  //        setFilteredBookings(bookingsRes.data);
-  //       setRooms(roomsRes.data);
-  //       setGuests(guestsRes.data);
-  //     } catch (err) {
-  //       setError(t("fetchError"));
-  //     }
-  //   };
-  //   fetchData();
-  // }, []); // ✅ Dependency array ensures it runs only once
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+  
+    // Parse the date string while considering it as UTC
+    const date = new Date(dateString + "Z"); // Append 'Z' to treat it as UTC
+  
+    // Extract day, month, and year
+    const day = String(date.getUTCDate()).padStart(2, "0"); // Ensure two digits
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const year = date.getUTCFullYear();
+  
+    // Return in the desired numeric format (e.g., MM/DD/YYYY)
+    return `${day}/${month}/${year}`;
+  };
+ 
   const fetchBookings = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/bookings", {
@@ -55,7 +45,7 @@ function BookingsTable() {
     } catch (err) {
       setError(t("fetchError"));
     }
-  }
+  };
   const fetchguests = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/guests", {
@@ -65,7 +55,7 @@ function BookingsTable() {
     } catch (err) {
       setError(t("fetchError"));
     }
-  }
+  };
   const fetchrooms = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/rooms", {
@@ -75,15 +65,13 @@ function BookingsTable() {
     } catch (err) {
       setError(t("fetchError"));
     }
-  }
+  };
   useEffect(() => {
     fetchBookings();
     fetchguests();
     fetchrooms();
     // handleUpdateBooking();
   }, []);
-
-
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -138,8 +126,19 @@ function BookingsTable() {
   };
 
   const handleUpdateBooking = (updatedBooking) => {
-    setBookings((prevBookings) =>
-      prevBookings.map((b) => (b.id === updatedBooking.id ? updatedBooking : b))
+    setBookings(prevBookings =>
+      prevBookings.map(b => 
+        b.id === updatedBooking.id 
+          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room } 
+          : b
+      )
+    );
+    setFilteredBookings(prev => 
+      prev.map(b => 
+        b.id === updatedBooking.id 
+          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room } 
+          : b
+      )
     );
   };
 
@@ -211,11 +210,12 @@ function BookingsTable() {
                   {booking.room.room_number}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {new Date(booking.check_in_date).toLocaleDateString()}
+                  {formatDate(booking.check_in_date)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {new Date(booking.check_out_date).toLocaleDateString()}
+                  {formatDate(booking.check_out_date)}
                 </td>
+
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   ${parseFloat(booking.total_amount).toFixed(2)}
                 </td>
@@ -236,7 +236,7 @@ function BookingsTable() {
                       setSelectedBooking(booking);
                       setShowEditModal(true);
                     }}
-                    className="text-indigo-400 hover:text-indigo-300 mr-2"
+                    className="text-blue-500 hover:text-indigo-300 mr-2"
                   >
                     <Edit size={18} />
                   </button>
@@ -245,7 +245,7 @@ function BookingsTable() {
                       setSelectedBookingId(booking.id);
                       setShowModal(true);
                     }}
-                    className="text-red-400 hover:text-red-300"
+                    className="text-red-500 hover:text-red-300"
                   >
                     <Trash2 size={18} />
                   </button>

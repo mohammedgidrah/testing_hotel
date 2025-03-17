@@ -35,7 +35,8 @@
      "CreditCard": "Credit Card",
      "Cash": "Cash",
      "room": "Room",
-     "slectpaymentmethod": "Select Payment Method"
+     "slectpaymentmethod": "Select Payment Method",
+     "Details": "Details"
   
   }
   
