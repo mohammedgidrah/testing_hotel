@@ -116,23 +116,23 @@ const Sidebar = ({ allowedRoles }) => {
 
   return (
     <motion.div
-      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-scroll  
+      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-scroll   
         [&::-webkit-scrollbar]:w-0.5 [&::-webkit-scrollbar]:h-0
         [&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full 
  
         ${isSidebarOpen ? "w-64" : "w-20"}`}
       animate={{ width: isSidebarOpen ? "w-256" : "w-80" }}
     >
-      <div className="bg-gray-800 bg-opacity-50   p-2 flex flex-col border-r border-gray-700 min-h-full">
+      <div className="bg-gray-800 bg-opacity-50  flex flex-col border-r border-gray-700 min-h-full ">
         <motion.button
           whileHover={{ scale: 1.0 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2  bg-opacity-50 backdrop-blur-md  max-w-fit flex items-center gap-2"
+          className="p-2  bg-opacity-50 backdrop-blur-md   flex items-center gap-2 position-sticky top-0 z-50 "
         >
           <Menu size={24} />
           {isSidebarOpen && (
-            <span className="text-white font-medium">{name || "Guest"}</span>
+            <span className="text-white font-medium ">{name || "Guest"}</span>
           )}
         </motion.button>
 

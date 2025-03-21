@@ -20,21 +20,31 @@ function BookingsTable() {
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [payments, setPayments] = useState([]);
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-  
+
     // Parse the date string while considering it as UTC
     const date = new Date(dateString + "Z"); // Append 'Z' to treat it as UTC
-  
+
     // Extract day, month, and year
     const day = String(date.getUTCDate()).padStart(2, "0"); // Ensure two digits
     const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = date.getUTCFullYear();
-  
-    // Return in the desired numeric format (e.g., MM/DD/YYYY)
-    return `${day}/${month}/${year}`;
+
+     return `${day}/${month}/${year}`;
   };
- 
+  const fetchPayments = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/payments", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setPayments(response.data);
+    } catch (err) {
+      setError(t("fetchError"));
+    }
+  };
+
   const fetchBookings = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/bookings", {
@@ -70,8 +80,8 @@ function BookingsTable() {
     fetchBookings();
     fetchguests();
     fetchrooms();
-    // handleUpdateBooking();
-  }, []);
+    fetchPayments();
+   }, []);
 
   const handleSearch = (e) => {
     const term = e.target.value.toLowerCase();
@@ -126,17 +136,17 @@ function BookingsTable() {
   };
 
   const handleUpdateBooking = (updatedBooking) => {
-    setBookings(prevBookings =>
-      prevBookings.map(b => 
-        b.id === updatedBooking.id 
-          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room } 
+    setBookings((prevBookings) =>
+      prevBookings.map((b) =>
+        b.id === updatedBooking.id
+          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room }
           : b
       )
     );
-    setFilteredBookings(prev => 
-      prev.map(b => 
-        b.id === updatedBooking.id 
-          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room } 
+    setFilteredBookings((prev) =>
+      prev.map((b) =>
+        b.id === updatedBooking.id
+          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room }
           : b
       )
     );
@@ -178,6 +188,7 @@ function BookingsTable() {
                 "CheckOutDate",
                 "TotalAmount",
                 "Status",
+                "paymentMethod",  
                 "Details",
                 "Actions",
               ].map((header) => (
@@ -223,6 +234,10 @@ function BookingsTable() {
                   {t(booking.payment_status)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  {payments.find((payment) => payment.booking_id === booking.id)
+                    ?.payment_method || "no payment"}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button
                     onClick={() => handleShowDetails(booking)}
                     className="text-blue-400 hover:text-blue-300"
@@ -230,6 +245,7 @@ function BookingsTable() {
                     <Eye size={20} />
                   </button>
                 </td>
+             
                 <td className="flex px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <button
                     onClick={() => {
