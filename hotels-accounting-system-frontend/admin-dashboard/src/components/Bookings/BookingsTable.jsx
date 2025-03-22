@@ -12,7 +12,6 @@ function BookingsTable() {
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [rooms, setRooms] = useState([]);
-  const [guests, setGuests] = useState([]);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
@@ -21,6 +20,9 @@ function BookingsTable() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [payments, setPayments] = useState([]);
+  const [showArrivals, setShowArrivals] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
 
@@ -34,6 +36,7 @@ function BookingsTable() {
 
      return `${day}/${month}/${year}`;
   };
+  
   const fetchPayments = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/payments", {
@@ -46,26 +49,20 @@ function BookingsTable() {
   };
 
   const fetchBookings = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/bookings", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setFilteredBookings(response.data);
       setBookings(response.data);
+      filterBookings(response.data, searchTerm, showArrivals);
     } catch (err) {
       setError(t("fetchError"));
+    } finally {
+      setIsLoading(false);
     }
   };
-  const fetchguests = async () => {
-    try {
-      const response = await axios.get("http://127.0.0.1:8000/api/guests", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      setGuests(response.data);
-    } catch (err) {
-      setError(t("fetchError"));
-    }
-  };
+
   const fetchrooms = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/rooms", {
@@ -76,40 +73,79 @@ function BookingsTable() {
       setError(t("fetchError"));
     }
   };
+  
   useEffect(() => {
     fetchBookings();
-    fetchguests();
     fetchrooms();
     fetchPayments();
-   }, []);
+  }, []);
+
+  // Apply filters when search term or showArrivals changes
+  useEffect(() => {
+    filterBookings(bookings, searchTerm, showArrivals);
+  }, [searchTerm, showArrivals]);
+
+  const filterBookings = (bookingsData, term, showTodayArrivals) => {
+    let filtered = [...bookingsData];
+    
+    // Apply search filter if search term exists
+    if (term) {
+      const searchTermLower = term.toLowerCase();
+      filtered = filtered.filter((booking) => {
+        if (!booking.guest) return false;
+        
+        const guestName = `${booking.guest.first_name} ${booking.guest.last_name}`.toLowerCase();
+        const roomNumber = booking.room?.room_number?.toLowerCase() || "";
+        const bookingId = booking.id.toString().toLowerCase();
+        
+        return (
+          guestName.includes(searchTermLower) ||
+          roomNumber.includes(searchTermLower) ||
+          bookingId.includes(searchTermLower)
+        );
+      });
+    }
+    
+    // Apply arrivals filter if showArrivals is true
+    if (showTodayArrivals) {
+      // Get today's date in the format YYYY-MM-DD
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const todayFormatted = `${year}-${month}-${day}`;
+      
+      // Filter for bookings where check-in date is today
+      filtered = filtered.filter((booking) => {
+        if (!booking.check_in_date) return false;
+        // Format booking check-in date to compare with today
+        const checkInDate = booking.check_in_date.split('T')[0];
+        return checkInDate === todayFormatted;
+      });
+    }
+    
+    setFilteredBookings(filtered);
+  };
 
   const handleSearch = (e) => {
-    const term = e.target.value.toLowerCase();
+    const term = e.target.value;
     setSearchTerm(term);
-    const filtered = bookings.filter((booking) => {
-      const guestName =
-        `${booking.guests.first_name} ${booking.guests.last_name}`.toLowerCase();
-      const roomNumber = booking.room.room_number.toLowerCase();
-      const bookingid = booking.id.toString().toLowerCase();
-      return (
-        guestName.includes(term) ||
-        roomNumber.includes(term) ||
-        bookingid.includes(term)
-      );
-    });
-    setFilteredBookings(filtered);
   };
 
   const handleDelete = () => {
     if (selectedBookingId) {
       axios
-        .delete(`http://127.0.0.1:8000/api/bookings/${selectedBookingId}`)
+        .delete(`http://127.0.0.1:8000/api/bookings/${selectedBookingId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        })
         .then(() => {
           setBookings((prev) =>
             prev.filter((booking) => booking.id !== selectedBookingId)
           );
-          setFilteredBookings((prev) =>
-            prev.filter((booking) => booking.id !== selectedBookingId)
+          filterBookings(
+            bookings.filter(booking => booking.id !== selectedBookingId),
+            searchTerm,
+            showArrivals
           );
           setShowModal(false);
         })
@@ -122,7 +158,10 @@ function BookingsTable() {
   const handleShowDetails = async (booking) => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/bookings/${booking.id}/services`
+        `http://localhost:8000/api/bookings/${booking.id}/services`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        }
       );
       const bookingWithServices = {
         ...booking,
@@ -136,20 +175,35 @@ function BookingsTable() {
   };
 
   const handleUpdateBooking = (updatedBooking) => {
-    setBookings((prevBookings) =>
-      prevBookings.map((b) =>
-        b.id === updatedBooking.id
-          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room }
-          : b
-      )
+    // Find the current booking with all its nested data
+    const existingBooking = bookings.find(b => b.id === updatedBooking.id);
+    
+    // Create a properly merged booking that preserves nested objects
+    const mergedBooking = {
+      ...existingBooking,
+      ...updatedBooking,
+      // Ensure room data is preserved
+      room: updatedBooking.room || existingBooking.room,
+      // Ensure guest data is preserved
+      guest: updatedBooking.guest || existingBooking.guest
+    };
+    
+    // Update the bookings state with the merged booking
+    const updatedBookings = bookings.map((b) =>
+      b.id === updatedBooking.id ? mergedBooking : b
     );
-    setFilteredBookings((prev) =>
-      prev.map((b) =>
-        b.id === updatedBooking.id
-          ? { ...b, ...updatedBooking, room: updatedBooking.room || b.room }
-          : b
-      )
-    );
+    
+    setBookings(updatedBookings);
+    
+    // Re-apply filters to updated bookings list
+    filterBookings(updatedBookings, searchTerm, showArrivals);
+    
+    // Re-fetch payments after a booking update
+    fetchPayments();
+  };
+  
+  const handleShowArrivals = () => {
+    setShowArrivals(!showArrivals);
   };
 
   return (
@@ -162,8 +216,14 @@ function BookingsTable() {
     >
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100">
-          {t("BookingList")}
+          {t("BookingList")} {showArrivals && `- ${t("TodayArrivals")}`}
         </h2>
+        <button 
+          className={`${showArrivals ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 px-4 rounded-lg transition-colors`} 
+          onClick={handleShowArrivals}
+        >
+          {showArrivals ? t("AllBookings") : t("TodayArrivals")}
+        </button>
         <div className="relative">
           <input
             type="text"
@@ -172,105 +232,127 @@ function BookingsTable() {
             onChange={handleSearch}
             value={searchTerm}
           />
+          
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-700">
-          <thead>
-            <tr>
-              {[
-                "ID",
-                "GuestName",
-                "RoomNumber",
-                "CheckInDate",
-                "CheckOutDate",
-                "TotalAmount",
-                "Status",
-                "paymentMethod",  
-                "Details",
-                "Actions",
-              ].map((header) => (
-                <th
-                  key={header}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+      {isLoading ? (
+        <div className="text-center py-8 text-gray-400">
+          {t("Loading")}...
+        </div>
+      ) : filteredBookings.length === 0 ? (
+        <div className="text-center py-8 text-gray-400">
+          {showArrivals 
+            ? t("NoArrivalsToday") 
+            : searchTerm 
+              ? t("NoMatchingBookings") 
+              : t("NoBookingsFound")}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead>
+              <tr>
+                {[
+                  "ID",
+                  "GuestName",
+                  "RoomNumber",
+                  "CheckInDate",
+                  "CheckOutDate",
+                  "TotalAmount",
+                  "Status",
+                  "paymentMethod",  
+                  "Details",
+                  "Actions",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
+                  >
+                    {t(header)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-gray-700">
+              {error && (
+                <tr>
+                  <td colSpan="10" className="px-6 py-4 text-red-500 text-center">
+                    {error}
+                  </td>
+                </tr>
+              )}
+              {filteredBookings.map((booking) => (
+                <motion.tr
+                  key={booking.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className={showArrivals ? "bg-green-900 bg-opacity-20" : ""}
                 >
-                  {t(header)}
-                </th>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {booking.id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
+                    {booking.guest ? `${booking.guest.first_name} ${booking.guest.last_name}` : "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {booking.room?.room_number || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {formatDate(booking.check_in_date)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {formatDate(booking.check_out_date)}
+                  </td>
+
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    ${parseFloat(booking.total_amount || 0).toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {t(booking.payment_status || "pending")}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {payments.find((payment) => payment.booking_id === booking.id)
+                      ?.payment_method || t("noPayment")}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <button
+                      onClick={() => handleShowDetails(booking)}
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      <Eye size={20} />
+                    </button>
+                  </td>
+                
+                  <td className="flex px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <button
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setShowEditModal(true);
+                      }}
+                      className="text-blue-500 hover:text-indigo-300 mr-2"
+                    >
+                      <Edit size={18} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedBookingId(booking.id);
+                        setShowModal(true);
+                      }}
+                      className="text-red-500 hover:text-red-300"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </td>
+                </motion.tr>
               ))}
-            </tr>
-          </thead>
-
-          <tbody className="divide-y divide-gray-700">
-            {error && <p className="text-red-500">{error}</p>}
-            {filteredBookings.map((booking) => (
-              <motion.tr
-                key={booking.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {booking.id}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                  {`${booking.guest.first_name} ${booking.guest.last_name}`}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {booking.room.room_number}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {formatDate(booking.check_in_date)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {formatDate(booking.check_out_date)}
-                </td>
-
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  ${parseFloat(booking.total_amount).toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {t(booking.payment_status)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  {payments.find((payment) => payment.booking_id === booking.id)
-                    ?.payment_method || "no payment"}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <button
-                    onClick={() => handleShowDetails(booking)}
-                    className="text-blue-400 hover:text-blue-300"
-                  >
-                    <Eye size={20} />
-                  </button>
-                </td>
-             
-                <td className="flex px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                  <button
-                    onClick={() => {
-                      setSelectedBooking(booking);
-                      setShowEditModal(true);
-                    }}
-                    className="text-blue-500 hover:text-indigo-300 mr-2"
-                  >
-                    <Edit size={18} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedBookingId(booking.id);
-                      setShowModal(true);
-                    }}
-                    className="text-red-500 hover:text-red-300"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {selectedBooking && (
         <EditBookingForm
@@ -327,31 +409,33 @@ function BookingsTable() {
                 }
               >
                 <strong>{t("GuestName")}:</strong>{" "}
-                {`${selectedBookingDetails.guest.first_name} ${selectedBookingDetails.guest.last_name}`}
+                {selectedBookingDetails.guest ? 
+                  `${selectedBookingDetails.guest.first_name} ${selectedBookingDetails.guest.last_name}` : 
+                  "N/A"}
               </p>
               <p>
                 <strong>{t("RoomNumber")}:</strong>{" "}
-                {selectedBookingDetails.room.room_number}
+                {selectedBookingDetails.room?.room_number || "N/A"}
               </p>
               <p>
                 <strong>{t("CheckInDate")}:</strong>{" "}
-                {new Date(
-                  selectedBookingDetails.check_in_date
-                ).toLocaleDateString()}
+                {selectedBookingDetails.check_in_date ? 
+                  new Date(selectedBookingDetails.check_in_date).toLocaleDateString() : 
+                  "N/A"}
               </p>
               <p>
                 <strong>{t("CheckOutDate")}:</strong>{" "}
-                {new Date(
-                  selectedBookingDetails.check_out_date
-                ).toLocaleDateString()}
+                {selectedBookingDetails.check_out_date ?
+                  new Date(selectedBookingDetails.check_out_date).toLocaleDateString() :
+                  "N/A"}
               </p>
               <p>
                 <strong>{t("TotalAmount")}:</strong> $
-                {parseFloat(selectedBookingDetails.total_amount).toFixed(2)}
+                {parseFloat(selectedBookingDetails.total_amount || 0).toFixed(2)}
               </p>
               <p>
                 <strong>{t("Status")}:</strong>{" "}
-                {t(selectedBookingDetails.payment_status)}
+                {t(selectedBookingDetails.payment_status || "pending")}
               </p>
 
               {/* Display Services */}
@@ -362,7 +446,7 @@ function BookingsTable() {
                   <ul>
                     {selectedBookingDetails.services.map((service) => (
                       <li key={service.id}>
-                        {service.name} - ${parseFloat(service.price).toFixed(2)}
+                        {service.name} - ${parseFloat(service.price || 0).toFixed(2)}
                       </li>
                     ))}
                   </ul>

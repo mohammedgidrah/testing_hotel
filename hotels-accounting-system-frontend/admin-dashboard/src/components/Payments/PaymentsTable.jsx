@@ -199,17 +199,17 @@ const PaymentsTable = () => {
         </table>
       </div>
 
-      {showEditModal && selectedPayment && (
+      {/* {showEditModal && selectedPayment && (
         <EditPayment
           show={!!selectedPayment}
           payment={selectedPayment}
           onClose={() => setSelectedPayment(null)}
           onPaymentUpdated={handlePaymentUpdated}
         />
-      )}
+      )} */}
 
       {/* Delete Confirmation Modal */}
-      <Modal
+      {/* <Modal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
         style={{ direction: "ltr" }}
@@ -226,8 +226,8 @@ const PaymentsTable = () => {
             {t("delete")}
           </Button>
         </Modal.Footer>
-      </Modal>
-      {/* {showDeleteModal && (
+      </Modal> */}
+      {showDeleteModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-800 p-6 rounded-lg w-96">
                         <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
@@ -247,7 +247,7 @@ const PaymentsTable = () => {
                         </div>
                     </div>
                 </div>
-            )} */}
+            )}
     </div>
   );
 };

@@ -42,7 +42,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
       const payment = payments.find((p) => p.booking_id === booking.id);
       setFormData({
         guest_id: booking.guest_id || "",
-        room_id: booking.room_id?.id || booking.room_id || "", // Handle case where room_id is an object
+        room_id: booking.room?.id || booking.room_id || "", // Handle different room property formats
         check_in_date: booking.check_in_date
           ? booking.check_in_date.split("T")[0]
           : "",
@@ -66,6 +66,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
       setErrors({ ...errors, [name]: null });
     }
   };
+  
   const formatDate = (date) => {
     return date.toISOString().split("T")[0];
   };
@@ -124,10 +125,13 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
           payment_date: new Date().toISOString().split("T")[0],
         };
 
-        if (booking.payment?.id) {
+        // Find payment for this booking
+        const existingPayment = payments.find(p => p.booking_id === booking.id);
+
+        if (existingPayment) {
           // Update existing payment
           const paymentResponse = await axios.put(
-            `http://localhost:8000/api/payments/${booking.payment.id}`,
+            `http://localhost:8000/api/payments/${existingPayment.id}`,
             paymentPayload,
             { headers }
           );
@@ -141,12 +145,17 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
           );
           paymentData = paymentResponse.data;
         }
-      } else if (booking.payment?.id) {
+      } else if (payment_status === "pending") {
+        // Find payment for this booking
+        const existingPayment = payments.find(p => p.booking_id === booking.id);
+        
         // Delete payment if status changed from paid to pending
-        await axios.delete(
-          `http://localhost:8000/api/payments/${booking.payment.id}`,
-          { headers }
-        );
+        if (existingPayment) {
+          await axios.delete(
+            `http://localhost:8000/api/payments/${existingPayment.id}`,
+            { headers }
+          );
+        }
       }
 
       // 3. Combine data for parent update
@@ -164,6 +173,9 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
       setIsSubmitting(false);
     }
   };
+
+  // Always show payment method field when payment status is "paid"
+  const showPaymentMethodField = formData.payment_status === "paid";
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
@@ -187,6 +199,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
               onChange={handleChange}
               isInvalid={!!errors.room_id}
             >
+              <option value="">{t("SelectRoom")}</option>
               {rooms.map((room) => (
                 <option key={room.id} value={room.id}>
                   {room.room_number} - {room.type} (${room.price_per_night})
@@ -217,9 +230,9 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                   }
                   minDate={new Date()}
                 />
-                <Form.Control.Feedback type="invalid" className="mt-1">
-                  {errors.check_in_date}
-                </Form.Control.Feedback>
+                {errors.check_in_date && (
+                  <div className="text-danger mt-1">{errors.check_in_date}</div>
+                )}
               </div>
 
               <div className="d-flex flex-column col-md-6">
@@ -243,9 +256,9 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                       : new Date()
                   }
                 />
-                <Form.Control.Feedback type="invalid" className="mt-1">
-                  {errors.check_out_date}
-                </Form.Control.Feedback>
+                {errors.check_out_date && (
+                  <div className="text-danger mt-1">{errors.check_out_date}</div>
+                )}
               </div>
             </div>
           </Form.Group>
@@ -258,6 +271,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
               onChange={handleChange}
               isInvalid={!!errors.payment_status}
             >
+              <option value="">{t("SelectStatus")}</option>
               <option value="paid">{t("paid")}</option>
               <option value="pending">{t("pending")}</option>
             </Form.Select>
@@ -266,7 +280,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
             </Form.Control.Feedback>
           </Form.Group>
 
-          {formData.payment_status === "paid" &&  formData.payment_method !== "cash" && formData.payment_method !== "credit_card" && (
+          {showPaymentMethodField && (
             <Form.Group className="mb-3">
               <Form.Label>{t("PaymentMethod")}</Form.Label>
               <Form.Select

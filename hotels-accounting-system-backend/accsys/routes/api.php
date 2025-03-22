@@ -24,7 +24,8 @@ use App\Http\Controllers\{
     PaymentController,
     FinancialReportController,
     LoginController,
-    ServiceController
+    ServiceController,
+    ItemController
 
 };
 
@@ -62,6 +63,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);
     });
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
+Route::apiResource('items', ItemController::class);
  Route::get('/bookings/{id}/services', [BookingController::class, 'getServices']);
 
 
