@@ -105,9 +105,7 @@ const PaymentsTable = () => {
 
   return (
     <div className="container mx-auto p-6" style={{ direction: "ltr" }}>
-      <h2 className="text-2xl font-semibold text-gray-100 mb-4">
-        {t("PaymentsList")}
-      </h2>
+ 
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
@@ -155,19 +153,19 @@ const PaymentsTable = () => {
             {filteredPayments.length > 0 ? (
               filteredPayments.map((payment) => (
                 <tr key={payment.id} className="border-b border-gray-700">
-                  <td className="px-4 py-2 text-sm text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {payment.booking_id}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     ${parseFloat(payment.amount_paid).toFixed(2)}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {payment.payment_method}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {formatDate(payment.payment_date)}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-300 flex space-x-2">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300 flex space-x-2">
                     <button
                       onClick={() => handleEditPayment(payment)}
                       className="text-blue-500 hover:text-blue-700"

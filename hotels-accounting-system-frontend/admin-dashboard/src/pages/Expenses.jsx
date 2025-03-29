@@ -16,6 +16,8 @@ function Expenses() {
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     axios.defaults.headers.common[
@@ -30,7 +32,10 @@ function Expenses() {
         setError("Failed to load expenses. Please try again.");
       });
   }, [successMessage, editExpense]);
-
+const openDeleteModal = (expenseId) => {
+  setExpenseToDelete(expenseId);
+  setShowModal(true);
+}
   // Custom date formatter
   const formatDate = (date) => {
     const d = new Date(date);
@@ -110,6 +115,18 @@ function Expenses() {
 
   const toggleForm = () => {
     setShowForm(!showForm);
+  };
+  const handleDelete = async (expenseId) => {
+    try {
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${localStorage.getItem("token")}`;
+      await axios.delete(`http://127.0.0.1:8000/api/expenses/${expenseId}`);
+      setSuccessMessage("Expense deleted successfully!"); // Set success message
+    } catch (error) {
+      setErrorMessage("Failed to delete expense");
+      console.error(error);
+    }
   };
 
   return (
@@ -204,8 +221,28 @@ function Expenses() {
             </form>
           </div>
         )}
-
-        <ExpensesTable handleEdit={handleEdit} successMessage={successMessage} />
+{showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{ zIndex: 9999,direction: "ltr" }}>
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-xl text-white mb-4">{t("Are you sure you want to delete this expense?")}</h3>
+            <div className="flex justify-end space-x-4">
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                {t("Cancel")}
+              </button>
+              <button 
+                onClick={handleDelete} 
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+        <ExpensesTable handleEdit={handleEdit} successMessage={successMessage} ondelete={openDeleteModal} />
       </div>
     </div>
   );

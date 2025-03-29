@@ -6,7 +6,7 @@ import StatCard from "../StatCard";
 import { Modal, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 
-const ExpensesTable = ({ handleEdit, successMessage }) => {
+const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
   const { t } = useTranslation("expenses");
   const [searchTerm, setSearchTerm] = useState("");
   const [expenses, setExpenses] = useState([]);
@@ -194,8 +194,9 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
                   </button>
                   <button
                     onClick={() => {
-                      setExpenseToDelete(expense);
-                      setShowModal(true);
+                      // setExpenseToDelete(expense);
+                      // setShowModal(true);
+                      ondelete(expense);
                     }}
                     className="text-red-400 hover:text-red-300"
                   >
@@ -209,7 +210,7 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
       </div>
 
       {/* Bootstrap Modal for confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
+      {/* <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
         <Modal.Header closeButton>
           <Modal.Title>{t("DeleteExpense")}</Modal.Title>
         </Modal.Header>
@@ -222,7 +223,7 @@ const ExpensesTable = ({ handleEdit, successMessage }) => {
             {t("delete")}
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </motion.div>
   );
 };

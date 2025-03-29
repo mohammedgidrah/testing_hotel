@@ -225,7 +225,7 @@ export default function Services() {
   
 
   return (
-    <div className="flex-1 overflow-auto relative z-10">
+    <div className="flex-1 overflow-auto relative z-10" style={{direction: "ltr"}}>
       <Header title={t("Services")} />
 
       <div className="flex justify-end items-center mt-4 mr-4 ml-4">
@@ -279,7 +279,7 @@ export default function Services() {
         </div>
       )}
 
-      <Modal
+      {/* <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
         style={{ direction: "ltr" }}
@@ -296,7 +296,28 @@ export default function Services() {
             {t("delete")}
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
+           {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-gray-800 p-6 rounded-lg w-96">
+                        <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
+                        <div className="flex justify-end space-x-4">
+                            <button 
+                                onClick={() => setShowModal(false)} 
+                                className="bg-gray-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("cancel")}
+                            </button>
+                            <button 
+                                onClick={handleDelete} 
+                                className="bg-red-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("delete")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
       {/* Services Table */}
       <Servestable

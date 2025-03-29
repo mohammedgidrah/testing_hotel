@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Modal, Button } from "react-bootstrap";
 import EditBookingForm from "./EditBookingForm";
 
-function BookingsTable() {
+function BookingsTable({ondelete}) {
   const { t, i18n } = useTranslation("bookings");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredBookings, setFilteredBookings] = useState([]);
@@ -222,7 +222,7 @@ function BookingsTable() {
           className={`${showArrivals ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 px-4 rounded-lg transition-colors`} 
           onClick={handleShowArrivals}
         >
-          {showArrivals ? t("AllBookings") : t("TodayArrivals")}
+          {showArrivals ? t("allbookings") : t("TodayArrivals")}
         </button>
         <div className="relative">
           <input
@@ -340,7 +340,7 @@ function BookingsTable() {
                     <button
                       onClick={() => {
                         setSelectedBookingId(booking.id);
-                        setShowModal(true);
+                        ondelete(booking.id);
                       }}
                       className="text-red-500 hover:text-red-300"
                     >
@@ -368,7 +368,7 @@ function BookingsTable() {
       )}
 
       {/* Delete Confirmation Modal */}
-      <Modal
+      {/* <Modal
         show={showModal}
         onHide={() => setShowModal(false)}
         style={{ direction: "ltr" }}
@@ -385,7 +385,7 @@ function BookingsTable() {
             {t("Delete")}
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
 
       <Modal
         show={showDetailsModal}

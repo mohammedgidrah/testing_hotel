@@ -78,7 +78,7 @@ export default function GuestTable({ loading, filteredGuests, setEditingGuest, h
       )}
 
       {/* Bootstrap Modal for confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
+      {/* <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
         <Modal.Header closeButton>
           <Modal.Title>{t("DeleteGuest")}</Modal.Title>
         </Modal.Header>
@@ -91,7 +91,28 @@ export default function GuestTable({ loading, filteredGuests, setEditingGuest, h
             {t("delete")}
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
+                   {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{ direction: "ltr" }}>
+                    <div className="bg-gray-800 p-6 rounded-lg w-96">
+                        <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
+                        <div className="flex justify-end space-x-4">
+                            <button 
+                                onClick={() => setShowModal(false)} 
+                                className="bg-gray-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("cancel")}
+                            </button>
+                            <button 
+                                onClick={handleDelete} 
+                                className="bg-red-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("delete")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
     </div>
   );
 }

@@ -200,20 +200,28 @@ function Rooms() {
       )}
 
       {/* Bootstrap Modal for deletion confirmation */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} style={{direction:"ltr"}}>
-        <Modal.Header closeButton>
-          <Modal.Title>{t("DeleteRoom")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{t("DeleteConfirmation")}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            {t("cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            {t("delete")}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+ 
+      {showModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{direction: "ltr"}}>
+                    <div className="bg-gray-800 p-6 rounded-lg w-96">
+                        <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
+                        <div className="flex justify-end space-x-4">
+                            <button 
+                                onClick={() => setShowModal(false)} 
+                                className="bg-gray-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("cancel")}
+                            </button>
+                            <button 
+                                onClick={handleDelete} 
+                                className="bg-red-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("delete")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
       {/* Rooms Table */}
       <RoomsTable

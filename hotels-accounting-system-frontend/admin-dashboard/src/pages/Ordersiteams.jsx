@@ -5,6 +5,7 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { Modal, Button, Form } from "react-bootstrap";
 import { ErrorBoundary } from 'react-error-boundary';
+import Header from '../components/Header';
 
 function ErrorFallback({ error }) {
   return (
@@ -16,7 +17,7 @@ function ErrorFallback({ error }) {
 }
 
 function OrderItems() { // Fixed component name
-  const { t, i18n } = useTranslation("items");
+  const { t, i18n } = useTranslation("orderitems");
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -232,17 +233,18 @@ function OrderItems() { // Fixed component name
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <motion.div
-        className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8 m-4"
+        className=" flex-1 overflow-auto relative z-10             "
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        style={{ direction: i18n.language === "ar" ? "rtl" : "ltr" }}
+        style={{ direction:"ltr"}}
       >
+      <Header  title={t("OrderItems") } />
         {/* Search and Add Button Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-100">
+        <div className="flex justify-end items-center mb-6 p-4">
+          {/* <h2 className="text-xl font-semibold text-gray-100">
             {t("ItemsManagement") || "Items Management"}
-          </h2>
+          </h2> */}
           <div className="flex space-x-4">
             <div className="relative">
               <input
@@ -259,7 +261,7 @@ function OrderItems() { // Fixed component name
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center transition-colors"
             >
               <Plus size={18} className="mr-2" />
-              {t("AddItem") || "Add Item"}
+              {t("addItem") || "Add Item"}
             </button>
           </div>
         </div>
@@ -278,10 +280,10 @@ function OrderItems() { // Fixed component name
               : t("NoItemsFound") || "No items found"}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-700">
+          <div className="overflow-x-auto  m-6 border border-gray-700 rounded-lg">
+            <table className="min-w-full divide-y divide-gray-700  rounded-lg ">
               {/* Table Header */}
-              <thead>
+              <thead className="bg-gray-800">
                 <tr>
                   {['ID', 'Name', 'Description', 'Category', 'Price', 'Status', 'Actions'].map((header) => (
                     <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -354,11 +356,11 @@ function OrderItems() { // Fixed component name
           show={showItemModal}
           onHide={() => setShowItemModal(false)}
           size="lg"
-          style={{ direction: i18n.language === "ar" ? "rtl" : "ltr" }}
+          style={{ direction:"ltr" }}
         >
           <Modal.Header closeButton>
             <Modal.Title>
-              {editMode ? t("EditItem") : t("AddNewItem")}
+              {editMode ? t("EditItem") : t("addnewitem")}
             </Modal.Title>
           </Modal.Header>
           <Form onSubmit={handleSubmitForm}>
@@ -400,7 +402,7 @@ function OrderItems() { // Fixed component name
                   onChange={handleFormChange}
                   isInvalid={!!formErrors.category}
                 >
-                  <option value="">{t("SelectCategory")}</option>
+                  <option value="">{t("selectcategory")}</option>
                   <option value="general">{t("General")}</option>
                   <option value="amenity">{t("Amenity")}</option>
                   <option value="service">{t("Service")}</option>
@@ -431,7 +433,7 @@ function OrderItems() { // Fixed component name
               <Form.Group className="mb-3">
                 <Form.Check
                   type="checkbox"
-                  label={t("IsAvailable")}
+                  label={t("isavailable")}
                   name="status"
                   checked={formData.status === "isavailable"}
                   onChange={handleFormChange}
@@ -440,40 +442,44 @@ function OrderItems() { // Fixed component name
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowItemModal(false)}>
-                {t("Cancel")}
+                {t("cancel")}
               </Button>
               <Button variant="primary" type="submit">
-                {editMode ? t("SaveChanges") : t("AddItem")}
+                {editMode ? t("SaveChanges") : t("additem")}
               </Button>
             </Modal.Footer>
           </Form>
         </Modal>
 
         {/* Delete Confirmation Modal */}
-        <Modal
-          show={showDeleteModal}
-          onHide={() => setShowDeleteModal(false)}
-          centered
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>{t("DeleteItem")}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {t("AreYouSureDeleteItem")}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-              {t("Cancel")}
-            </Button>
-            <Button variant="danger" onClick={handleDeleteItem}>
-              {t("Delete")}
-            </Button>
-          </Modal.Footer>
-        </Modal>
+  
+             {showDeleteModal && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-gray-800 p-6 rounded-lg w-96">
+                        <h3 className="text-xl text-white mb-4">{t("deletcofermation")}</h3>
+                        <div className="flex justify-end space-x-4">
+                            <button 
+                                onClick={() => setShowDeleteModal(false)} 
+                                className="bg-gray-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("cancel")}
+                            </button>
+                            <button 
+                                onClick={handleDeleteItem} 
+                                className="bg-red-600 text-white px-4 py-2 rounded"
+                            >
+                                {t("delete")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
       </motion.div>
+      
     </ErrorBoundary>
   );
 }
+
 
 export default function App() {
   return (

@@ -1,5 +1,4 @@
-import React from 'react';
-
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import { motion } from 'framer-motion';
 import StatCard from '../components/StatCard';
@@ -9,70 +8,64 @@ import BookingsTable from '../components/Bookings/BookingsTable';
 import { useTranslation } from 'react-i18next';
 
 function Bookings() {
+  const { t } = useTranslation("bookings");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [bookings, setBookings] = useState([]);
+  const [totalBookings, setTotalBookings] = useState(0);
+  const [totalBookingsToday, setTotalBookingsToday] = useState(0);
+  const [totalGuests, setTotalGuests] = useState(0);
+  const [totalRooms, setTotalRooms] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState(null);
 
-  const { t } = useTranslation("bookings"); // Specify the namespace
-  const [error, setError] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-  const [bookings, setBookings] = React.useState([]);
-  const [totalBookings, setTotalBookings] = React.useState(0);
-  const [totalBookingsToday, setTotalBookingsToday] = React.useState(0);
-  const [totalGuests, setTotalGuests] = React.useState(0);
-  const [totalRooms, setTotalRooms] = React.useState(0);
-
-  React.useEffect(() => {
+  useEffect(() => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+
     axios.get('http://127.0.0.1:8000/api/bookings')
       .then(response => {
         setTotalBookings(response.data.length);
         setBookings(response.data);
-        setLoading(false);
       })
-      .catch(error => {
-        console.log(error);
-        setError('Failed to load data');
-      });
+      .catch(() => setError('Failed to load data'))
+      .finally(() => setLoading(false));
 
     axios.get('http://127.0.0.1:8000/api/guests')
-      .then(response => {
-        setTotalGuests(response.data.length);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.log(error);
-        setError('Failed to load data');
-      });
+      .then(response => setTotalGuests(response.data.length))
+      .catch(() => setError('Failed to load data'));
 
     axios.get('http://127.0.0.1:8000/api/rooms')
-      .then(response => {
-        setTotalRooms(response.data.length);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.log(error);
-        setError('Failed to load data');
-      });
+      .then(response => setTotalRooms(response.data.length))
+      .catch(() => setError('Failed to load data'));
 
     axios.get('http://127.0.0.1:8000/api/bookingsQuery/today')
       .then(response => {
-        if (response.data.data && response.data.data.length === 0) {
-          setTotalBookingsToday(0);
-          
-        } else {
-          
-          setTotalBookingsToday(response.data.length);
-        }
-        setLoading(false);
+        setTotalBookingsToday(response.data?.length || 0);
       })
-      .catch(error => {
-        console.log(error);
-        setError('Failed to load data');
-      });
+      .catch(() => setError('Failed to load data'));
   }, []);
+
+  const openDeleteModal = (bookingId) => {
+    setBookingToDelete(bookingId);
+    setShowModal(true);
+  };
+
+  const handleDelete = () => {
+    if (!bookingToDelete) return;
+    
+    axios.delete(`http://127.0.0.1:8000/api/bookings/${bookingToDelete}`)
+      .then(() => {
+        setBookings(bookings.filter(booking => booking.id !== bookingToDelete));
+        setTotalBookings(prev => prev - 1);
+        setShowModal(false);
+      })
+      .catch(() => setError('Failed to delete booking'));
+  };
 
   return (
     <div className='flex-1 overflow-auto relative z-10'>
       <Header title={t('title')} />
-      {error && <p>{error}</p>}
+      {error && <p className="text-red-500">{error}</p>}
       {loading ? <p>Loading...</p> : (
         <>
           <motion.div
@@ -83,13 +76,33 @@ function Bookings() {
           >
             <StatCard name={t('Rooms')} value={totalRooms} icon={School} color="#34d399" />
             <StatCard name={t('title')} value={totalBookings} icon={Users} color="#34d399" />
-            <StatCard name={t('BookingsToday')} value={totalBookingsToday?totalBookingsToday : 0} icon={Book} color="#34d399" />
+            <StatCard name={t('BookingsToday')} value={totalBookingsToday} icon={Book} color="#34d399" />
             <StatCard name={t('TotalGuests')} value={totalGuests} icon={User} color="#34d399" />
           </motion.div>
-          <BookingsTable/>
+          <BookingsTable ondelete={openDeleteModal} />
         </>
       )}
-
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{direction: "ltr"}}>
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-xl text-white mb-4">{t("AreYouSure")}</h3>
+            <div className="flex justify-end space-x-4">
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                {t("Cancel")}
+              </button>
+              <button 
+                onClick={handleDelete} 
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                {t("Delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,3 +1,21 @@
 {
-    "OrderItems": "عناصر الطلبات"
+    "OrderItems": "عناصر الطلبات",
+    "Search": "بحث",
+    "ID": " رقم العنصر",
+    "Name": "الاسم",
+    "Description": "الوصف",
+    "Price": "السعر",
+    "Category": "الفئة",
+    "Status": "الحالة",
+    "Actions": "الاجراءات",
+    "addItem": "اضافة عنصر",
+    "addnewitem": "اضافة عنصر جديد",
+    "isavailable": "متوفر",
+    "selectcategory": "اختر الفئة",
+    "cancel": "الغاء",
+    "additem": "اضافة عنصر",
+    "SaveChanges": "حفظ التغييرات",
+    "EditItem": "تعديل العنصر",
+    "delete": "حذف",
+    "deletcofermation": "هل أنت متأكد من حذف هذا العنصر؟"
 }

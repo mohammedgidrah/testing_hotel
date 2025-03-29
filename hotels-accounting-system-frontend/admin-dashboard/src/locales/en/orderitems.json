@@ -1,3 +1,21 @@
 {
-    "OrderItems": "Order Items"
+    "OrderItems": "Order Items",
+    "Search": "Search",
+    "ID": "item ID",
+    "Name": "Name",
+    "Description": "Description",
+    "Price": "Price",
+    "Category": "Category",
+    "Status": "Status",
+    "Actions": "Actions",
+    "addItem": "Add Item",
+    "addnewitem": "Add New Item",
+    "isavailable": "Available",
+    "selectcategory": "Select Category",
+    "cancel": "Cancel",
+    "additem": "Add Item",
+    "SaveChanges": "Save Changes",
+    "EditItem": "Edit Item",
+    "delete": "Delete",
+    "deletcofermation": "Are you sure you want to delete this item?"
 }
