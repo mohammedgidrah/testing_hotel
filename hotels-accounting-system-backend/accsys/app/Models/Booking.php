@@ -39,5 +39,10 @@ public function services()
 {
     return $this->belongsToMany(Service::class, 'booking_service');
 }
+public function orders()
+{
+    return $this->hasMany(Order::class);
+}
+
 }
 

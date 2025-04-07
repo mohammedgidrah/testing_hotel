@@ -15,6 +15,16 @@ class Item extends Model
         'price',
         'category',
         'status',
-        'description'
+        'description',
+        'image'  
     ];
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
+
 }

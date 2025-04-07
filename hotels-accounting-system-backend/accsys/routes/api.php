@@ -25,7 +25,8 @@ use App\Http\Controllers\{
     FinancialReportController,
     LoginController,
     ServiceController,
-    ItemController
+    ItemController,
+    OrderController
 
 };
 
@@ -59,6 +60,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('services', ServiceController::class);
+    Route::apiResource('orders', OrderController::class);
     Route::prefix('bookingsQuery')->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);
     });
