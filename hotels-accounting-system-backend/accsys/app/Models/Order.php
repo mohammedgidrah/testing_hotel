@@ -11,6 +11,7 @@ class Order extends Model
         'item_id',
         'booking_id',
         'quantity',
+        'price_per_item',
         'total_price',
     ];
 

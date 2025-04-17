@@ -1,16 +1,14 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Order;
 use Illuminate\Http\Request;
-
- use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-     /**
+    /**
      * Display a listing of orders.
      *
      * @return \Illuminate\Http\JsonResponse
@@ -22,12 +20,12 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'data' => $orders
+                'data'   => $orders,
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Error fetching orders: ' . $e->getMessage()
+                'status'  => 'error',
+                'message' => 'Error fetching orders: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -41,41 +39,42 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'item_id' => 'required|exists:items,id',
+            'item_id'    => 'required|exists:items,id',
             'booking_id' => 'required|exists:bookings,id',
-            'quantity' => 'required|integer|min:1',
-         ]);
+            'quantity'   => 'required|integer|min:1',
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'errors' => $validator->errors()->all()
+                'errors' => $validator->errors()->all(),
             ], 422);
         }
 
         try {
             // Get price from items table
             $item = Item::findOrFail($request->item_id);
-            
+
             $orderData = [
-                'item_id' => $request->item_id,
-                'booking_id' => $request->booking_id,
-                'quantity' => $request->quantity,
-                 'total_price' => $item->price * $request->quantity
+                'item_id'        => $request->item_id,
+                'booking_id'     => $request->booking_id,
+                'quantity'       => $request->quantity,
+                'price_per_item' => $item->price,  
+
+                'total_price'    => $item->price * $request->quantity,
             ];
 
- 
             $order = Order::create($orderData);
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Order created successfully',
-                'data' => $order->load(['item', 'booking'])
+                'data'    => $order->load(['item', 'booking']),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Error creating order: ' . $e->getMessage()
+                'status'  => 'error',
+                'message' => 'Error creating order: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -90,15 +89,15 @@ class OrderController extends Controller
     {
         try {
             $order = Order::with(['item', 'booking'])->findOrFail($id);
-            
+
             return response()->json([
                 'status' => 'success',
-                'data' => $order
+                'data'   => $order,
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Order not found'
+                'status'  => 'error',
+                'message' => 'Order not found',
             ], 404);
         }
     }
@@ -113,43 +112,41 @@ class OrderController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'item_id' => 'required|exists:items,id',
+            'item_id'    => 'required|exists:items,id',
             'booking_id' => 'required|exists:bookings,id',
-            'quantity' => 'required|integer|min:1',
-         ]);
+            'quantity'   => 'required|integer|min:1',
+        ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
-                'errors' => $validator->errors()->all()
+                'errors' => $validator->errors()->all(),
             ], 422);
         }
 
         try {
             $order = Order::findOrFail($id);
-            $item = Item::findOrFail($request->item_id);
+            $item  = Item::findOrFail($request->item_id);
 
             $orderData = [
-                'item_id' => $request->item_id,
-                'booking_id' => $request->booking_id,
-                'quantity' => $request->quantity,
+                'item_id'        => $request->item_id,
+                'booking_id'     => $request->booking_id,
+                'quantity'       => $request->quantity,
                 'price_per_item' => $item->price, // Get fresh price from item
-                'total_price' => $item->price * $request->quantity
+                'total_price'    => $item->price * $request->quantity,
             ];
-
-  
 
             $order->update($orderData);
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Order updated successfully',
-                'data' => $order->load(['item', 'booking'])
+                'data'    => $order->load(['item', 'booking']),
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Error updating order: ' . $e->getMessage()
+                'status'  => 'error',
+                'message' => 'Error updating order: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -164,18 +161,17 @@ class OrderController extends Controller
     {
         try {
             $order = Order::findOrFail($id);
-            
-    
+
             $order->delete();
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Order deleted successfully'
+                'status'  => 'success',
+                'message' => 'Order deleted successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Error deleting order: ' . $e->getMessage()
+                'status'  => 'error',
+                'message' => 'Error deleting order: ' . $e->getMessage(),
             ], 500);
         }
     }
