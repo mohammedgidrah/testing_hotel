@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
@@ -17,12 +17,12 @@ class ItemController extends Controller
             $items = Item::all(); // Remove pagination if not needed
             return response()->json([
                 'success' => true,
-                'data' => $items
+                'data'    => $items,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to retrieve items'
+                'message' => 'Failed to retrieve items',
             ], 500);
         }
     }
@@ -35,21 +35,30 @@ class ItemController extends Controller
         return response()->json(['message' => 'Not implemented'], 501);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'category' => 'required|in:general,amenity,service,food',
-            'status' => 'required|in:isavailable,notavailable'
+            'price'       => 'required|numeric|min:0',
+            'category'    => 'required|in:general,amenity,service,food',
+            'status'      => 'required|in:isavailable,notavailable',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
         ]);
-    
+
+        // Store the image in the 'public/images' directory
+        $path = $request->file('image')->store('images', 'public');
+
+        // Save the image path to the validated data
+        $validated['image'] = $path;
+
+        // Create the item
         $item = Item::create($validated);
-        return response()->json($item, 201);
+
+        return response()->json([
+            'item' => $item,
+            'url'  => asset("storage/$path"),
+        ], 201);
     }
 
     /**
@@ -61,13 +70,13 @@ class ItemController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Item retrieved successfully',
-                'data' => $item
+                'data'    => $item,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to retrieve item',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
@@ -86,33 +95,52 @@ class ItemController extends Controller
     public function update(Request $request, Item $item)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
+            'name'        => 'sometimes|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'sometimes|numeric|min:0',
-            'category' => 'sometimes|in:general,amenity,service,food',
-            'status' => 'sometimes|in:isavailable,notavailable'
+            'price'       => 'sometimes|numeric|min:0',
+            'category'    => 'sometimes|in:general,amenity,service,food',
+            'status'      => 'sometimes|in:isavailable,notavailable',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
+    
+        // Remove this line - $item is already resolved by Laravel
+        // $item = Item::findOrFail($id);
+    
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()
+                'errors'  => $validator->errors(),
             ], 422);
         }
-
+    
         try {
-            $item->update($request->all());
+            // Handle image update
+            if ($request->hasFile('image')) {
+                // Delete old image
+                if ($item->image) {
+                    Storage::delete($item->image);
+                }
+                
+                // Store new image
+                $path = $request->file('image')->store('images', 'public');
+                $item->image = $path;
+            }
+    
+            // Update other fields
+            $item->update($request->except('image'));
+    
             return response()->json([
                 'success' => true,
                 'message' => 'Item updated successfully',
-                'data' => $item
+                'data'    => $item,
             ]);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update item',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
@@ -126,18 +154,18 @@ class ItemController extends Controller
             if ($item->delete()) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Item deleted successfully'
+                    'message' => 'Item deleted successfully',
                 ], 204);
             }
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete item'
+                'message' => 'Failed to delete item',
             ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete item',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }

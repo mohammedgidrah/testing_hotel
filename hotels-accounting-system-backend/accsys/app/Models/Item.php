@@ -22,9 +22,6 @@ class Item extends Model
     {
         return $this->hasMany(Order::class);
     }
-    public function getImageUrlAttribute()
-    {
-        return $this->image ? asset('storage/' . $this->image) : null;
-    }
+ 
 
 }
