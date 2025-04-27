@@ -5,6 +5,7 @@ use App\Models\Item;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -39,46 +40,62 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'item_id'    => 'required|exists:items,id',
-            'booking_id' => 'required|exists:bookings,id',
-            'quantity'   => 'required|integer|min:1',
+            'orders' => 'required|array|min:1',
+            'orders.*.item_id' => 'required|exists:items,id',
+            'orders.*.booking_id' => 'required|exists:bookings,id',
+            'orders.*.quantity' => 'required|integer|min:1',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
                 'errors' => $validator->errors()->all(),
             ], 422);
         }
-
+    
         try {
-            // Get price from items table
-            $item = Item::findOrFail($request->item_id);
-
-            $orderData = [
-                'item_id'        => $request->item_id,
-                'booking_id'     => $request->booking_id,
-                'quantity'       => $request->quantity,
-                'price_per_item' => $item->price,  
-
-                'total_price'    => $item->price * $request->quantity,
-            ];
-
-            $order = Order::create($orderData);
-
+            DB::beginTransaction();
+    
+            $createdOrders = [];
+    
+            foreach ($request->orders as $orderRequest) {
+                $item = Item::findOrFail($orderRequest['item_id']);
+    
+                $orderData = [
+                    'item_id' => $orderRequest['item_id'],
+                    'booking_id' => $orderRequest['booking_id'],
+                    'quantity' => $orderRequest['quantity'],
+                    'price_per_item' => $item->price,
+                    'total_price' => $item->price * $orderRequest['quantity'],
+                ];
+    
+                $order = Order::create($orderData);
+                $createdOrders[] = $order->load(['item', 'booking']);
+            }
+    
+            DB::commit();
+    
             return response()->json([
-                'status'  => 'success',
-                'message' => 'Order created successfully',
-                'data'    => $order->load(['item', 'booking']),
+                'status' => 'success',
+                'message' => 'Orders created successfully',
+                'data' => $createdOrders,
             ], 201);
-        } catch (\Exception $e) {
+    
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
             return response()->json([
-                'status'  => 'error',
-                'message' => 'Error creating order: ' . $e->getMessage(),
+                'status' => 'error',
+                'message' => 'One of the items or bookings was not found',
+            ], 404);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error creating orders: ' . $e->getMessage(),
             ], 500);
         }
     }
-
     /**
      * Display the specified order.
      *

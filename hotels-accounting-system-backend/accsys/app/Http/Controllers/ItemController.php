@@ -103,8 +103,7 @@ class ItemController extends Controller
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
     
-        // Remove this line - $item is already resolved by Laravel
-        // $item = Item::findOrFail($id);
+ 
     
         if ($validator->fails()) {
             return response()->json([

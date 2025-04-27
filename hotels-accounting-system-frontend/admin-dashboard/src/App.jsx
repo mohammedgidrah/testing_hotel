@@ -18,6 +18,7 @@ import Reception from "./pages/Reception";
 import Services from "./pages/services";
 import Orders from "./pages/Orders";
 import Ordersiteams from "./pages/Ordersiteams";
+import Itempage from "./pages/itemspage";
 
 
 
@@ -67,6 +68,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={['admin', 'manager', 'accountant']}>
               <Bookings />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/booking-items"
+          element={
+            <PrivateRoute allowedRoles={['admin', 'manager', 'accountant']}>
+              <Itempage />
             </PrivateRoute>
           }
         />

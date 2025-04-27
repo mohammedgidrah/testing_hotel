@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Edit, Trash2, Search, Eye } from "lucide-react";
+import { Edit, Trash2, Search, Eye, Plus } from "lucide-react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { Modal, Button } from "react-bootstrap";
 import EditBookingForm from "./EditBookingForm";
+import { useNavigate } from "react-router-dom";
 
-function BookingsTable({ondelete}) {
+function BookingsTable({ ondelete }) {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation("bookings");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredBookings, setFilteredBookings] = useState([]);
@@ -22,7 +24,7 @@ function BookingsTable({ondelete}) {
   const [payments, setPayments] = useState([]);
   const [showArrivals, setShowArrivals] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
 
@@ -34,9 +36,9 @@ function BookingsTable({ondelete}) {
     const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = date.getUTCFullYear();
 
-     return `${day}/${month}/${year}`;
+    return `${day}/${month}/${year}`;
   };
-  
+
   const fetchPayments = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/payments", {
@@ -73,7 +75,7 @@ function BookingsTable({ondelete}) {
       setError(t("fetchError"));
     }
   };
-  
+
   useEffect(() => {
     fetchBookings();
     fetchrooms();
@@ -87,17 +89,18 @@ function BookingsTable({ondelete}) {
 
   const filterBookings = (bookingsData, term, showTodayArrivals) => {
     let filtered = [...bookingsData];
-    
+
     // Apply search filter if search term exists
     if (term) {
       const searchTermLower = term.toLowerCase();
       filtered = filtered.filter((booking) => {
         if (!booking.guest) return false;
-        
-        const guestName = `${booking.guest.first_name} ${booking.guest.last_name}`.toLowerCase();
+
+        const guestName =
+          `${booking.guest.first_name} ${booking.guest.last_name}`.toLowerCase();
         const roomNumber = booking.room?.room_number?.toLowerCase() || "";
         const bookingId = booking.id.toString().toLowerCase();
-        
+
         return (
           guestName.includes(searchTermLower) ||
           roomNumber.includes(searchTermLower) ||
@@ -105,7 +108,7 @@ function BookingsTable({ondelete}) {
         );
       });
     }
-    
+
     // Apply arrivals filter if showArrivals is true
     if (showTodayArrivals) {
       // Get today's date in the format YYYY-MM-DD
@@ -114,16 +117,16 @@ function BookingsTable({ondelete}) {
       const month = String(today.getMonth() + 1).padStart(2, "0");
       const day = String(today.getDate()).padStart(2, "0");
       const todayFormatted = `${year}-${month}-${day}`;
-      
+
       // Filter for bookings where check-in date is today
       filtered = filtered.filter((booking) => {
         if (!booking.check_in_date) return false;
         // Format booking check-in date to compare with today
-        const checkInDate = booking.check_in_date.split('T')[0];
+        const checkInDate = booking.check_in_date.split("T")[0];
         return checkInDate === todayFormatted;
       });
     }
-    
+
     setFilteredBookings(filtered);
   };
 
@@ -136,14 +139,14 @@ function BookingsTable({ondelete}) {
     if (selectedBookingId) {
       axios
         .delete(`http://127.0.0.1:8000/api/bookings/${selectedBookingId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         })
         .then(() => {
           setBookings((prev) =>
             prev.filter((booking) => booking.id !== selectedBookingId)
           );
           filterBookings(
-            bookings.filter(booking => booking.id !== selectedBookingId),
+            bookings.filter((booking) => booking.id !== selectedBookingId),
             searchTerm,
             showArrivals
           );
@@ -160,7 +163,7 @@ function BookingsTable({ondelete}) {
       const response = await axios.get(
         `http://localhost:8000/api/bookings/${booking.id}/services`,
         {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
       );
       const bookingWithServices = {
@@ -176,8 +179,8 @@ function BookingsTable({ondelete}) {
 
   const handleUpdateBooking = (updatedBooking) => {
     // Find the current booking with all its nested data
-    const existingBooking = bookings.find(b => b.id === updatedBooking.id);
-    
+    const existingBooking = bookings.find((b) => b.id === updatedBooking.id);
+
     // Create a properly merged booking that preserves nested objects
     const mergedBooking = {
       ...existingBooking,
@@ -185,23 +188,23 @@ function BookingsTable({ondelete}) {
       // Ensure room data is preserved
       room: updatedBooking.room || existingBooking.room,
       // Ensure guest data is preserved
-      guest: updatedBooking.guest || existingBooking.guest
+      guest: updatedBooking.guest || existingBooking.guest,
     };
-    
+
     // Update the bookings state with the merged booking
     const updatedBookings = bookings.map((b) =>
       b.id === updatedBooking.id ? mergedBooking : b
     );
-    
+
     setBookings(updatedBookings);
-    
+
     // Re-apply filters to updated bookings list
     filterBookings(updatedBookings, searchTerm, showArrivals);
-    
+
     // Re-fetch payments after a booking update
     fetchPayments();
   };
-  
+
   const handleShowArrivals = () => {
     setShowArrivals(!showArrivals);
   };
@@ -218,8 +221,12 @@ function BookingsTable({ondelete}) {
         <h2 className="text-xl font-semibold text-gray-100">
           {t("BookingList")} {showArrivals && `- ${t("TodayArrivals")}`}
         </h2>
-        <button 
-          className={`${showArrivals ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 px-4 rounded-lg transition-colors`} 
+        <button
+          className={`${
+            showArrivals
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-blue-500 hover:bg-blue-600"
+          } text-white py-2 px-4 rounded-lg transition-colors`}
           onClick={handleShowArrivals}
         >
           {showArrivals ? t("allbookings") : t("TodayArrivals")}
@@ -232,22 +239,20 @@ function BookingsTable({ondelete}) {
             onChange={handleSearch}
             value={searchTerm}
           />
-          
+
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8 text-gray-400">
-          {t("Loading")}...
-        </div>
+        <div className="text-center py-8 text-gray-400">{t("Loading")}...</div>
       ) : filteredBookings.length === 0 ? (
         <div className="text-center py-8 text-gray-400">
-          {showArrivals 
-            ? t("NoArrivalsToday") 
-            : searchTerm 
-              ? t("NoMatchingBookings") 
-              : t("NoBookingsFound")}
+          {showArrivals
+            ? t("NoArrivalsToday")
+            : searchTerm
+            ? t("NoMatchingBookings")
+            : t("NoBookingsFound")}
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -262,7 +267,7 @@ function BookingsTable({ondelete}) {
                   "CheckOutDate",
                   "TotalAmount",
                   "Status",
-                  "paymentMethod",  
+                  "paymentMethod",
                   "Details",
                   "Actions",
                 ].map((header) => (
@@ -279,7 +284,10 @@ function BookingsTable({ondelete}) {
             <tbody className="divide-y divide-gray-700">
               {error && (
                 <tr>
-                  <td colSpan="10" className="px-6 py-4 text-red-500 text-center">
+                  <td
+                    colSpan="10"
+                    className="px-6 py-4 text-red-500 text-center"
+                  >
                     {error}
                   </td>
                 </tr>
@@ -296,7 +304,9 @@ function BookingsTable({ondelete}) {
                     {booking.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                    {booking.guest ? `${booking.guest.first_name} ${booking.guest.last_name}` : "N/A"}
+                    {booking.guest
+                      ? `${booking.guest.first_name} ${booking.guest.last_name}`
+                      : "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {booking.room?.room_number || "N/A"}
@@ -315,8 +325,9 @@ function BookingsTable({ondelete}) {
                     {t(booking.payment_status || "pending")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                    {payments.find((payment) => payment.booking_id === booking.id)
-                      ?.payment_method || t("noPayment")}
+                    {payments.find(
+                      (payment) => payment.booking_id === booking.id
+                    )?.payment_method || t("noPayment")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <button
@@ -326,8 +337,8 @@ function BookingsTable({ondelete}) {
                       <Eye size={20} />
                     </button>
                   </td>
-                
-                  <td className="flex px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+
+                  <td className="flex justify-ar px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <button
                       onClick={() => {
                         setSelectedBooking(booking);
@@ -345,6 +356,16 @@ function BookingsTable({ondelete}) {
                       className="text-red-500 hover:text-red-300"
                     >
                       <Trash2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        navigate("/booking-items", {
+                          state: { bookingId: booking.id }, // Pass booking ID in route state
+                        });
+                      }}
+                      className="text-yellow-500 hover:text-red-300"
+                    >
+                      <Plus size={18} />
                     </button>
                   </td>
                 </motion.tr>
@@ -366,26 +387,6 @@ function BookingsTable({ondelete}) {
           rooms={rooms}
         />
       )}
-
-      {/* Delete Confirmation Modal */}
-      {/* <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        style={{ direction: "ltr" }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{t("DeleteBooking")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{t("AreYouSure")}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            {t("Cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            {t("Delete")}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
 
       <Modal
         show={showDetailsModal}
@@ -409,9 +410,9 @@ function BookingsTable({ondelete}) {
                 }
               >
                 <strong>{t("GuestName")}:</strong>{" "}
-                {selectedBookingDetails.guest ? 
-                  `${selectedBookingDetails.guest.first_name} ${selectedBookingDetails.guest.last_name}` : 
-                  "N/A"}
+                {selectedBookingDetails.guest
+                  ? `${selectedBookingDetails.guest.first_name} ${selectedBookingDetails.guest.last_name}`
+                  : "N/A"}
               </p>
               <p>
                 <strong>{t("RoomNumber")}:</strong>{" "}
@@ -419,19 +420,25 @@ function BookingsTable({ondelete}) {
               </p>
               <p>
                 <strong>{t("CheckInDate")}:</strong>{" "}
-                {selectedBookingDetails.check_in_date ? 
-                  new Date(selectedBookingDetails.check_in_date).toLocaleDateString() : 
-                  "N/A"}
+                {selectedBookingDetails.check_in_date
+                  ? new Date(
+                      selectedBookingDetails.check_in_date
+                    ).toLocaleDateString()
+                  : "N/A"}
               </p>
               <p>
                 <strong>{t("CheckOutDate")}:</strong>{" "}
-                {selectedBookingDetails.check_out_date ?
-                  new Date(selectedBookingDetails.check_out_date).toLocaleDateString() :
-                  "N/A"}
+                {selectedBookingDetails.check_out_date
+                  ? new Date(
+                      selectedBookingDetails.check_out_date
+                    ).toLocaleDateString()
+                  : "N/A"}
               </p>
               <p>
                 <strong>{t("TotalAmount")}:</strong> $
-                {parseFloat(selectedBookingDetails.total_amount || 0).toFixed(2)}
+                {parseFloat(selectedBookingDetails.total_amount || 0).toFixed(
+                  2
+                )}
               </p>
               <p>
                 <strong>{t("Status")}:</strong>{" "}
@@ -446,7 +453,8 @@ function BookingsTable({ondelete}) {
                   <ul>
                     {selectedBookingDetails.services.map((service) => (
                       <li key={service.id}>
-                        {service.name} - ${parseFloat(service.price || 0).toFixed(2)}
+                        {service.name} - $
+                        {parseFloat(service.price || 0).toFixed(2)}
                       </li>
                     ))}
                   </ul>

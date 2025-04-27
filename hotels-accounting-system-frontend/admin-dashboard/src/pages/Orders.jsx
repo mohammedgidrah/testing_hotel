@@ -369,13 +369,13 @@
                   size={18}
                 />
               </div>
-              <button
+              {/* <button
                 onClick={handleAddOrder}
                 className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center transition-colors"
               >
                 <Plus size={18} className="mr-2" />
                 {t("addOrder") || "Add Order"}
-              </button>
+              </button> */}
             </div>
           </div>
 

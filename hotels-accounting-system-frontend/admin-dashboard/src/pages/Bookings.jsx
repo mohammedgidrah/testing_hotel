@@ -99,6 +99,7 @@ function Bookings() {
               >
                 {t("Delete")}
               </button>
+              
             </div>
           </div>
         </div>
