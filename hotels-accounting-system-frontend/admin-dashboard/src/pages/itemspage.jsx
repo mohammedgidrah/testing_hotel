@@ -7,12 +7,14 @@ import axios from "axios";
 import ProductCards from "../pages/ProductCard";
 import { t } from "i18next";
 import { useLocation, useNavigate } from "react-router-dom"; // Add imports
+import { useTranslation } from "react-i18next";
 
 
 // Product Card Component
 
 // Main App Component
 export default function ProductCardPage() {
+  const { t } = useTranslation("items"); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
@@ -62,13 +64,7 @@ useEffect(() => {
       }));
    
    
-      // Check booking validity
-    //   const bookingCheck = await axios.get(
-    //     `http://127.0.0.1:8000/api/bookings/${selectedBookingId}`,
-    //     {
-    //       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-    //     }
-    //   );
+  
   
       // Send order data with proper structure
       const response = await axios.post(
@@ -226,7 +222,7 @@ const addToCart = (product, quantity) => {
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
-      <Header title="Items" />
+      <Header title={t('items')}/>
       {error && <p className="text-red-500 px-4">{error}</p>}
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -254,14 +250,15 @@ const addToCart = (product, quantity) => {
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white">
-                Available Products
+                {t("Available Products")}
               </h2>
               <button
                 onClick={() => setShowCartModal(true)}
                 className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center"
+                style={{direction:"ltr"}}
               >
-                <ShoppingCart size={16} className="mr-2" /> View Cart (
-                {cart.length})
+                <ShoppingCart size={16} className="mr-2"  /> {t("View Cart")} ({cart.length})
+                
               </button>
             </div>
 

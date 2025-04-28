@@ -1,3 +1,13 @@
 {
-    "Orders": "Orders"
+    "Orders": "Orders",
+    "id": "ID",
+    "item": "Item",
+    "booking": "Booking",
+    "quantity": "Quantity",
+    "pricePerItem": "Price per item",
+    "totalPrice": "Total price",
+    "actions": "Actions",
+    "EditOrder": "Edit Order",
+    "SelectItem": "Select Item",
+    "SelectBooking": "Select Booking"
 }

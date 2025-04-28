@@ -1,8 +1,10 @@
 import React from 'react';
 import { useState } from 'react';
 import {   Plus, Minus } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 const ProductCard = ({ items, addToCart  }) => {
+  const { t } = useTranslation("items");
     const [count, setCount] = useState(0);
   
     const increaseCount = () => {
@@ -56,7 +58,7 @@ const ProductCard = ({ items, addToCart  }) => {
             count === 0 ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600'
           }`}
         >
-          Add to Cart
+          {t("Add to Cart")}
         </button>
         </div>
  

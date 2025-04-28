@@ -17,5 +17,6 @@
     "SaveChanges": "حفظ التغييرات",
     "EditItem": "تعديل العنصر",
     "delete": "حذف",
-    "deletcofermation": "هل أنت متأكد من حذف هذا العنصر؟"
+    "deletcofermation": "هل أنت متأكد من حذف هذا العنصر؟",
+    "Image": "صورة"
 }

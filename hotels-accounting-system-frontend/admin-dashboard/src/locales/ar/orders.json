@@ -1,3 +1,13 @@
 {
-    "Orders": "الطلبات"
+    "Orders": "الطلبات",
+    "id": "الرقم",
+    "item": "العنصر",
+    "booking": "الحجز",
+    "quantity": "الكمية",
+    "pricePerItem": "سعر العنصر",
+    "totalPrice": "السعر الإجمالي",
+    "actions": "الإجراءات",
+    "EditOrder": "تعديل الطلب",
+    "SelectItem": "اختر العنصر",
+    "SelectBooking": "اختر الحجز"
 }

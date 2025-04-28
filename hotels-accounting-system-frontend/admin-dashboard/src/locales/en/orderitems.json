@@ -17,5 +17,6 @@
     "SaveChanges": "Save Changes",
     "EditItem": "Edit Item",
     "delete": "Delete",
-    "deletcofermation": "Are you sure you want to delete this item?"
+    "deletcofermation": "Are you sure you want to delete this item?",
+    "Image": "Image"
 }

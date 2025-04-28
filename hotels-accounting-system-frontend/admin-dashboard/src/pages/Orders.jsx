@@ -208,27 +208,7 @@
           [name]: newQuantity,
           total_price: (price * quantity).toFixed(2),
         }));
-        // const { name, value } = e.target;
-  
-
-      
-        // if (name === "item_id") {
-           
-        //   const quantity = parseInt(formData.quantity) || 1;
-          
-        //   if (selectedItem && selectedItem.price) {
-        //     const price = parseFloat(selectedItem.price);
-        //     const total = price * quantity;
-            
-        //     console.log("Calculated price:", price);
-        //     console.log("Calculated total:", total);
-      
-        //     setFormData((prev) => ({
-        //       ...prev,
-        //       [name]: value,
-        //       price_per_item: price.toFixed(2),
-        //       total_price: total.toFixed(2),
-        //     }));
+ 
       } else {
         setFormData((prev) => ({ ...prev, [name]: value }));
       }
@@ -399,26 +379,26 @@
                 <thead className="bg-gray-800">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("ID") || "ID"}
+                      {t("id") || "ID"}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("Item") || "Item"}
+                      {t("item") || "Item"}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("Booking") || "Booking"}
+                      {t("booking") || "Booking"}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("Quantity") || "Quantity"}
+                      {t("quantity") || "Quantity"}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("PricePerItem") || "Price Per Item"}
+                      {t("pricePerItem") || "Price Per Item"}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("TotalPrice") || "Total Price"}
+                      {t("totalPrice") || "Total Price"}
                     </th>
 
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                      {t("Actions") || "Actions"}
+                      {t("actions") || "Actions"}
                     </th>
                   </tr>
                 </thead>
@@ -495,7 +475,7 @@
                 )}
 
                 <Form.Group className="mb-3">
-                  <Form.Label>{t("Item") || "Item"}</Form.Label>
+                  <Form.Label>{t("item") || "Item"}</Form.Label>
                   <Form.Select
                     name="item_id"
                     value={formData.item_id}
@@ -515,7 +495,7 @@
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>{t("Booking") || "Booking"}</Form.Label>
+                  <Form.Label>{t("booking") || "Booking"}</Form.Label>
                   <Form.Select
                     name="booking_id"
                     value={formData.booking_id}
@@ -537,7 +517,7 @@
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label>{t("Quantity") || "Quantity"}</Form.Label>
+                  <Form.Label>{t("quantity") || "Quantity"}</Form.Label>
                   <Form.Control
                     type="number"
                     name="quantity"
@@ -569,7 +549,7 @@
                 </Form.Group> */}
 
                 <Form.Group className="mb-3">
-                  <Form.Label>{t("TotalPrice") || "Total Price"}</Form.Label>
+                  <Form.Label>{t("totalPrice") || "Total Price"}</Form.Label>
                   <div className="input-group">
                     <span className="input-group-text">$</span>
                     <Form.Control

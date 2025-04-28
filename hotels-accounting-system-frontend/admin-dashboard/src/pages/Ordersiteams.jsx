@@ -547,7 +547,7 @@ function OrderItems() {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>{t("image") || "Image"}</Form.Label>
+                <Form.Label>{t("Image") || "Image"}</Form.Label>
 
                 <Form.Control
                   type="file"
