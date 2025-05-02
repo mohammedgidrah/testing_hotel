@@ -9,5 +9,7 @@
     "actions": "Actions",
     "EditOrder": "Edit Order",
     "SelectItem": "Select Item",
-    "SelectBooking": "Select Booking"
+    "SelectBooking": "Select Booking",
+    "DeleteConfirmation": "Are You Sure You Want To Delete This Order ?"
+
 }

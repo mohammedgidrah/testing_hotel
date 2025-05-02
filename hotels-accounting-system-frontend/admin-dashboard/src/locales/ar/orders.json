@@ -9,5 +9,7 @@
     "actions": "الإجراءات",
     "EditOrder": "تعديل الطلب",
     "SelectItem": "اختر العنصر",
-    "SelectBooking": "اختر الحجز"
+    "SelectBooking": "اختر الحجز",
+    "DeleteConfirmation": "هل انت متاكد انك تريد حذف هذا الطلب"
+
 }
