@@ -19,6 +19,7 @@ import Services from "./pages/services";
 import Orders from "./pages/Orders";
 import Ordersiteams from "./pages/Ordersiteams";
 import Itempage from "./pages/itemspage";
+import Categoryitems from "./pages/categoryitems";
 
 
 
@@ -60,6 +61,14 @@ function App() {
           element={
             <PrivateRoute allowedRoles={['admin']}>
               <Services />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/items-category"
+          element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <Categoryitems />
             </PrivateRoute>
           }
         />

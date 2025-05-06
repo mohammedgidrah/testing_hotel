@@ -43,6 +43,7 @@ class ItemController extends Controller
             'price'       => 'required|numeric|min:0',
             'category'    => 'required|in:general,amenity,service,food',
             'status'      => 'required|in:isavailable,notavailable',
+            'itemcategory*.item_id' => 'required|exists:items,id',
             'image'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
         ]);
 

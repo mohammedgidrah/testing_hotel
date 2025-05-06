@@ -19,6 +19,8 @@ function ErrorFallback({ error }) {
 function OrderItems() {
   // Fixed component name
   const { t, i18n } = useTranslation("orderitems");
+  const [categories, setCategories] = useState([]);
+
   const [items, setItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,7 +53,27 @@ function OrderItems() {
       reader.readAsDataURL(selectedFile);
     }
   };
- 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/item-categories",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        ); // Replace with your API endpoint
+        if (!response.ok) throw new Error("Failed to fetch categories");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
   const fetchItems = async (retries = 3) => {
     setIsLoading(true);
     try {
@@ -184,90 +206,45 @@ function OrderItems() {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  // old
-  // const handleSubmitForm = async (e) => {
-  //   e.preventDefault();
-  //   if (!validateForm()) return;
-
-  //   const submitData = {
-  //     ...formData,
-  //     price: parseFloat(formData.price).toFixed(2),
-  //   };
-
-  //   try {
-  //     const headers = {
-  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //       "Content-Type": "application/json",
-  //     };
-
-  //     let response;
-  //     if (editMode) {
-  //       response = await axios.put(
-  //         `http://127.0.0.1:8000/api/items/${selectedItemId}`,
-  //         submitData,
-  //         { headers }
-  //       );
-  //     } else {
-  //       response = await axios.post(
-  //         "http://127.0.0.1:8000/api/items",
-  //         submitData,
-  //         { headers }
-  //       );
-  //     }
-
-  //     await fetchItems();
-  //     setShowItemModal(false);
-  //   } catch (err) {
-  //     console.error("Submission error:", err.response || err);
-  //     setFormErrors({
-  //       submit:
-  //         err.response?.data?.message ||
-  //         err.response?.data?.errors?.join(", ") ||
-  //         t("saveError") ||
-  //         "Error saving item",
-  //     });
-  //     setShowItemModal(true);
-  //   }
-  // };
 
   // new
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-  
+
     const formDataToSend = new FormData();
-    
+
     // Append regular form fields
     formDataToSend.append("name", formData.name);
     formDataToSend.append("description", formData.description);
     formDataToSend.append("category", formData.category);
     formDataToSend.append("price", parseFloat(formData.price).toFixed(2));
     formDataToSend.append("status", formData.status);
-  
+
     // Conditionally append image only if a new file is selected
     if (file) {
       formDataToSend.append("image", file);
     }
-  
+
     // For edit mode: Add Laravel's method override
     if (editMode) {
       formDataToSend.append("_method", "PUT"); // Important for Laravel to recognize as PUT
     }
-  
+
     try {
       const headers = {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         // Let browser set Content-Type automatically for FormData
         // (it will set multipart/form-data with proper boundary)
       };
-  
-      const url = editMode 
+
+      const url = editMode
         ? `http://127.0.0.1:8000/api/items/${selectedItemId}`
         : "http://127.0.0.1:8000/api/items";
-  
+
       // Use POST for both create and update (with _method override)
       const response = await axios.post(url, formDataToSend, { headers });
-  
+
       await fetchItems();
       setShowItemModal(false);
     } catch (err) {
@@ -416,8 +393,10 @@ function OrderItems() {
                     <td className="px-6 py-4 text-sm text-gray-300 max-w-md truncate">
                       {item.description || "-"}
                     </td>
+                    {/* In the table cell for category */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {item.category}
+                      {categories.find((c) => c.value === item.category)
+                        ?.label || item.category}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       ${parseFloat(item.price).toFixed(2)}
@@ -510,10 +489,13 @@ function OrderItems() {
                   isInvalid={!!formErrors.category}
                 >
                   <option value="">{t("selectcategory")}</option>
-                  <option value="general">{t("General")}</option>
-                  <option value="amenity">{t("Amenity")}</option>
-                  <option value="service">{t("Service")}</option>
-                  <option value="food">{t("Food")}</option>
+                  {/* In the Form.Select */}
+                  {categories.map((category) => (
+                    <option key={category.value} value={category.value}>
+                      {t(category.category)}{" "}
+                      {/* Changed from category.category to category.label */}
+                    </option>
+                  ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   {formErrors.category}

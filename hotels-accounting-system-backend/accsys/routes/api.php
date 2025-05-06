@@ -26,7 +26,8 @@ use App\Http\Controllers\{
     LoginController,
     ServiceController,
     ItemController,
-    OrderController
+    OrderController,
+    ItemCategoryController
 
 };
 
@@ -65,6 +66,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);
     });
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
+    Route::apiResource('item-categories', ItemCategoryController::class);
 Route::apiResource('items', ItemController::class);
  Route::get('/bookings/{id}/services', [BookingController::class, 'getServices']);
 

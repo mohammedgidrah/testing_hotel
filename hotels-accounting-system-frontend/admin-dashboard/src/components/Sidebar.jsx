@@ -11,6 +11,7 @@ import {
   Package,
   Box,
   ShoppingCart,
+  Archive,
 } from "lucide-react";
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -61,6 +62,14 @@ const SIDEBAR_ITEMS = [
     path: "/orders-items",
     roles: ["admin", "manager", "accountant"],
   },
+  {
+    name: "itemscategory",
+    icon: Archive, // Box icon
+    color: "#60a5fa", // Light Blue
+    path: "/items-category",
+    roles: ["admin", "manager", "accountant"],
+  },
+  
   {
     name: "expenses",
     icon: DollarSign,
