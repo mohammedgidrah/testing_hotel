@@ -34,7 +34,7 @@ function OrderItems() {
     name: "",
     description: "",
     price: "",
-    category: "",
+    category_id: "",
     status: "isavailable",
     image: null,
   });
@@ -140,7 +140,7 @@ function OrderItems() {
       name: "",
       description: "",
       price: "",
-      category: "",
+      category_id: "",
       status: "isavailable",
       image: null,
     });
@@ -155,7 +155,7 @@ function OrderItems() {
       name: item?.name || "",
       description: item?.description || "",
       price: item?.price ? item.price.toString() : "",
-      category: item?.category || "",
+      category_id: item?.category_id || "",
       status: item?.status || "isavailable",
       image: null,
     });
@@ -193,9 +193,10 @@ function OrderItems() {
     const errors = {};
     if (!formData.name.trim())
       errors.name = t("nameRequired") || "Name is required";
-    if (!formData.category)
-      errors.category = t("categoryRequired") || "Category is required";
-
+    // In validateForm
+    if (!formData.category_id) {
+      errors.category_id = t("categoryRequired") || "Category is required";
+    }
     const priceValue = parseFloat(formData.price);
     if (isNaN(priceValue)) {
       errors.price = t("priceRequired") || "Price is required";
@@ -217,7 +218,7 @@ function OrderItems() {
     // Append regular form fields
     formDataToSend.append("name", formData.name);
     formDataToSend.append("description", formData.description);
-    formDataToSend.append("category", formData.category);
+    formDataToSend.append("category_id", formData.category_id);
     formDataToSend.append("price", parseFloat(formData.price).toFixed(2));
     formDataToSend.append("status", formData.status);
 
@@ -395,8 +396,8 @@ function OrderItems() {
                     </td>
                     {/* In the table cell for category */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {categories.find((c) => c.value === item.category)
-                        ?.label || item.category}
+                      {categories.find((c) => c.id === item.category_id)
+                        ?.name || item.category_id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       ${parseFloat(item.price).toFixed(2)}
@@ -483,22 +484,20 @@ function OrderItems() {
               <Form.Group className="mb-3">
                 <Form.Label>{t("Category")}</Form.Label>
                 <Form.Select
-                  name="category"
-                  value={formData.category}
+                  name="category_id"
+                  value={formData.category_id}
                   onChange={handleFormChange}
-                  isInvalid={!!formErrors.category}
+                  isInvalid={!!formErrors.category_id}
                 >
                   <option value="">{t("selectcategory")}</option>
-                  {/* In the Form.Select */}
                   {categories.map((category) => (
-                    <option key={category.value} value={category.value}>
-                      {t(category.category)}{" "}
-                      {/* Changed from category.category to category.label */}
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
-                  {formErrors.category}
+                  {formErrors.category_id}
                 </Form.Control.Feedback>
               </Form.Group>
 

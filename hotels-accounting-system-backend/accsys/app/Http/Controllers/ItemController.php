@@ -38,13 +38,12 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'category'    => 'required|in:general,amenity,service,food',
-            'status'      => 'required|in:isavailable,notavailable',
-            'itemcategory*.item_id' => 'required|exists:items,id',
-            'image'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'category_id'  => 'required|exists:item_categories,id', // Changed to category_id
+            'status'       => 'required|in:isavailable,notavailable',
+            'image'        => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Store the image in the 'public/images' directory

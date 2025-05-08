@@ -13,7 +13,7 @@ class Item extends Model
     protected $fillable = [
         'name',
         'price',
-        'category',
+        'category_id',
         'status',
         'description',
         'image'  
@@ -23,9 +23,9 @@ class Item extends Model
         return $this->hasMany(Order::class);
     }
     public function category()
-{
-    return $this->belongsTo(Category::class);
-}
+    {
+        return $this->belongsTo(ItemCategory::class, 'category_id');
+    }
  
 
 }

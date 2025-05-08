@@ -30,9 +30,8 @@ class ItemCategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'category' => 'required|string|max:255',
-            'item_id' => 'required|exists:items,id',
-        ]);
+            'name' => 'required|string|max:255',
+         ]);
 
         $item = ItemCategory::create($validated);
 
@@ -61,15 +60,14 @@ class ItemCategoryController extends Controller
     public function update(Request $request, ItemCategory $itemCategory)
     {
         $validated = $request->validate([
-            'category' => 'required|string|max:255',
-            'item_id' => 'required|exists:items,id',
-        ]);
+            'name' => 'required|string|max:255',
+         ]);
 
         $itemCategory->update($validated);
 
         return response()->json(['message' => 'Item category updated successfully.', 'data' => $itemCategory]);
     }
-
+    
     /**
      * Remove the specified resource from storage.
      */

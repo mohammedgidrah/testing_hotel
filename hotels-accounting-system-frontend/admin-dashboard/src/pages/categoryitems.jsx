@@ -28,7 +28,6 @@ export default function CategoryManagement() {
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    item_id: "",
   });
   const [formErrors, setFormErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -113,7 +112,6 @@ export default function CategoryManagement() {
   const handleAddCategory = () => {
     setFormData({
       name: "",
-      item_id: "",
     });
     setFormErrors({});
     setEditMode(false);
@@ -123,8 +121,7 @@ export default function CategoryManagement() {
 
   const handleEditCategory = (category) => {
     setFormData({
-      category: category?.category || "",
-      item_id: category?.item_id || "",
+      name: category?.name || "",
     });
     setFormErrors({});
     setEditMode(true);
@@ -140,8 +137,7 @@ export default function CategoryManagement() {
 
   const validateForm = () => {
     const errors = {};
-    if (!formData.category.trim()) errors.name = "Name is required";
-    if (!formData.item_id) errors.item_id = "Item selection is required";
+    if (!formData.name.trim()) errors.name = "Name is required";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -220,9 +216,8 @@ export default function CategoryManagement() {
   };
 
   // Find item name by id
-  const getItemNameById = (itemId) => {
-    const item = items.find((item) => item.id === itemId);
-    return item ? item.name : "Unknown Item";
+  const getItemsByCategoryId = (categoryId) => {
+    return items.filter((item) => item.category_id === categoryId);
   };
 
   return (
@@ -291,7 +286,7 @@ export default function CategoryManagement() {
               {/* Table Header */}
               <thead className="bg-gray-800">
                 <tr>
-                  {["ID", "Name", "Item", "Actions"].map((header) => (
+                  {["ID", "Name",  "Actions"].map((header) => (
                     <th
                       key={header}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
@@ -315,11 +310,15 @@ export default function CategoryManagement() {
                       {category.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
-                      {category.category}
+                      {category.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {getItemNameById(category.item_id)}
-                    </td>
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                      {getItemsByCategoryId(category.id).map((item) => (
+                        <div key={item.id}>{item.name}</div>
+                      ))}
+                      {getItemsByCategoryId(category.id).length === 0 &&
+                        "No items in category"}
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       <button
                         onClick={() => handleEditCategory(category)}
@@ -373,8 +372,8 @@ export default function CategoryManagement() {
                   <label className="block text-gray-300 mb-2">Name</label>
                   <input
                     type="text"
-                    name="category"
-                    value={formData.category}
+                    name="name"
+                    value={formData.name}
                     onChange={handleFormChange}
                     className={`w-full bg-gray-700 text-white rounded p-2 ${
                       formErrors.name ? "border border-red-500" : ""
@@ -384,39 +383,6 @@ export default function CategoryManagement() {
                   {formErrors.name && (
                     <p className="text-red-500 text-xs mt-1">
                       {formErrors.name}
-                    </p>
-                  )}
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-300 mb-2">Item</label>
-                  <select
-                    name="item_id"
-                    value={formData.item_id}
-                    onChange={handleFormChange}
-                    className={`w-full bg-gray-700 text-white rounded p-2 ${
-                      formErrors.item_id ? "border border-red-500" : ""
-                    }`}
-                    disabled={isLoading || isItemsLoading}
-                  >
-                    <option value="">Select an item</option>
-                    {isItemsLoading ? (
-                      <option disabled>Loading items...</option>
-                    ) : items.length === 0 ? (
-                      <option disabled>No items available</option>
-                    ) : (
-                      // Add Array.isArray check as safety net
-                      Array.isArray(items) &&
-                      items.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                  {formErrors.item_id && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {formErrors.item_id}
                     </p>
                   )}
                 </div>
