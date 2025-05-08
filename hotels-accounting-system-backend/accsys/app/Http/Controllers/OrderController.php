@@ -39,39 +39,62 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
-        $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'category'    => 'required|in:general,amenity,service,food',
-            'status'      => 'required|in:isavailable,notavailable',
-            'itemcategory' => 'required|array',
-            'itemcategory.*.item_id' => 'required|exists:items,id',
-            'image'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        $validator = Validator::make($request->all(), [
+            'orders' => 'required|array|min:1',
+            'orders.*.item_id' => 'required|exists:items,id',
+            'orders.*.booking_id' => 'required|exists:bookings,id',
+            'orders.*.quantity' => 'required|integer|min:1',
         ]);
     
-        // Store the image in the 'public/images' directory
-        $path = $request->file('image')->store('images', 'public');
-        $validated['image'] = $path;
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()->all(),
+            ], 422);
+        }
     
-        // Create the item
-        $item = Item::create([
-            'name'        => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'price'       => $validated['price'],
-            'category'    => $validated['category'],
-            'status'      => $validated['status'],
-            'image'       => $validated['image'],
-        ]);
+        try {
+            DB::beginTransaction();
     
-        // Optionally attach itemcategory relationships if there's a pivot table
-        // $item->categories()->attach(collect($validated['itemcategory'])->pluck('item_id'));
+            $createdOrders = [];
     
-        return response()->json([
-            'item' => $item,
-            'image_url' => asset("storage/$path"),
-        ], 201);
+            foreach ($request->orders as $orderRequest) {
+                $item = Item::findOrFail($orderRequest['item_id']);
+    
+                $orderData = [
+                    'item_id' => $orderRequest['item_id'],
+                    'booking_id' => $orderRequest['booking_id'],
+                    'quantity' => $orderRequest['quantity'],
+                    'price_per_item' => $item->price,
+                    'total_price' => $item->price * $orderRequest['quantity'],
+                ];
+    
+                $order = Order::create($orderData);
+                $createdOrders[] = $order->load(['item', 'booking']);
+            }
+    
+            DB::commit();
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Orders created successfully',
+                'data' => $createdOrders,
+            ], 201);
+    
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'One of the items or bookings was not found',
+            ], 404);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Error creating orders: ' . $e->getMessage(),
+            ], 500);
+        }
     }
     /**
      * Display the specified order.

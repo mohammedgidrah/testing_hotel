@@ -10,5 +10,6 @@
     "reception": "Reception",
     "service": "Service",
     "Ordersiteams":"Order Items",
-    "orders":"Orders"
+    "orders":"Orders",
+    "itemscategory":"Items Category"
 }

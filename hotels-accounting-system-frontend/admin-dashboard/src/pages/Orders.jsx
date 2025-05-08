@@ -17,7 +17,7 @@
   }
 
   export default function Orders() {
-    const { t, i18n } = useTranslation("orders");
+    const { t } = useTranslation("orders");
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");

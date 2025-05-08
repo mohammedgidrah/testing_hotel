@@ -1,0 +1,16 @@
+{
+    "Category Management": "إدارة الفئات",
+    "Add Category": "إضافة فئة ",
+    "Name": "اسم الفئة",
+    "ID": "رقم الفئة",
+    "Actions": "الإجراءات",
+    "Save Changes": "حفظ التغييرات",
+    "Edit Category": "تعديل الفئة",
+    "Delete Category": "حذف الفئة",
+    "Are you sure you want to delete this category?": "هل أنت متأكد من حذف هذه الفئة؟",
+    "delete": "حذف",
+    "Update": "تحديث",
+    "Cancel": "الغاء",
+    "Add": "إضافة ",
+    "search": "بحث"
+}

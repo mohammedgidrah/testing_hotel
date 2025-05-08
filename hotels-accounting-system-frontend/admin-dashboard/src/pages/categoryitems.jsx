@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Edit, Trash2, Plus, Search } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 import Header from "../components/Header";
+import { useTranslation } from "react-i18next";
 import axios from "axios"; // Import axios for API calls
 
 function ErrorFallback({ error }) {
@@ -15,6 +16,7 @@ function ErrorFallback({ error }) {
 }
 
 export default function CategoryManagement() {
+  const { t } = useTranslation("itemcategory");
   const [categories, setCategories] = useState([]);
   const [items, setItems] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -229,7 +231,7 @@ export default function CategoryManagement() {
         transition={{ delay: 0.2 }}
         style={{ direction: "ltr" }}
       >
-        <Header title="Category Management" />
+        <Header title={t("Category Management")} />
 
         {/* Search and Add Button Section */}
         <div className="flex justify-end items-center mb-6 p-4">
@@ -237,7 +239,7 @@ export default function CategoryManagement() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search"
+                placeholder={t("search")}
                 className="bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:w-80 sm:w-40"
                 onChange={handleSearch}
                 value={searchTerm}
@@ -253,7 +255,7 @@ export default function CategoryManagement() {
               disabled={isLoading}
             >
               <Plus size={18} className="mr-2" />
-              Add Category
+              {t("Add Category")}
             </button>
           </div>
         </div>
@@ -291,7 +293,7 @@ export default function CategoryManagement() {
                       key={header}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
                     >
-                      {header}
+                      {t(header)}
                     </th>
                   ))}
                 </tr>
@@ -312,13 +314,7 @@ export default function CategoryManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
                       {category.name}
                     </td>
-                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                      {getItemsByCategoryId(category.id).map((item) => (
-                        <div key={item.id}>{item.name}</div>
-                      ))}
-                      {getItemsByCategoryId(category.id).length === 0 &&
-                        "No items in category"}
-                    </td> */}
+ 
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       <button
                         onClick={() => handleEditCategory(category)}
@@ -350,7 +346,7 @@ export default function CategoryManagement() {
             <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-white">
-                  {editMode ? "Edit Category" : "Add New Category"}
+                  {editMode ? t("Edit Category") : t("Add Category")}
                 </h2>
                 <button
                   onClick={() => setShowCategoryModal(false)}
@@ -369,7 +365,7 @@ export default function CategoryManagement() {
 
               <form onSubmit={handleSubmitForm}>
                 <div className="mb-4">
-                  <label className="block text-gray-300 mb-2">Name</label>
+                  <label className="block text-gray-300 mb-2">{t("Name")}</label>
                   <input
                     type="text"
                     name="name"
@@ -394,7 +390,7 @@ export default function CategoryManagement() {
                     className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
                     disabled={isLoading}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </button>
                   <button
                     type="submit"
@@ -404,7 +400,7 @@ export default function CategoryManagement() {
                     {isLoading && (
                       <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
                     )}
-                    {editMode ? "Update" : "Add"}
+                    {editMode ? t("Update") : t("Add")}
                   </button>
                 </div>
               </form>

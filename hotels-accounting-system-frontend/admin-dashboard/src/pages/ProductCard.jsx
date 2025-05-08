@@ -4,7 +4,7 @@ import {   Plus, Minus } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
 const ProductCard = ({ items, addToCart  }) => {
-  const { t } = useTranslation("items");
+  const { t, i18n } = useTranslation("items");
     const [count, setCount] = useState(0);
   
     const increaseCount = () => {
@@ -32,6 +32,7 @@ const ProductCard = ({ items, addToCart  }) => {
             <button
               onClick={decreaseCount}
               className="p-2 rounded-l bg-red-700   text-white"
+              style={i18n.language === "ar" ? { transform: "scaleX(-1)" } : {}}
             >
               <Minus size={16} />
             </button>
@@ -43,6 +44,7 @@ const ProductCard = ({ items, addToCart  }) => {
             <button
               onClick={increaseCount}
               className="p-2 rounded-r bg-blue-600 text-white"
+              style={i18n.language === "ar" ? { transform: "scaleX(-1)" } : {}}
             >
               <Plus size={16} />
             </button>

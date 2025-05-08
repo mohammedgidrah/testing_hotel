@@ -16,6 +16,7 @@ import enservices from "../../locales/en/services.json";
 import enorder from "../../locales/en/orders.json";
 import enorderitems from "../../locales/en/orderitems.json";
 import enitems from "../../locales/en/items.json";
+import enitemcategory from "../../locales/en/itemcategory.json";
 // Arabic
 import arDashboard from "../../locales/ar/dashboard.json";
 import arBookings from "../../locales/ar/bookings.json";
@@ -31,6 +32,7 @@ import arservices from "../../locales/ar/services.json";
 import arorder from "../../locales/ar/orders.json";
 import arorderitems from "../../locales/ar/orderitems.json";
 import aritems from "../../locales/ar/items.json";
+import aritemcategory from "../../locales/ar/itemcategory.json";
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -48,7 +50,8 @@ i18n.use(initReactI18next).init({
       services: enservices,
       orders: enorder,
       orderitems: enorderitems,
-      items: enitems
+      items: enitems,
+      itemcategory: enitemcategory
     },
     ar: {
       dashboard: arDashboard,
@@ -64,7 +67,8 @@ i18n.use(initReactI18next).init({
       services: arservices,
       orders: arorder,
       orderitems: arorderitems,
-      items: aritems
+      items: aritems,
+      itemcategory: aritemcategory
     },
   },
   lng: "en", // Default language
