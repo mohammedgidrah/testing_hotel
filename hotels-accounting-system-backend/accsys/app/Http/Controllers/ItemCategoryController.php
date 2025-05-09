@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\ItemCategory;
@@ -12,7 +11,7 @@ class ItemCategoryController extends Controller
      */
     public function index()
     {
-        $items = ItemCategory::all();
+        $items = ItemCategory::withCount('items')->get();
         return response()->json($items);
     }
 
@@ -31,7 +30,7 @@ class ItemCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-         ]);
+        ]);
 
         $item = ItemCategory::create($validated);
 
@@ -61,13 +60,13 @@ class ItemCategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-         ]);
+        ]);
 
         $itemCategory->update($validated);
 
         return response()->json(['message' => 'Item category updated successfully.', 'data' => $itemCategory]);
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */

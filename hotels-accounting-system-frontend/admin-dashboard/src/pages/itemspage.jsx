@@ -12,15 +12,39 @@ import { useTranslation } from "react-i18next";
 // Main App Component
 export default function ProductCardPage() {
   const { t } = useTranslation("items");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
   const [showCartModal, setShowCartModal] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [cart, setCart] = useState([]); // Add cart state here
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedBookingId, setSelectedBookingId] = useState(null);
 
+  useEffect(() => {
+    // Fetch categories
+    axios
+      .get("http://127.0.0.1:8000/api/item-categories", {
+        // Note the endpoint might be different
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        if (Array.isArray(response.data)) {
+          setCategories(response.data);
+        } else if (response.data?.data) {
+          setCategories(response.data.data);
+        }
+        setCategoriesLoading(false);
+      })
+      .catch((err) => console.error("Error fetching categories:", err));
+
+    setCategoriesLoading(false);
+  }, []);
   // In useEffect
   useEffect(() => {
     const storedBooking = sessionStorage.getItem("currentBooking");
@@ -35,7 +59,37 @@ export default function ProductCardPage() {
       navigate("/bookings");
     }
   }, [location, navigate]);
+  // Remove this duplicate useEffect (line 139-201 in your original code)
+  // Delete this entire useEffect block:
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        let url = "http://127.0.0.1:8000/api/items";
+        if (selectedCategory) {
+          url += `?category_id=${selectedCategory}`;
+        }
 
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        // Handle different response structures
+        const itemsData = response.data.data || response.data;
+        const itemsArray = Array.isArray(itemsData) ? itemsData : [];
+
+        setProducts(itemsArray);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError("Failed to load items data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory]); // This will re-run when selectedCategory changes
   const removeFromCart = (itemId) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
   };
@@ -205,9 +259,37 @@ export default function ProductCardPage() {
             transition={{ duration: 0.8, delay: 0.3 }}
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-white">
-                {t("Available Products")}
-              </h2>
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold text-white">
+                  {t("Available Products")}
+                </h2>
+                {/* In your JSX */}
+                <div className="flex gap-4 items-center">
+                  <select
+                    value={selectedCategory || ""}
+                    onChange={(e) =>
+                      setSelectedCategory(e.target.value || null)
+                    }
+                    className="bg-gray-700 text-white px-3 py-2 rounded-md"
+                  >
+                    <option value="">{t("All Categories")}</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name} ({category.items_count || 0})
+                      </option>
+                    ))}
+                  </select>
+
+                  {selectedCategory && (
+                    <button
+                      onClick={() => setSelectedCategory(null)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      {t("Clear Filter")}
+                    </button>
+                  )}
+                </div>
+              </div>
               <button
                 onClick={() => setShowCartModal(true)}
                 className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md flex items-center"
@@ -220,10 +302,10 @@ export default function ProductCardPage() {
 
             {products.length > 0 ? (
               <div className="flex flex-wrap justify-around gap-6 mb-8">
-                {products.map((items, index) => (
+                {products.map((item) => (
                   <ProductCards
-                    key={items.id || index}
-                    items={items}
+                    key={item.id}
+                    item={item} // Singular prop name
                     addToCart={addToCart}
                   />
                 ))}

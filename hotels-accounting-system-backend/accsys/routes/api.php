@@ -65,6 +65,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::prefix('bookingsQuery')->group(function () {
         Route::get('today', [BookingController::class, 'getBookingsToday']);
     });
+    Route::group(['middleware' => 'auth:sanctum'], function() {
+        Route::get('/items', [ItemController::class, 'index']);
+        Route::get('/item-categories', [ItemController::class, 'categories']);
+    });
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy']);
     Route::apiResource('item-categories', ItemCategoryController::class);
 Route::apiResource('items', ItemController::class);

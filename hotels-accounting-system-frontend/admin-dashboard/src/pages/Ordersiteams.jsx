@@ -148,6 +148,7 @@ function OrderItems() {
     setEditMode(false);
     setSelectedItemId(null);
     setShowItemModal(true);
+     setPreviewUrl("");
   };
 
   const handleEditItem = (item) => {

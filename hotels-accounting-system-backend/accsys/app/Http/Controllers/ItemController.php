@@ -11,20 +11,23 @@ class ItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+// ItemController.php
+    public function index(Request $request)
     {
-        try {
-            $items = Item::all(); // Remove pagination if not needed
-            return response()->json([
-                'success' => true,
-                'data'    => $items,
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve items',
-            ], 500);
-        }
+        $request->validate([
+            'category_id' => 'nullable|integer|exists:item_categories,id',
+        ]);
+
+        $query = Item::query()
+            ->when($request->category_id, function ($q) use ($request) {
+                return $q->where('category_id', $request->category_id);
+            })
+            ->with('category');
+
+        return response()->json([
+            'success' => true,
+            'data'    => $query->get(),
+        ]);
     }
 
     /**
@@ -38,12 +41,12 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'         => 'required|string|max:255',
-            'description'  => 'nullable|string',
-            'price'        => 'required|numeric|min:0',
-            'category_id'  => 'required|exists:item_categories,id', // Changed to category_id
-            'status'       => 'required|in:isavailable,notavailable',
-            'image'        => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price'       => 'required|numeric|min:0',
+            'category_id' => 'required|exists:item_categories,id', // Changed to category_id
+            'status'      => 'required|in:isavailable,notavailable',
+            'image'       => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         // Store the image in the 'public/images' directory
@@ -102,9 +105,7 @@ class ItemController extends Controller
             'status'      => 'sometimes|in:isavailable,notavailable',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-    
- 
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -112,7 +113,7 @@ class ItemController extends Controller
                 'errors'  => $validator->errors(),
             ], 422);
         }
-    
+
         try {
             // Handle image update
             if ($request->hasFile('image')) {
@@ -120,21 +121,21 @@ class ItemController extends Controller
                 if ($item->image) {
                     Storage::delete($item->image);
                 }
-                
+
                 // Store new image
-                $path = $request->file('image')->store('images', 'public');
+                $path        = $request->file('image')->store('images', 'public');
                 $item->image = $path;
             }
-    
+
             // Update other fields
             $item->update($request->except('image'));
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Item updated successfully',
                 'data'    => $item,
             ]);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
