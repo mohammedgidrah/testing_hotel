@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Modal, Button, Form } from "react-bootstrap";
 import { ErrorBoundary } from "react-error-boundary";
 import Header from "../components/Header";
+import "../components/bookingcalender.css";
 
 function ErrorFallback({ error }) {
   return (
@@ -148,7 +149,7 @@ function OrderItems() {
     setEditMode(false);
     setSelectedItemId(null);
     setShowItemModal(true);
-     setPreviewUrl("");
+    setPreviewUrl("");
   };
 
   const handleEditItem = (item) => {
@@ -443,21 +444,25 @@ function OrderItems() {
         <Modal
           show={showItemModal}
           onHide={() => setShowItemModal(false)}
-          size="lg"
+          size="s"
           style={{ direction: "ltr" }}
         >
-          <Modal.Header closeButton>
+          <Modal.Header
+            closeButton
+            className="bg-gray-800 text-xl font-bold text-white border-none custom-close"
+          >
             <Modal.Title>
               {editMode ? t("EditItem") : t("addnewitem")}
             </Modal.Title>
           </Modal.Header>
+
           <Form onSubmit={handleSubmitForm}>
-            <Modal.Body>
+            <Modal.Body className="bg-gray-800 text-x text-gray-200 text-opacity-80">
               {formErrors.submit && (
-                <div className="alert alert-danger">{formErrors.submit}</div>
+                <div className="alert alert-danger ">{formErrors.submit}</div>
               )}
 
-              <Form.Group className="mb-3">
+              <Form.Group className="mb-3 ">
                 <Form.Label>{t("Name")}</Form.Label>
                 <Form.Control
                   type="text"
@@ -465,7 +470,9 @@ function OrderItems() {
                   value={formData.name}
                   onChange={handleFormChange}
                   isInvalid={!!formErrors.name}
+                  className="w-full bg-gray-700 text-white rounded p-2 border-none   focus:ring-0     focus:bg-gray-700   "
                 />
+
                 <Form.Control.Feedback type="invalid">
                   {formErrors.name}
                 </Form.Control.Feedback>
@@ -479,24 +486,48 @@ function OrderItems() {
                   name="description"
                   value={formData.description}
                   onChange={handleFormChange}
+                  className="w-full bg-gray-700 text-white rounded p-2 border-none  focus:ring-0     focus:bg-gray-700 "
                 />
               </Form.Group>
 
               <Form.Group className="mb-3">
                 <Form.Label>{t("Category")}</Form.Label>
-                <Form.Select
-                  name="category_id"
-                  value={formData.category_id}
-                  onChange={handleFormChange}
-                  isInvalid={!!formErrors.category_id}
-                >
-                  <option value="">{t("selectcategory")}</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </Form.Select>
+                <div className="relative">
+                  <Form.Select
+                    name="category_id"
+                    value={formData.category_id}
+                    onChange={handleFormChange}
+                    isInvalid={!!formErrors.category_id}
+                    className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none  focus:ring-0     focus:bg-gray-700  "
+                  >
+                    <option value="">{t("selectcategory")}</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+
+                  {/* Custom white arrow */}
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.category_id}
+                  </Form.Control.Feedback>
+                </div>
+
                 <Form.Control.Feedback type="invalid">
                   {formErrors.category_id}
                 </Form.Control.Feedback>
@@ -505,13 +536,16 @@ function OrderItems() {
               <Form.Group className="mb-3">
                 <Form.Label>{t("Price")}</Form.Label>
                 <div className="input-group">
-                  <span className="input-group-text">$</span>
+                  <span className="input-group-text     text-center  bg-gray-700 text-white rounded mr-1  border-none  focus:ring-0     focus:bg-gray-700">
+                    $
+                  </span>
                   <Form.Control
                     type="text"
                     name="price"
                     value={formData.price}
                     onChange={handleFormChange}
                     isInvalid={!!formErrors.price}
+                    className="w-full bg-gray-700 text-white rounded p-2 border-none  focus:ring-0     focus:bg-gray-700 "
                   />
                   <Form.Control.Feedback type="invalid">
                     {formErrors.price}
@@ -531,22 +565,38 @@ function OrderItems() {
               <Form.Group className="mb-3">
                 <Form.Label>{t("Image") || "Image"}</Form.Label>
 
-                <Form.Control
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
+                <div className="relative">
+                  {/* Hidden native input */}
+                  <input
+                    id="customFile"
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+
+                  {/* Styled label as button */}
+                  <label
+                    htmlFor="customFile"
+                    className="  bg-gray-700 hover:bg-gray-500 text-white font-medium py-2 px-4 rounded cursor-pointer"
+                  >
+                    {t("ChooseImage") || "Choose Image"}
+                  </label>
+                </div>
+
+                {/* Optional preview */}
                 {previewUrl && (
                   <img
                     src={previewUrl}
                     alt="Preview"
+                    className="mt-2 rounded"
                     style={{ width: "200px" }}
                   />
                 )}
               </Form.Group>
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer className="  bg-gray-800 text-white  p-2 pr-10  border-none  ">
               <Button
                 variant="secondary"
                 onClick={() => setShowItemModal(false)}

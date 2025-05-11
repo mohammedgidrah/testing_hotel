@@ -86,3 +86,7 @@
     border-radius: 50%;
     background-color: #e9ecef;
   }
+
+  .custom-close .btn-close {
+  filter: invert(1);
+  }
