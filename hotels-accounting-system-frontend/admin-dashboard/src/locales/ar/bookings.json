@@ -39,5 +39,7 @@
   "Details": "تفاصيل",
   "TodayArrivals": "وصول اليوم",
   "allbookings": "كل الحجوزات",
-  "paymentMethod": "طريقة الدفع"
+  "paymentMethod": "طريقة الدفع",
+  "SelectStatus": "حدد حالة الدفع",
+  "SelectRoom": "حدد غرفة"
 }

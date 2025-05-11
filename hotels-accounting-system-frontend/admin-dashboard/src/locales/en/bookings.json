@@ -39,7 +39,9 @@
      "Details": "Details",
      "TodayArrivals": "Today Arrivals",
      "allbookings": "All Bookings",
-     "paymentMethod": "Payment Method"
+     "paymentMethod": "Payment Method",
+     "SelectStatus": "Select Status",
+     "SelectRoom": "Select Room"
   
   }
   

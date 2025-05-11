@@ -66,7 +66,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
       setErrors({ ...errors, [name]: null });
     }
   };
-  
+
   const formatDate = (date) => {
     return date.toISOString().split("T")[0];
   };
@@ -126,7 +126,9 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
         };
 
         // Find payment for this booking
-        const existingPayment = payments.find(p => p.booking_id === booking.id);
+        const existingPayment = payments.find(
+          (p) => p.booking_id === booking.id
+        );
 
         if (existingPayment) {
           // Update existing payment
@@ -147,8 +149,10 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
         }
       } else if (payment_status === "pending") {
         // Find payment for this booking
-        const existingPayment = payments.find(p => p.booking_id === booking.id);
-        
+        const existingPayment = payments.find(
+          (p) => p.booking_id === booking.id
+        );
+
         // Delete payment if status changed from paid to pending
         if (existingPayment) {
           await axios.delete(
@@ -182,11 +186,12 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
       <Modal.Header
         closeButton
         style={i18n.language === "ar" ? { direction: "ltr" } : {}}
+        className="bg-gray-800 text-xl font-bold text-white border-none custom-close"
       >
         <Modal.Title>{t("EditBooking")}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
-        <Modal.Body>
+        <Modal.Body className="bg-gray-800 text-x text-gray-200 text-opacity-80">
           {errors.submit && (
             <div className="alert alert-danger">{errors.submit}</div>
           )}
@@ -198,6 +203,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
               value={formData.room_id}
               onChange={handleChange}
               isInvalid={!!errors.room_id}
+              className=" bg-gray-700 text-white rounded    border-none focus:ring-0 focus:bg-gray-700  "
             >
               <option value="">{t("SelectRoom")}</option>
               {rooms.map((room) => (
@@ -206,6 +212,19 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                 </option>
               ))}
             </Form.Select>
+                          <div className="pointer-events-none absolute   bottom-64  inset-y-0 right-5 font-size-l flex items-center px-2 text-white text-size-xl" style={{bottom:"16.7rem"}}>
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
             <Form.Control.Feedback type="invalid">
               {errors.room_id}
             </Form.Control.Feedback>
@@ -222,6 +241,7 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                       ? new Date(formData.check_in_date)
                       : null
                   }
+                  
                   setSelectedDate={(date) =>
                     setFormData({
                       ...formData,
@@ -257,7 +277,9 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                   }
                 />
                 {errors.check_out_date && (
-                  <div className="text-danger mt-1">{errors.check_out_date}</div>
+                  <div className="text-danger mt-1">
+                    {errors.check_out_date}
+                  </div>
                 )}
               </div>
             </div>
@@ -270,11 +292,26 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
               value={formData.payment_status}
               onChange={handleChange}
               isInvalid={!!errors.payment_status}
+                                  className="w-full bg-gray-700 text-white rounded   border-none focus:ring-0 focus:bg-gray-700  "
+
             >
               <option value="">{t("SelectStatus")}</option>
               <option value="paid">{t("paid")}</option>
               <option value="pending">{t("pending")}</option>
             </Form.Select>
+                       <div className="pointer-events-none absolute   right-5  bottom-0 font-size-l flex items-center px-2 text-white text-size-xl" style={{top:"8.2rem"}}>
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
             <Form.Control.Feedback type="invalid">
               {errors.payment_status}
             </Form.Control.Feedback>
@@ -288,18 +325,33 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                 value={formData.payment_method || ""}
                 onChange={handleChange}
                 isInvalid={!!errors.payment_method}
+                                                  className="w-full bg-gray-700 text-white rounded   border-none focus:ring-0 focus:bg-gray-700  "
+
               >
                 <option value="">{t("slectpaymentmethod")}</option>
                 <option value="cash">{t("Cash")}</option>
                 <option value="credit_card">{t("CreditCard")}</option>
               </Form.Select>
+                         <div className="pointer-events-none absolute   right-5  bottom-0 font-size-l flex items-center px-2 text-white text-size-xl" style={{top:"18.7rem"}}>
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
               <Form.Control.Feedback type="invalid">
                 {errors.payment_method}
               </Form.Control.Feedback>
             </Form.Group>
           )}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="  bg-gray-800 text-white  p-2 pr-10  border-none  ">
           <Button variant="secondary" onClick={onHide} disabled={isSubmitting}>
             {t("Cancel")}
           </Button>

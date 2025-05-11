@@ -18,5 +18,6 @@
     "EditItem": "تعديل العنصر",
     "delete": "حذف",
     "deletcofermation": "هل أنت متأكد من حذف هذا العنصر؟",
-    "Image": "صورة"
+    "Image": "صورة",
+    "ChooseImage": "اختر صورة"
 }

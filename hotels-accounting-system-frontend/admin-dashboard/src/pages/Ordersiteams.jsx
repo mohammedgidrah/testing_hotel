@@ -165,6 +165,7 @@ function OrderItems() {
     setEditMode(true);
     setSelectedItemId(item?.id || null);
     setShowItemModal(true);
+    setPreviewUrl("");
   };
 
   const handleFormChange = (e) => {
@@ -302,9 +303,7 @@ function OrderItems() {
         <Header title={t("OrderItems")} />
         {/* Search and Add Button Section */}
         <div className="flex justify-end items-center mb-6 p-4">
-          {/* <h2 className="text-xl font-semibold text-gray-100">
-            {t("ItemsManagement") || "Items Management"}
-          </h2> */}
+ 
           <div className="flex space-x-4">
             <div className="relative">
               <input
@@ -470,7 +469,7 @@ function OrderItems() {
                   value={formData.name}
                   onChange={handleFormChange}
                   isInvalid={!!formErrors.name}
-                  className="w-full bg-gray-700 text-white rounded p-2 border-none   focus:ring-0     focus:bg-gray-700   "
+                  className="w-full bg-gray-700 text-white rounded p-2 border-none focus:ring-0 focus:bg-gray-700   "
                 />
 
                 <Form.Control.Feedback type="invalid">
@@ -486,7 +485,7 @@ function OrderItems() {
                   name="description"
                   value={formData.description}
                   onChange={handleFormChange}
-                  className="w-full bg-gray-700 text-white rounded p-2 border-none  focus:ring-0     focus:bg-gray-700 "
+                  className="w-full bg-gray-700 text-white rounded p-2 border-none  focus:ring-0 focus:bg-gray-700 "
                 />
               </Form.Group>
 
@@ -498,7 +497,7 @@ function OrderItems() {
                     value={formData.category_id}
                     onChange={handleFormChange}
                     isInvalid={!!formErrors.category_id}
-                    className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none  focus:ring-0     focus:bg-gray-700  "
+                    className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none focus:ring-0 focus:bg-gray-700  "
                   >
                     <option value="">{t("selectcategory")}</option>
                     {categories.map((category) => (
@@ -509,7 +508,7 @@ function OrderItems() {
                   </Form.Select>
 
                   {/* Custom white arrow */}
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                  <div className="pointer-events-none absolute inset-y-0 right-1 font-size-l flex items-center px-2 text-white text-size-xl">
                     <svg
                       className="h-4 w-4"
                       viewBox="0 0 20 20"

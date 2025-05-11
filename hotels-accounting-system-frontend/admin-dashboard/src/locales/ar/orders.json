@@ -10,6 +10,9 @@
     "EditOrder": "تعديل الطلب",
     "SelectItem": "اختر العنصر",
     "SelectBooking": "اختر الحجز",
-    "DeleteConfirmation": "هل انت متاكد انك تريد حذف هذا الطلب"
+    "DeleteConfirmation": "هل انت متاكد انك تريد حذف هذا الطلب",
+    "Cancel": "إلغاء",
+    "Delete": "حذف",
+    "SaveChanges": "حفظ التغييرات"
 
 }

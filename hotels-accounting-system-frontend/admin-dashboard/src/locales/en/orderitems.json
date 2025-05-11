@@ -18,5 +18,6 @@
     "EditItem": "Edit Item",
     "delete": "Delete",
     "deletcofermation": "Are you sure you want to delete this item?",
-    "Image": "Image"
+    "Image": "Image",
+    "ChooseImage": "Choose Image"
 }

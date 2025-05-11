@@ -10,6 +10,9 @@
     "EditOrder": "Edit Order",
     "SelectItem": "Select Item",
     "SelectBooking": "Select Booking",
-    "DeleteConfirmation": "Are You Sure You Want To Delete This Order ?"
+    "DeleteConfirmation": "Are You Sure You Want To Delete This Order ?",
+    "Cancel": "Cancel",
+    "Delete": "Delete",
+    "SaveChanges": "Save Changes"
 
 }

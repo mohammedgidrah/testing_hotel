@@ -350,7 +350,7 @@ export default function CategoryManagement() {
                 </h2>
                 <button
                   onClick={() => setShowCategoryModal(false)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white text-2xl"
                   disabled={isLoading}
                 >
                   ✕
@@ -412,10 +412,9 @@ export default function CategoryManagement() {
         {showDeleteModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-gray-800 p-6 rounded-lg w-96">
-              <h3 className="text-xl text-white mb-4">Confirm Deletion</h3>
-              <p className="text-gray-300 mb-6">
-                Are you sure you want to delete this category? This action
-                cannot be undone.
+              {/* <h3 className="text-xl text-white mb-4">Confirm Deletion</h3> */}
+              <p className="text-xl text-white mb-4">
+                {t("Are you sure you want to delete this category?")}
               </p>
               <div className="flex justify-end space-x-4">
                 <button
@@ -423,7 +422,7 @@ export default function CategoryManagement() {
                   className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
                   disabled={isLoading}
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
                 <button
                   onClick={handleDeleteCategory}
@@ -433,7 +432,7 @@ export default function CategoryManagement() {
                   {isLoading && (
                     <span className="animate-spin h-4 w-4 mr-2 border-t-2 border-b-2 border-white rounded-full"></span>
                   )}
-                  Delete
+                  {t("Delete")}
                 </button>
               </div>
             </div>

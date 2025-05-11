@@ -393,14 +393,20 @@ function BookingsTable({ ondelete }) {
         onHide={() => setShowDetailsModal(false)}
         style={{ direction: "ltr" }}
       >
-        <Modal.Header closeButton>
+        <Modal.Header
+          closeButton
+          className="bg-gray-800 text-xl font-bold text-white border-none custom-close"
+        >
           <Modal.Title>{t("BookingDetails")}</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className="bg-gray-800 text-x text-gray-200 text-opacity-80">
           {selectedBookingDetails && (
             <div>
-              <p>
-                <strong>{t("ID")}:</strong> {selectedBookingDetails.id}
+              <p className="text-gray-300">
+                <strong style={{ color: "white", fontWeight: "bold" }}>
+                  {t("ID")}:
+                </strong>{" "}
+                {selectedBookingDetails.id}
               </p>
               <p
                 style={
@@ -408,52 +414,66 @@ function BookingsTable({ ondelete }) {
                     ? { direction: "rtl", textAlign: "left" }
                     : {}
                 }
+                className="text-gray-300"
               >
-                <strong>{t("GuestName")}:</strong>{" "}
+                <strong className="font-bold text-white">
+                  {t("GuestName")}:
+                </strong>{" "}
                 {selectedBookingDetails.guest
                   ? `${selectedBookingDetails.guest.first_name} ${selectedBookingDetails.guest.last_name}`
                   : "N/A"}
               </p>
-              <p>
-                <strong>{t("RoomNumber")}:</strong>{" "}
+              <p className="text-gray-300">
+                <strong className="font-bold text-white">
+                  {t("RoomNumber")}:
+                </strong>{" "}
                 {selectedBookingDetails.room?.room_number || "N/A"}
               </p>
-              <p>
-                <strong>{t("CheckInDate")}:</strong>{" "}
+              <p className="text-gray-300">
+                <strong className="font-bold text-white">
+                  {t("CheckInDate")}:
+                </strong>{" "}
                 {selectedBookingDetails.check_in_date
                   ? new Date(
                       selectedBookingDetails.check_in_date
                     ).toLocaleDateString()
                   : "N/A"}
               </p>
-              <p>
-                <strong>{t("CheckOutDate")}:</strong>{" "}
+              <p className="text-gray-300">
+                <strong className="font-bold text-white">
+                  {t("CheckOutDate")}:
+                </strong>{" "}
                 {selectedBookingDetails.check_out_date
                   ? new Date(
                       selectedBookingDetails.check_out_date
                     ).toLocaleDateString()
                   : "N/A"}
               </p>
-              <p>
-                <strong>{t("TotalAmount")}:</strong> $
+              <p className="text-gray-300">
+                <strong className="font-bold text-white">
+                  {t("TotalAmount")}:
+                </strong>{" "}
+                $
                 {parseFloat(selectedBookingDetails.total_amount || 0).toFixed(
                   2
                 )}
               </p>
-              <p>
-                <strong>{t("Status")}:</strong>{" "}
+              <p className="text-gray-300">
+                <strong className="font-bold text-white">{t("Status")}:</strong>{" "}
                 {t(selectedBookingDetails.payment_status || "pending")}
               </p>
 
               {/* Display Services */}
               <div>
-                <strong>{t("Services")}:</strong>
+                <strong className="font-bold text-white">
+                  {t("Services")}:
+                </strong>
                 {selectedBookingDetails.services &&
                 selectedBookingDetails.services.length > 0 ? (
                   <ul>
                     {selectedBookingDetails.services.map((service) => (
                       <li key={service.id}>
-                        {service.name} - $
+                        <span className="font-bold text-white">{service.name} </span>{" - $"}
                         {parseFloat(service.price || 0).toFixed(2)}
                       </li>
                     ))}
@@ -465,7 +485,7 @@ function BookingsTable({ ondelete }) {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer className="  bg-gray-800 text-white  p-2 pr-10  border-none  ">
           <Button
             variant="secondary"
             onClick={() => setShowDetailsModal(false)}
