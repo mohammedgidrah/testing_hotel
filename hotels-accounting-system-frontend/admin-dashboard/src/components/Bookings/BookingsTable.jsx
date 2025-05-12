@@ -9,9 +9,21 @@ import { useNavigate } from "react-router-dom";
 
 function BookingsTable({ ondelete }) {
   const navigate = useNavigate();
+  const [filteredBookings, setFilteredBookings] = useState([]);
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+const bookingsPerPage = 5;
+const indexOfLastBooking = currentPage * bookingsPerPage;
+const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+
+const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // end pagination
   const { t, i18n } = useTranslation("bookings");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredBookings, setFilteredBookings] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [error, setError] = useState(null);
@@ -292,7 +304,7 @@ function BookingsTable({ ondelete }) {
                   </td>
                 </tr>
               )}
-              {filteredBookings.map((booking) => (
+              {currentBookings.map((booking) => (
                 <motion.tr
                   key={booking.id}
                   initial={{ opacity: 0 }}
@@ -327,7 +339,7 @@ function BookingsTable({ ondelete }) {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {payments.find(
                       (payment) => payment.booking_id === booking.id
-                    )?.payment_method || t("noPayment")}
+                    )?.payment_method || t("No Payment")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <button
@@ -372,6 +384,21 @@ function BookingsTable({ ondelete }) {
               ))}
             </tbody>
           </table>
+          <div className="flex justify-center mt-4 space-x-2">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === index + 1
+          ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -473,7 +500,10 @@ function BookingsTable({ ondelete }) {
                   <ul>
                     {selectedBookingDetails.services.map((service) => (
                       <li key={service.id}>
-                        <span className="font-bold text-white">{service.name} </span>{" - $"}
+                        <span className="font-bold text-white">
+                          {service.name}{" "}
+                        </span>
+                        {" - $"}
                         {parseFloat(service.price || 0).toFixed(2)}
                       </li>
                     ))}

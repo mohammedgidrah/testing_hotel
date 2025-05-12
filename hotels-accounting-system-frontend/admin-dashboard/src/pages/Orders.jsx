@@ -17,28 +17,38 @@ function ErrorFallback({ error }) {
 }
 
 export default function Orders() {
-  const { t } = useTranslation("orders");
-  const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [showOrderModal, setShowOrderModal] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [formData, setFormData] = useState({
-    item_id: "",
-    booking_id: "",
-    quantity: "1",
-    price_per_item: "",
-    total_price: "",
-  });
-  const [formErrors, setFormErrors] = useState({});
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [orderToDelete, setOrderToDelete] = useState(null);
-
-  // For dropdown options
+    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredOrders, setFilteredOrders] = useState([]);
+    
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const { t } = useTranslation("orders");
+    const [orders, setOrders] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    
+    const [showOrderModal, setShowOrderModal] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [formData, setFormData] = useState({
+      item_id: "",
+      booking_id: "",
+      quantity: "1",
+      price_per_item: "",
+      total_price: "",
+    });
+    const [formErrors, setFormErrors] = useState({});
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [orderToDelete, setOrderToDelete] = useState(null);
+    
+    const ordersPerPage = 5;
+  
+    const indexOfLastorder = currentPage * ordersPerPage;
+    const indexOfFirstorder = indexOfLastorder - ordersPerPage;
+    const currentorders = filteredOrders.slice(indexOfFirstorder, indexOfLastorder);
+  
+    const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+    // For dropdown options
   const [items, setItems] = useState([]);
   const [bookings, setBookings] = useState([]);
 
@@ -405,7 +415,7 @@ export default function Orders() {
 
               {/* Table Body */}
               <tbody className="divide-y divide-gray-700">
-                {filteredOrders.map((order) => (
+                {currentorders.map((order) => (
                   <motion.tr
                     key={order.id}
                     initial={{ opacity: 0 }}
@@ -451,6 +461,23 @@ export default function Orders() {
                 ))}
               </tbody>
             </table>
+                  {totalPages > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === index + 1
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
           </div>
         )}
 
@@ -479,72 +506,64 @@ export default function Orders() {
 
               <Form.Group className="mb-3">
                 <Form.Label>{t("item") || "Item"}</Form.Label>
-                <Form.Select
-                  name="item_id"
-                  value={formData.item_id}
-                  onChange={handleFormChange}
-                  isInvalid={!!formErrors.item_id}
-                  className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none focus:ring-0 focus:bg-gray-700 "
-                >
-                  <option value="">{t("SelectItem") || "Select Item"}</option>
-                  {items.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.name} - ${parseFloat(item.price).toFixed(2)}
-                    </option>
-                  ))}
-                </Form.Select>
-                <div className="pointer-events-none absolute mt-1   top-14 text-size-2 bottom-65 right-5 flex items-center px-2 text-white">
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                <div className="relative w-full">
+                  <Form.Select
+                    name="item_id"
+                    value={formData.item_id}
+                    onChange={handleFormChange}
+                    isInvalid={!!formErrors.item_id}
+                    className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none focus:ring-0 focus:bg-gray-700 "
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                    <option value="">{t("SelectItem") || "Select Item"}</option>
+                    {items.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name} - ${parseFloat(item.price).toFixed(2)}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <div
+                    className="pointer-events-none absolute    "
+                    style={{ top: "1.1rem", right: "1rem" }}
+                  >
+                    <div className="w-1 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+                  </div>
+
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.item_id}
+                  </Form.Control.Feedback>
                 </div>
-                <Form.Control.Feedback type="invalid">
-                  {formErrors.item_id}
-                </Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group className="mb-3">
                 <Form.Label>{t("booking") || "Booking"}</Form.Label>
-                <Form.Select
-                  name="booking_id"
-                  value={formData.booking_id}
-                  onChange={handleFormChange}
-                  isInvalid={!!formErrors.booking_id}
-                  className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none focus:ring-0 focus:bg-gray-700 "
-                >
-                  <option value="">
-                    {t("SelectBooking") || "Select Booking"}
-                  </option>
-                  {bookings.map((booking) => (
-                    <option key={booking.id} value={booking.id}>
-                      {booking.reference || `Booking ${booking.id}`}
-                    </option>
-                  ))}
-                </Form.Select>
-                <div className="pointer-events-none absolute mt-1   top-36 text-size-2 bottom-65 right-5 flex items-center px-2 text-white">
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                <div className="relative w-full">
+                  <Form.Select
+                    name="booking_id"
+                    value={formData.booking_id}
+                    onChange={handleFormChange}
+                    isInvalid={!!formErrors.booking_id}
+                    className="w-full bg-gray-700 text-white rounded p-2 pr-10 border-none focus:ring-0 focus:bg-gray-700 "
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                    <option value="">
+                      {t("SelectBooking") || "Select Booking"}
+                    </option>
+                    {bookings.map((booking) => (
+                      <option key={booking.id} value={booking.id}>
+                        {booking.reference || `Booking ${booking.id}`}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <div
+                    className="pointer-events-none absolute    "
+                    style={{ top: "1.1rem", right: "1rem" }}
+                  >
+                    <div className="w-1 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+                  </div>
+
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.booking_id}
+                  </Form.Control.Feedback>
                 </div>
-                <Form.Control.Feedback type="invalid">
-                  {formErrors.booking_id}
-                </Form.Control.Feedback>
               </Form.Group>
 
               <Form.Group className="mb-3">

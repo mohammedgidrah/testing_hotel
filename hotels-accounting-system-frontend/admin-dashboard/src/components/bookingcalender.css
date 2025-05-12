@@ -11,8 +11,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  /* border: 1px solid #ced4da; */
-  border-radius: 4px;
+   border-radius: 4px;
   background-color: rgb(55, 65, 81, 1);
   cursor: pointer;
   transition: border-color 0.15s ease-in-out;
@@ -47,7 +46,7 @@
   border: none;
   outline: none;
 }
-
+ 
  
 .calendar-icon {
   color: white;
@@ -102,11 +101,13 @@
 
 /* Booked day styling */
 .react-datepicker__day--booked {
-  background-color: #ffe3e3 !important;
-  color: #ff6b6b !important;
+  /* background-color: #ffe3e3; */
+  color: #ff6b6b;
   text-decoration: line-through;
   cursor: not-allowed;
 }
+
+
 
 /* Weekend styling */
 /* .react-datepicker__day--weekend {
@@ -131,7 +132,4 @@
 button:focus:not(:focus-visible) {
   box-shadow: none;
 }
-/* .custom-close .btn-close:hover {
-    filter: invert(0);
-  background-color: red;
-  } */
+ 

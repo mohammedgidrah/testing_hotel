@@ -44,5 +44,7 @@
   "AdditionalServices": "Additional Services",
   "Subtotal:": "Subtotal:",
   "Total:": "Total:",
-  "Services": "Services"
+  "Services": "Services",
+  "Next": "Next",
+  "Previous": "Previous"
 }

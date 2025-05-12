@@ -46,6 +46,8 @@
   "AdditionalServices": "خدمات اضافية",
   "Total": "المجموع",
   "Services": "خدمات",
-  "Subtotal": "المجموع الفرعي"
+  "Subtotal": "المجموع الفرعي",
+      "Next": "التالي",
+    "Previous": "السابق"
 
 }

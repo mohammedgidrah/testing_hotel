@@ -198,36 +198,32 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
 
           <Form.Group className="mb-3">
             <Form.Label>{t("room")}</Form.Label>
-            <Form.Select
-              name="room_id"
-              value={formData.room_id}
-              onChange={handleChange}
-              isInvalid={!!errors.room_id}
-              className=" bg-gray-700 text-white rounded    border-none focus:ring-0 focus:bg-gray-700  "
-            >
-              <option value="">{t("SelectRoom")}</option>
-              {rooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.room_number} - {room.type} (${room.price_per_night})
-                </option>
-              ))}
-            </Form.Select>
-                          <div className="pointer-events-none absolute   bottom-64  inset-y-0 right-5 font-size-l flex items-center px-2 text-white text-size-xl" style={{bottom:"16.7rem"}}>
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-            <Form.Control.Feedback type="invalid">
-              {errors.room_id}
-            </Form.Control.Feedback>
+            <div className="relative w-full">
+              <Form.Select
+                name="room_id"
+                value={formData.room_id}
+                onChange={handleChange}
+                isInvalid={!!errors.room_id}
+                className=" bg-gray-700 text-white rounded    border-none focus:ring-0 focus:bg-gray-700  "
+              >
+                <option value="">{t("SelectRoom")}</option>
+                {rooms.map((room) => (
+                  <option key={room.id} value={room.id}>
+                    {room.room_number} - {room.type} (${room.price_per_night})
+                  </option>
+                ))}
+              </Form.Select>
+              <div
+                className="pointer-events-none absolute  text-   "
+                style={{ top: "1.1rem", right: "1rem" }}
+              >
+                <div className="w-1 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+              </div>
+
+              <Form.Control.Feedback type="invalid">
+                {errors.room_id}
+              </Form.Control.Feedback>
+            </div>
           </Form.Group>
 
           <Form.Group className="mb-4">
@@ -241,7 +237,6 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
                       ? new Date(formData.check_in_date)
                       : null
                   }
-                  
                   setSelectedDate={(date) =>
                     setFormData({
                       ...formData,
@@ -287,67 +282,55 @@ function EditBookingForm({ booking, show, onHide, onUpdate, rooms }) {
 
           <Form.Group className="mb-3">
             <Form.Label>{t("PaymentStatus")}</Form.Label>
-            <Form.Select
-              name="payment_status"
-              value={formData.payment_status}
-              onChange={handleChange}
-              isInvalid={!!errors.payment_status}
-                                  className="w-full bg-gray-700 text-white rounded   border-none focus:ring-0 focus:bg-gray-700  "
-
-            >
-              <option value="">{t("SelectStatus")}</option>
-              <option value="paid">{t("paid")}</option>
-              <option value="pending">{t("pending")}</option>
-            </Form.Select>
-                       <div className="pointer-events-none absolute   right-5  bottom-0 font-size-l flex items-center px-2 text-white text-size-xl" style={{top:"8.2rem"}}>
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-            <Form.Control.Feedback type="invalid">
-              {errors.payment_status}
-            </Form.Control.Feedback>
+            <div className="relative w-full">
+              <Form.Select
+                name="payment_status"
+                value={formData.payment_status}
+                onChange={handleChange}
+                isInvalid={!!errors.payment_status}
+                className="w-full bg-gray-700 text-white rounded   border-none focus:ring-0 focus:bg-gray-700  "
+              >
+                <option value="">{t("SelectStatus")}</option>
+                <option value="paid">{t("paid")}</option>
+                <option value="pending">{t("pending")}</option>
+              </Form.Select>
+              <div
+                className="pointer-events-none absolute    "
+                style={{ top: "1.1rem", right: "1rem" }}
+              >
+                <div className="w-1 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+              </div>
+              <Form.Control.Feedback type="invalid">
+                {errors.payment_status}
+              </Form.Control.Feedback>
+            </div>
           </Form.Group>
 
           {showPaymentMethodField && (
             <Form.Group className="mb-3">
               <Form.Label>{t("PaymentMethod")}</Form.Label>
-              <Form.Select
-                name="payment_method"
-                value={formData.payment_method || ""}
-                onChange={handleChange}
-                isInvalid={!!errors.payment_method}
-                                                  className="w-full bg-gray-700 text-white rounded   border-none focus:ring-0 focus:bg-gray-700  "
-
-              >
-                <option value="">{t("slectpaymentmethod")}</option>
-                <option value="cash">{t("Cash")}</option>
-                <option value="credit_card">{t("CreditCard")}</option>
-              </Form.Select>
-                         <div className="pointer-events-none absolute   right-5  bottom-0 font-size-l flex items-center px-2 text-white text-size-xl" style={{top:"18.7rem"}}>
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-              <Form.Control.Feedback type="invalid">
-                {errors.payment_method}
-              </Form.Control.Feedback>
+              <div className="relative w-full">
+                <Form.Select
+                  name="payment_method"
+                  value={formData.payment_method || ""}
+                  onChange={handleChange}
+                  isInvalid={!!errors.payment_method}
+                  className="w-full bg-gray-700 text-white rounded   border-none focus:ring-0 focus:bg-gray-700  "
+                >
+                  <option value="">{t("slectpaymentmethod")}</option>
+                  <option value="cash">{t("Cash")}</option>
+                  <option value="credit_card">{t("CreditCard")}</option>
+                </Form.Select>
+                <div
+                  className="pointer-events-none absolute      "
+                  style={{ top: "1.1rem", right: "1rem" }}
+                >
+                  <div className="w-1 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
+                </div>
+                <Form.Control.Feedback type="invalid">
+                  {errors.payment_method}
+                </Form.Control.Feedback>
+              </div>
             </Form.Group>
           )}
         </Modal.Body>

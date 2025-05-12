@@ -39,6 +39,16 @@ function OrderItems() {
     status: "isavailable",
     image: null,
   });
+    const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const indexOfLastitems = currentPage * itemsPerPage;
+  const indexOfFirstitems = indexOfLastitems - itemsPerPage;
+  const currentitems = filteredItems.slice(indexOfFirstitems, indexOfLastitems);
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   const [formErrors, setFormErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -303,7 +313,6 @@ function OrderItems() {
         <Header title={t("OrderItems")} />
         {/* Search and Add Button Section */}
         <div className="flex justify-end items-center mb-6 p-4">
- 
           <div className="flex space-x-4">
             <div className="relative">
               <input
@@ -369,7 +378,7 @@ function OrderItems() {
 
               {/* Table Body */}
               <tbody className="divide-y divide-gray-700">
-                {filteredItems.map((item) => (
+                {currentitems.map((item) => (
                   <motion.tr
                     key={item.id}
                     initial={{ opacity: 0 }}
@@ -436,6 +445,23 @@ function OrderItems() {
                 ))}
               </tbody>
             </table>
+                              {totalPages > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === index + 1
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
           </div>
         )}
 
@@ -491,7 +517,7 @@ function OrderItems() {
 
               <Form.Group className="mb-3">
                 <Form.Label>{t("Category")}</Form.Label>
-                <div className="relative">
+                <div className="relative w-full">
                   <Form.Select
                     name="category_id"
                     value={formData.category_id}
@@ -506,20 +532,11 @@ function OrderItems() {
                       </option>
                     ))}
                   </Form.Select>
-
-                  {/* Custom white arrow */}
-                  <div className="pointer-events-none absolute inset-y-0 right-1 font-size-l flex items-center px-2 text-white text-size-xl">
-                    <svg
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+                  <div
+                    className="pointer-events-none absolute    "
+                    style={{ top: "1.1rem", right: "1rem" }}
+                  >
+                    <div className="w-1 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-white"></div>
                   </div>
 
                   <Form.Control.Feedback type="invalid">
