@@ -6,7 +6,7 @@ import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
 
 export default function Services() {
-  const { t } = useTranslation("services");
+  const { t, i18n } = useTranslation("services");
 
   // State management
   const [services, setServices] = useState([]);
@@ -225,7 +225,7 @@ export default function Services() {
   
 
   return (
-    <div className="flex-1 overflow-auto relative z-10" style={{direction: "ltr"}}>
+    <div className="flex-1 overflow-auto relative z-10" style={i18n.language === 'ar' ? { direction: 'rtl' } : {}}>
       <Header title={t("Services")} />
 
       <div className="flex justify-end items-center mt-4 mr-4 ml-4">
@@ -279,29 +279,12 @@ export default function Services() {
         </div>
       )}
 
-      {/* <Modal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        style={{ direction: "ltr" }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{t("DeleteService")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{t("DeleteConfirmation")}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            {t("cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            {t("delete")}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
+ 
            {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ">
                     <div className="bg-gray-800 p-6 rounded-lg w-96">
                         <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
-                        <div className="flex justify-end space-x-4">
+                        <div className="flex justify-end space-x-4  " style={i18n.language === 'ar' ? { direction: 'ltr' } : {}}>
                             <button 
                                 onClick={() => setShowModal(false)} 
                                 className="bg-gray-600 text-white px-4 py-2 rounded"

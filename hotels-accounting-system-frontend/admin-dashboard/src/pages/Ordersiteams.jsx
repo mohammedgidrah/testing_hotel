@@ -201,7 +201,17 @@ function OrderItems() {
 
     setFormErrors((prev) => ({ ...prev, [name]: null }));
   };
+useEffect(() => {
+  if (showDeleteModal) {
+    document.body.classList.add("no-scroll");
+  } else {
+    document.body.classList.remove("no-scroll");
+  }
 
+  return () => {
+    document.body.classList.remove("no-scroll");
+  };
+}, [showDeleteModal]);
   const validateForm = () => {
     const errors = {};
     if (!formData.name.trim())
@@ -304,16 +314,16 @@ function OrderItems() {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <motion.div
-        className=" flex-1 overflow-auto relative z-10             "
+        className=" flex-1 overflow-auto relative z-10 "
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        style={{ direction: "ltr" }}
+        style={i18n.language === "ar" ? { direction: "rtl" } : {}}
       >
         <Header title={t("OrderItems")} />
         {/* Search and Add Button Section */}
-        <div className="flex justify-end items-center mb-6 p-4">
-          <div className="flex space-x-4">
+        <div className="flex justify-end items-center mb-6 p-4 ">
+          <div className="flex space-x-4 gap-4">
             <div className="relative">
               <input
                 type="text"
@@ -351,7 +361,7 @@ function OrderItems() {
               : t("NoItemsFound") || "No items found"}
           </div>
         ) : (
-          <div className="overflow-x-auto  m-6 border border-gray-700 rounded-lg">
+          <div className="overflow-x-auto  m-6 border border-gray-700 rounded-lg" style={{ direction: "ltr" }}>
             <table className="min-w-full divide-y divide-gray-700  rounded-lg ">
               {/* Table Header */}
               <thead className="bg-gray-800">
@@ -628,29 +638,35 @@ function OrderItems() {
 
         {/* Delete Confirmation Modal */}
 
-        {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-gray-800 p-6 rounded-lg w-96">
-              <h3 className="text-xl text-white mb-4">
-                {t("deletcofermation")}
-              </h3>
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded"
-                >
-                  {t("cancel")}
-                </button>
-                <button
-                  onClick={handleDeleteItem}
-                  className="bg-red-600 text-white px-4 py-2 rounded"
-                >
-                  {t("delete")}
-                </button>
-              </div>
-            </div>
+    {showDeleteModal && (
+<div
+  className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${
+    showDeleteModal ? "overflow-y-hidden" : ""
+  }`}
+>        <div className="bg-gray-800 p-6 rounded-lg w-96">
+          <h3 className="text-xl text-white mb-4">
+            {t("deletcofermation")}
+          </h3>
+          <div
+            className="flex justify-end space-x-4"
+            style={i18n.language === "ar" ? { direction: "ltr" } : {}}
+          >
+            <button
+              onClick={() => setShowDeleteModal(false)}
+              className="bg-gray-600 text-white px-4 py-2 rounded"
+            >
+              {t("cancel")}
+            </button>
+            <button
+              onClick={handleDeleteItem}
+              className="bg-red-600 text-white px-4 py-2 rounded"
+            >
+              {t("delete")}
+            </button>
           </div>
-        )}
+        </div>
+      </div>
+    )}
       </motion.div>
     </ErrorBoundary>
   );

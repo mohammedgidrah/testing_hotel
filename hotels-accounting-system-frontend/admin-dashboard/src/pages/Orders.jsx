@@ -21,7 +21,7 @@ export default function Orders() {
     const [filteredOrders, setFilteredOrders] = useState([]);
     
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
-    const { t } = useTranslation("orders");
+    const { t, i18n } = useTranslation("orders");
     const [orders, setOrders] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -339,7 +339,7 @@ export default function Orders() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        style={{ direction: "ltr" }}
+        style={i18n.language === "ar" ? { direction: "rtl" } : {}}
       >
         <Header title={t("Orders")} />
 
@@ -383,7 +383,7 @@ export default function Orders() {
               : t("NoOrdersFound") || "No orders found"}
           </div>
         ) : (
-          <div className="overflow-x-auto m-6 border border-gray-700 rounded-lg">
+          <div className="overflow-x-auto m-6 border border-gray-700 rounded-lg" style={i18n.language === 'ar' ? { direction: 'ltr' } : {}}>
             <table className="min-w-full divide-y divide-gray-700 rounded-lg">
               {/* Table Header */}
               <thead className="bg-gray-800">
@@ -620,7 +620,7 @@ export default function Orders() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{direction: 'ltr'}}>
             <div className="bg-gray-800 p-6 rounded-lg w-96">
               <h3 className="text-xl text-white mb-4">
                 {t("DeleteConfirmation") ||

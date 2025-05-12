@@ -16,7 +16,7 @@ function ErrorFallback({ error }) {
 }
 
 export default function CategoryManagement() {
-  const { t } = useTranslation("itemcategory");
+  const { t, i18n } = useTranslation("itemcategory");
   const [categories, setCategories] = useState([]);
   const [items, setItems] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -229,13 +229,13 @@ export default function CategoryManagement() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        style={{ direction: "ltr" }}
+        style={i18n.language==="ar"?{direction:"rtl"}:{}}
       >
         <Header title={t("Category Management")} />
 
         {/* Search and Add Button Section */}
-        <div className="flex justify-end items-center mb-6 p-4">
-          <div className="flex space-x-4">
+        <div className="flex justify-end items-center mb-6 p-4 " >
+          <div className="flex space-x-4 gap-4">
             <div className="relative">
               <input
                 type="text"
@@ -283,7 +283,7 @@ export default function CategoryManagement() {
               : "No categories found"}
           </div>
         ) : (
-          <div className="overflow-x-auto m-6 border border-gray-700 rounded-lg">
+          <div className="overflow-x-auto m-6 border border-gray-700 rounded-lg" style={{direction: 'ltr'}}>
             <table className="min-w-full divide-y divide-gray-700 rounded-lg">
               {/* Table Header */}
               <thead className="bg-gray-800">
@@ -342,7 +342,7 @@ export default function CategoryManagement() {
 
         {/* Add/Edit Category Modal */}
         {showCategoryModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" >
             <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-white">
@@ -410,10 +410,10 @@ export default function CategoryManagement() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" style={{direction:'ltr'}}>
             <div className="bg-gray-800 p-6 rounded-lg w-96">
               {/* <h3 className="text-xl text-white mb-4">Confirm Deletion</h3> */}
-              <p className="text-xl text-white mb-4">
+              <p className="text-xl text-white mb-4" style={i18n.language === 'ar' ? {direction:'rtl'} : {}}>
                 {t("Are you sure you want to delete this category?")}
               </p>
               <div className="flex justify-end space-x-4">
