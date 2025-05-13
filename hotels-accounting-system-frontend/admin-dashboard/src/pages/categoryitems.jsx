@@ -16,6 +16,8 @@ function ErrorFallback({ error }) {
 }
 
 export default function CategoryManagement() {
+  const [currentPage, setCurrentPage] = useState(1);
+
   const { t, i18n } = useTranslation("itemcategory");
   const [categories, setCategories] = useState([]);
   const [items, setItems] = useState([]);
@@ -24,13 +26,25 @@ export default function CategoryManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [isItemsLoading, setIsItemsLoading] = useState(false);
   const [error, setError] = useState(null);
-
+ 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
   });
+  const categoryPerPage = 5;
+
+  const indexOfLastorder = currentPage * categoryPerPage;
+  const indexOfFirstorder = indexOfLastorder - categoryPerPage;
+  const currentcategory = filteredCategories.slice(
+    indexOfFirstorder,
+    indexOfLastorder
+  );
+
+  const totalPages = Math.ceil(filteredCategories.length / categoryPerPage);
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   const [formErrors, setFormErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -229,12 +243,12 @@ export default function CategoryManagement() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        style={i18n.language==="ar"?{direction:"rtl"}:{}}
+        style={i18n.language === "ar" ? { direction: "rtl" } : {}}
       >
         <Header title={t("Category Management")} />
 
         {/* Search and Add Button Section */}
-        <div className="flex justify-end items-center mb-6 p-4 " >
+        <div className="flex justify-end items-center mb-6 p-4 ">
           <div className="flex space-x-4 gap-4">
             <div className="relative">
               <input
@@ -283,12 +297,15 @@ export default function CategoryManagement() {
               : "No categories found"}
           </div>
         ) : (
-          <div className="overflow-x-auto m-6 border border-gray-700 rounded-lg" style={{direction: 'ltr'}}>
+          <div
+            className="overflow-x-auto m-6 border border-gray-700 rounded-lg"
+            style={{ direction: "ltr" }}
+          >
             <table className="min-w-full divide-y divide-gray-700 rounded-lg">
               {/* Table Header */}
               <thead className="bg-gray-800">
                 <tr>
-                  {["ID", "Name",  "Actions"].map((header) => (
+                  {["ID", "Name", "Actions"].map((header) => (
                     <th
                       key={header}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
@@ -301,7 +318,7 @@ export default function CategoryManagement() {
 
               {/* Table Body */}
               <tbody className="divide-y divide-gray-700">
-                {filteredCategories.map((category) => (
+                {currentcategory.map((category) => (
                   <motion.tr
                     key={category.id}
                     initial={{ opacity: 0 }}
@@ -314,7 +331,7 @@ export default function CategoryManagement() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100">
                       {category.name}
                     </td>
- 
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                       <button
                         onClick={() => handleEditCategory(category)}
@@ -337,12 +354,29 @@ export default function CategoryManagement() {
                 ))}
               </tbody>
             </table>
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-4 space-x-2">
+                {[...Array(totalPages)].map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => paginate(index + 1)}
+                    className={`px-3 py-1 text-sm rounded ${
+                      currentPage === index + 1
+                        ? "bg-indigo-500 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
         {/* Add/Edit Category Modal */}
         {showCategoryModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" >
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-white">
@@ -365,7 +399,9 @@ export default function CategoryManagement() {
 
               <form onSubmit={handleSubmitForm}>
                 <div className="mb-4">
-                  <label className="block text-gray-300 mb-2">{t("Name")}</label>
+                  <label className="block text-gray-300 mb-2">
+                    {t("Name")}
+                  </label>
                   <input
                     type="text"
                     name="name"
@@ -410,10 +446,16 @@ export default function CategoryManagement() {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" style={{direction:'ltr'}}>
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+            style={{ direction: "ltr" }}
+          >
             <div className="bg-gray-800 p-6 rounded-lg w-96">
               {/* <h3 className="text-xl text-white mb-4">Confirm Deletion</h3> */}
-              <p className="text-xl text-white mb-4" style={i18n.language === 'ar' ? {direction:'rtl'} : {}}>
+              <p
+                className="text-xl text-white mb-4"
+                style={i18n.language === "ar" ? { direction: "rtl" } : {}}
+              >
                 {t("Are you sure you want to delete this category?")}
               </p>
               <div className="flex justify-end space-x-4">

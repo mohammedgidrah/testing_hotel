@@ -48,6 +48,7 @@ export default function Orders() {
     const currentorders = filteredOrders.slice(indexOfFirstorder, indexOfLastorder);
   
     const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+    
     // For dropdown options
   const [items, setItems] = useState([]);
   const [bookings, setBookings] = useState([]);
