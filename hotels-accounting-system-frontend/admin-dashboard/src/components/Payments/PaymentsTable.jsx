@@ -5,7 +5,7 @@ import EditPayment from "./EditPaymentForm";
 import { Edit, Trash2 } from "lucide-react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
- 
+
 const PaymentsTable = () => {
   const { t } = useTranslation("payments");
   const [payments, setPayments] = useState([]);
@@ -19,6 +19,19 @@ const PaymentsTable = () => {
   // States for delete confirmation modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const paymentPerPage = 5;
+
+  const indexOfLastpayment = currentPage * paymentPerPage;
+  const indexOfFirstpayment = indexOfLastpayment - paymentPerPage;
+  const currentpayment = filteredPayments.slice(
+    indexOfFirstpayment,
+    indexOfLastpayment
+  );
+
+  const totalPages = Math.ceil(filteredPayments.length / paymentPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const fetchPayments = useCallback(async () => {
     try {
@@ -67,15 +80,15 @@ const PaymentsTable = () => {
   //   };
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-  
+
     // Parse the date string while considering it as UTC
     const date = new Date(dateString + "Z"); // Append 'Z' to treat it as UTC
-  
+
     // Extract day, month, and year
     const day = String(date.getUTCDate()).padStart(2, "0"); // Ensure two digits
     const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-indexed
     const year = date.getUTCFullYear();
-  
+
     // Return in the desired numeric format (e.g., MM/DD/YYYY)
     return `${day}/${month}/${year}`;
   };
@@ -105,8 +118,6 @@ const PaymentsTable = () => {
 
   return (
     <div className="container mx-auto p-6" style={{ direction: "ltr" }}>
- 
-
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <div className="flex justify-between items-center mb-4">
@@ -150,8 +161,8 @@ const PaymentsTable = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {filteredPayments.length > 0 ? (
-              filteredPayments.map((payment) => (
+            {currentpayment.length > 0 ? (
+              currentpayment.map((payment) => (
                 <tr key={payment.id} className="border-b border-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     {payment.booking_id}
@@ -195,6 +206,23 @@ const PaymentsTable = () => {
             )}
           </tbody>
         </table>
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-4 space-x-2">
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => paginate(index + 1)}
+                className={`px-3 py-1 text-sm rounded ${
+                  currentPage === index + 1
+                    ? "bg-indigo-500 text-white"
+                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* {showEditModal && selectedPayment && (
@@ -226,26 +254,28 @@ const PaymentsTable = () => {
         </Modal.Footer>
       </Modal> */}
       {showDeleteModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-gray-800 p-6 rounded-lg w-96">
-                        <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
-                        <div className="flex justify-end space-x-4">
-                            <button 
-                                onClick={() => setShowDeleteModal(false)} 
-                                className="bg-gray-600 text-white px-4 py-2 rounded"
-                            >
-                                {t("cancel")}
-                            </button>
-                            <button 
-                                onClick={handleDeletePayment} 
-                                className="bg-red-600 text-white px-4 py-2 rounded"
-                            >
-                                {t("delete")}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-xl text-white mb-4">
+              {t("DeleteConfirmation")}
+            </h3>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                onClick={handleDeletePayment}
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

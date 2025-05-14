@@ -1,11 +1,30 @@
-import React, { useState } from 'react';
-import { Edit, Trash2 } from 'lucide-react'; // Import icons
-import { Modal, Button } from 'react-bootstrap'; // Import Modal and Button components from react-bootstrap
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import { Edit, Trash2 } from "lucide-react"; // Import icons
+import { Modal, Button } from "react-bootstrap"; // Import Modal and Button components from react-bootstrap
+import { motion } from "framer-motion";
 
-export default function GuestTable({ loading, filteredGuests, setEditingGuest, handleDeleteGuest, t }) {
+export default function GuestTable({
+  loading,
+  filteredGuests,
+  setEditingGuest,
+  handleDeleteGuest,
+  t,
+}) {
   const [showModal, setShowModal] = useState(false);
   const [guestToDelete, setGuestToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const guestsPerPage = 5;
+
+  const indexOfLastguests = currentPage * guestsPerPage;
+  const indexOfFirstguests = indexOfLastguests - guestsPerPage;
+  const currentguests = filteredGuests.slice(
+    indexOfFirstguests,
+    indexOfLastguests
+  );
+
+  const totalPages = Math.ceil(filteredGuests.length / guestsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleDelete = () => {
     if (guestToDelete) {
@@ -16,7 +35,7 @@ export default function GuestTable({ loading, filteredGuests, setEditingGuest, h
 
   return (
     <div>
-      {!loading && filteredGuests.length > 0 ? (
+      {!loading && currentguests.length > 0 ? (
         <div className="overflow-x-auto" style={{ direction: "ltr" }}>
           <table className="min-w-full bg-gray-800 text-gray-100 rounded-lg">
             <thead className="bg-gray-700">
@@ -42,13 +61,26 @@ export default function GuestTable({ loading, filteredGuests, setEditingGuest, h
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-700">
-              {filteredGuests.map((guest) => (
-                <tr key={guest.id} className="hover:bg-gray-700 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.first_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.last_name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.phone_number}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{guest.address}</td>
+              {currentguests.map((guest) => (
+                <tr
+                  key={guest.id}
+                  className="hover:bg-gray-700 transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {guest.first_name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {guest.last_name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {guest.email}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {guest.phone_number}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    {guest.address}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                     <button
                       onClick={() => setEditingGuest(guest)}
@@ -70,6 +102,23 @@ export default function GuestTable({ loading, filteredGuests, setEditingGuest, h
               ))}
             </tbody>
           </table>
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 space-x-2">
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => paginate(index + 1)}
+                  className={`px-3 py-1 text-sm rounded ${
+                    currentPage === index + 1
+                      ? "bg-indigo-500 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         !loading && (
@@ -77,42 +126,32 @@ export default function GuestTable({ loading, filteredGuests, setEditingGuest, h
         )
       )}
 
-      {/* Bootstrap Modal for confirmation */}
-      {/* <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
-        <Modal.Header closeButton>
-          <Modal.Title>{t("DeleteGuest")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{t("DeleteConfirmation")}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            {t("cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            {t("delete")}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
-                   {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{ direction: "ltr" }}>
-                    <div className="bg-gray-800 p-6 rounded-lg w-96">
-                        <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
-                        <div className="flex justify-end space-x-4">
-                            <button 
-                                onClick={() => setShowModal(false)} 
-                                className="bg-gray-600 text-white px-4 py-2 rounded"
-                            >
-                                {t("cancel")}
-                            </button>
-                            <button 
-                                onClick={handleDelete} 
-                                className="bg-red-600 text-white px-4 py-2 rounded"
-                            >
-                                {t("delete")}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+      {showModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          style={{ direction: "ltr" }}
+        >
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-xl text-white mb-4">
+              {t("DeleteConfirmation")}
+            </h3>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

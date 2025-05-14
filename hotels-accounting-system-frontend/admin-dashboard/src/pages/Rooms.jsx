@@ -127,7 +127,7 @@ function Rooms() {
           onClick={toggleForm}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
         >
-          {showForm ? t("HideForm")  : editRoom ? t("UpdateRoom") : t("AddRoom")}
+          {showForm ? t("HideForm") : editRoom ? t("UpdateRoom") : t("AddRoom")}
         </button>
       </div>
 
@@ -136,11 +136,13 @@ function Rooms() {
         <p className="text-green-500 mb-4">{successMessage}</p>
       )}
       {showForm && (
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mt-4 mr-4 ml-4 mx-auto" >
+        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mt-4 mr-4 ml-4 mx-auto">
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <form onSubmit={editRoom ? handleUpdateRoom : handleAddRoom}>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">{t("RoomNumber")}</label>
+              <label className="block text-gray-300 mb-2">
+                {t("RoomNumber")}
+              </label>
               <input
                 type="text"
                 value={roomNumber}
@@ -150,7 +152,9 @@ function Rooms() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">{t("RoomType")}</label>
+              <label className="block text-gray-300 mb-2">
+                {t("RoomType")}
+              </label>
               <select
                 value={roomType}
                 onChange={(e) => setRoomType(e.target.value)}
@@ -177,7 +181,9 @@ function Rooms() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-300 mb-2">{t("RoomStatus")}</label>
+              <label className="block text-gray-300 mb-2">
+                {t("RoomStatus")}
+              </label>
               <select
                 value={roomStatus}
                 onChange={(e) => setRoomStatus(e.target.value)}
@@ -200,28 +206,33 @@ function Rooms() {
       )}
 
       {/* Bootstrap Modal for deletion confirmation */}
- 
+
       {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{direction: "ltr"}}>
-                    <div className="bg-gray-800 p-6 rounded-lg w-96">
-                        <h3 className="text-xl text-white mb-4">{t("DeleteConfirmation")}</h3>
-                        <div className="flex justify-end space-x-4">
-                            <button 
-                                onClick={() => setShowModal(false)} 
-                                className="bg-gray-600 text-white px-4 py-2 rounded"
-                            >
-                                {t("cancel")}
-                            </button>
-                            <button 
-                                onClick={handleDelete} 
-                                className="bg-red-600 text-white px-4 py-2 rounded"
-                            >
-                                {t("delete")}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+          style={{ direction: "ltr" }}
+        >
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-xl text-white mb-4">
+              {t("DeleteConfirmation")}
+            </h3>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                {t("cancel")}
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                {t("delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rooms Table */}
       <RoomsTable
@@ -229,6 +240,7 @@ function Rooms() {
         onEdit={handleEdit}
         onDelete={openDeleteModal} // Pass openDeleteModal function
         refreshRooms={fetchRooms}
+        // filteredrooms={filteredRooms}  
       />
     </div>
   );
