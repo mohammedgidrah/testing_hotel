@@ -16,6 +16,16 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const expensePerPage = 5;
+  
+    const indexOfLastexpense = currentPage * expensePerPage;
+    const indexOfFirstexpense = indexOfLastexpense - expensePerPage;
+    const currentexpense = filteredExpenses.slice(indexOfFirstexpense, indexOfLastexpense);
+  
+    const totalPages = Math.ceil(filteredExpenses.length / expensePerPage);
+  
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   useEffect(() => {
     const fetchExpensesAndUsers = async () => {
@@ -90,13 +100,11 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
           );
   
           setShowModal(false); // Close modal after deletion
-          setSuccessMessage("Expense deleted successfully!"); // Set success message
-          setError(""); // Clear any previous error message
+           setError(""); // Clear any previous error message
         }
       } catch (error) {
         console.error("Error during deletion:", error.response || error.message);
-        setSuccessMessage(""); // Clear success message if there's an error
-      }
+       }
     }
   };
   
@@ -163,7 +171,7 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
-            {filteredExpenses.map((expense) => (
+            {currentexpense.map((expense) => (
               <motion.tr
                 key={expense.id}
                 initial={{ opacity: 0 }}
@@ -194,8 +202,8 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
                   </button>
                   <button
                     onClick={() => {
-                      // setExpenseToDelete(expense);
-                      // setShowModal(true);
+                      setExpenseToDelete(expense);
+                      setShowModal(true);
                       ondelete(expense);
                     }}
                     className="text-red-400 hover:text-red-300"
@@ -207,23 +215,26 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
             ))}
           </tbody>
         </table>
+                                      {totalPages > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === index + 1
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
       </div>
 
-      {/* Bootstrap Modal for confirmation */}
-      {/* <Modal show={showModal} onHide={() => setShowModal(false)} style={{ direction: "ltr" }}>
-        <Modal.Header closeButton>
-          <Modal.Title>{t("DeleteExpense")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{t("Are you sure you want to delete this expense?")}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            {t("Cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleDelete}>
-            {t("delete")}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
+  
     </motion.div>
   );
 };

@@ -177,7 +177,7 @@ const BookingModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showAddGuestModal, setShowAddGuestModal] = useState(false);
 
-  const itemsPerPage = 6; // You can adjust this number
+  const itemsPerPage = 5; // You can adjust this number
 
   const totalPages = Math.ceil(services.length / itemsPerPage);
 

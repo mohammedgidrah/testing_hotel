@@ -32,10 +32,10 @@ function Expenses() {
         setError("Failed to load expenses. Please try again.");
       });
   }, [successMessage, editExpense]);
-const openDeleteModal = (expenseId) => {
-  setExpenseToDelete(expenseId);
-  setShowModal(true);
-}
+  const openDeleteModal = (expenseId) => {
+    setExpenseToDelete(expenseId);
+    setShowModal(true);
+  };
   // Custom date formatter
   const formatDate = (date) => {
     const d = new Date(date);
@@ -49,24 +49,27 @@ const openDeleteModal = (expenseId) => {
     setEditExpense(expense);
     setDescription(expense.description);
     setAmount(expense.amount);
-    
+
     // Set the date in the input's format (yyyy-mm-dd)
     setExpenseDate(expense.expense_date); // Directly use the date format as it is from the API
     setCategory(expense.category);
     setShowForm(true);
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (editExpense) {
       setSuccessMessage("");
       setErrorMessage("");
-  
+
       try {
         axios.defaults.headers.common[
           "Authorization"
         ] = `Bearer ${localStorage.getItem("token")}`;
-  
+
         await axios.put(
           `http://127.0.0.1:8000/api/expenses/${editExpense.id}`,
           {
@@ -81,6 +84,9 @@ const openDeleteModal = (expenseId) => {
         setAmount("");
         setExpenseDate("");
         setCategory("");
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 3000);
         setEditExpense(null);
       } catch (error) {
         setErrorMessage("Failed to update expense. Please try again.");
@@ -89,7 +95,7 @@ const openDeleteModal = (expenseId) => {
     } else {
       setSuccessMessage("");
       setErrorMessage("");
-  
+
       try {
         axios.defaults.headers.common[
           "Authorization"
@@ -105,24 +111,33 @@ const openDeleteModal = (expenseId) => {
         setAmount("");
         setExpenseDate("");
         setCategory("");
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 3000);
       } catch (error) {
         setErrorMessage("Failed to add expense. Please try again.");
         console.log("Error adding expense:", error.response.data.message);
       }
     }
   };
-  
 
   const toggleForm = () => {
     setShowForm(!showForm);
   };
-  const handleDelete = async (expenseId) => {
+  const handleDelete = async (expense) => {
     try {
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${localStorage.getItem("token")}`;
-      await axios.delete(`http://127.0.0.1:8000/api/expenses/${expenseId}`);
-      setSuccessMessage("Expense deleted successfully!"); // Set success message
+      await axios.delete(`http://127.0.0.1:8000/api/expenses/${expense.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      setSuccessMessage("Expense deleted successfully!");
+      setShowModal(false); // Close modal
+      setExpenseToDelete(null); // Reset the selected ID
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
     } catch (error) {
       setErrorMessage("Failed to delete expense");
       console.error(error);
@@ -187,7 +202,6 @@ const openDeleteModal = (expenseId) => {
                   value={expenseDate} // Use formatted date here
                   onChange={(e) => setExpenseDate(e.target.value)}
                   className="w-full p-2 bg-gray-700 text-white rounded"
-                  
                   required
                 />
               </div>
@@ -221,28 +235,37 @@ const openDeleteModal = (expenseId) => {
             </form>
           </div>
         )}
-{showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" style={{ zIndex: 9999,direction: "ltr" }}>
-          <div className="bg-gray-800 p-6 rounded-lg w-96">
-            <h3 className="text-xl text-white mb-4">{t("Are you sure you want to delete this expense?")}</h3>
-            <div className="flex justify-end space-x-4">
-              <button 
-                onClick={() => setShowModal(false)} 
-                className="bg-gray-600 text-white px-4 py-2 rounded"
-              >
-                {t("Cancel")}
-              </button>
-              <button 
-                onClick={handleDelete} 
-                className="bg-red-600 text-white px-4 py-2 rounded"
-              >
-                {t("delete")}
-              </button>
+        {showModal && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+            style={{ zIndex: 9999, direction: "ltr" }}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg w-96">
+              <h3 className="text-xl text-white mb-4">
+                {t("Are you sure you want to delete this expense?")}
+              </h3>
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="bg-gray-600 text-white px-4 py-2 rounded"
+                >
+                  {t("Cancel")}
+                </button>
+                <button
+                  onClick={() => handleDelete(expenseToDelete)}
+                  className="bg-red-600 text-white px-4 py-2 rounded"
+                >
+                  {t("delete")}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-        <ExpensesTable handleEdit={handleEdit} successMessage={successMessage} ondelete={openDeleteModal} />
+        )}
+        <ExpensesTable
+          handleEdit={handleEdit}
+          successMessage={successMessage}
+          ondelete={openDeleteModal}
+        />
       </div>
     </div>
   );
