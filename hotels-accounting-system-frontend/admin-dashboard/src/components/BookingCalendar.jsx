@@ -30,17 +30,12 @@ const BookingCalendar = ({
   // Date normalization with proper timezone handling
   const normalizeDate = useCallback((date) => {
     if (!date) return null;
-
-    // If date is string (from API), parse as local date
     if (typeof date === "string") {
       const [year, month, day] = date.split("-").map(Number);
-      return new Date(year, month - 1, day); // Local time
+      return new Date(year, month - 1, day);
     }
-
-    // Create a new date object and set to local midnight
     const d = new Date(date);
-    // Important: Use UTC methods to avoid timezone issues
-    d.setUTCHours(12, 0, 0, 0); // Set to noon UTC to avoid any timezone shifting
+    d.setHours(0, 0, 0, 0);
     return d;
   }, []);
 
@@ -112,28 +107,81 @@ const BookingCalendar = ({
   );
 
   // Date validation - check if a date is booked
-  const isDateBooked = useCallback(
-    (date) => {
-      if (!date || bookedRanges.length === 0) return false;
+const isDateBooked = useCallback(
+  (date) => {
+    if (!date || bookedRanges.length === 0) return false;
 
-      const testDate = normalizeDate(date);
-      return bookedRanges.some(({ start, end }) => {
-        // Skip null date ranges
-        if (!start || !end) return false;
+    const testDate = normalizeDate(date);
 
-        // Compare year, month, and day for date equality instead of time
-        return (
-          testDate.getFullYear() >= start.getFullYear() &&
-          testDate.getFullYear() <= end.getFullYear() &&
-          testDate.getMonth() >= start.getMonth() &&
-          testDate.getMonth() <= end.getMonth() &&
-          testDate.getDate() >= start.getDate() &&
-          testDate.getDate() <= end.getDate()
-        );
-      });
-    },
-    [bookedRanges, normalizeDate]
-  );
+    const ranges = bookedRanges
+      .filter(({ start, end }) => start && end)
+      .map(({ start, end }) => ({
+        start: normalizeDate(start),
+        end: normalizeDate(end),
+      }))
+      .sort((a, b) => a.start - b.start);
+
+    // Check if date is inside any booked range
+    const isInRange = ranges.some(({ start, end }) => {
+      return testDate >= start && testDate <= end;
+    });
+    if (isInRange) return true;
+
+    // Check for isolated single day gap between bookings
+    for (let i = 0; i < ranges.length - 1; i++) {
+      const currentEnd = ranges[i].end;
+      const nextStart = ranges[i + 1].start;
+
+      const gap = (nextStart - currentEnd) / (1000 * 60 * 60 * 24); // gap in days
+
+      if (gap === 1) { // gap=2 means exactly one day in the middle (because currentEnd and nextStart are inclusive booking days)
+        const middleDate = new Date(currentEnd);
+        middleDate.setDate(middleDate.getDate() + 1); // the isolated day
+
+        if (testDate.getTime() === middleDate.getTime()) {
+          return true; // Disable isolated single date between bookings
+        }
+      }
+    }
+
+    return false;
+  },
+  [bookedRanges, normalizeDate]
+);
+const isDateDisabled = useCallback(
+  (date) => {
+    if (!date || bookedRanges.length === 0) return false;
+
+    const testDate = normalizeDate(date);
+
+    const ranges = bookedRanges
+      .filter(({ start, end }) => start && end)
+      .map(({ start, end }) => ({
+        start: normalizeDate(start),
+        end: normalizeDate(end),
+      }))
+      .sort((a, b) => a.start - b.start);
+
+    for (let i = 0; i < ranges.length - 1; i++) {
+      const currentEnd = ranges[i].end;
+      const nextStart = ranges[i + 1].start;
+
+      const gap = (nextStart - currentEnd) / (1000 * 60 * 60 * 24);
+
+      if (gap === 2) {
+        const middleDate = new Date(currentEnd);
+        middleDate.setDate(middleDate.getDate() + 1);
+
+        if (testDate.getTime() === middleDate.getTime()) {
+          return true; // disable this isolated day
+        }
+      }
+    }
+    return false;
+  },
+  [bookedRanges, normalizeDate]
+);
+
 
   // Convert displayed date back to correct format
   const displayDate = useCallback((date) => {
@@ -195,7 +243,7 @@ const BookingCalendar = ({
               selected={selectedDate ? displayDate(selectedDate) : null}
               onChange={handleDateChange}
               minDate={minDate ? displayDate(minDate) : new Date()}
-              filterDate={(date) => !isDateBooked(date)}
+  filterDate={(date) => !isDateBooked(date) && !isDateDisabled(date)}  // disable both booked and isolated disabled dates
               inline
               popperPlacement="bottom-start"
               dateFormat="yyyy-MM-dd"

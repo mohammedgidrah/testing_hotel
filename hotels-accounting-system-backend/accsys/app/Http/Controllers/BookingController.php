@@ -32,7 +32,7 @@ class BookingController extends Controller
             'check_out_date' => 'required|date|after:check_in_date',
             'email'          => 'nullable|email',
             'phone_number'   => 'nullable|string',
-            'payment_status' => 'required|in:pending,paid',
+            'payment_status' => 'required|in:Pending,paid',
             'total_amount'   => 'required|numeric',
             'services'       => 'nullable|array',     // Array of service IDs
             'services.*'     => 'exists:services,id', // Validate each service ID
@@ -111,7 +111,7 @@ class BookingController extends Controller
         $validator = Validator::make($request->all(), [
             'room_id'        => 'required|exists:rooms,id', // Ensure room_id is provided
             'booking_id'     => 'required|exists:bookings,id',
-            'payment_status' => 'required|in:pending,paid',
+            'payment_status' => 'required|in:Pending,paid',
             'check_in_date'  => 'required|date',
             'check_out_date' => 'required|date|after:check_in_date',
         ]);

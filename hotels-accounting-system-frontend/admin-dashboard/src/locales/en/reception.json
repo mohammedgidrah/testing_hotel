@@ -22,10 +22,11 @@
   "close": "Close",
   "email": "Email",
   "phone": "Phone Number",
-  "Single": "Single",
-  "Double": "Double",
-  "Triple": "Triple",
-  "Suite4Bed": "Suite 4 Bed",
+  "single": "Single",
+  "double": "Double",
+  "triple": "Triple",
+  "suite 4 bed": "Suite 4 Bed",
+  "suite 5 bed": "Suite 5 Bed",
   "Suite5Bed": "Suite 5 Bed",
   "AddGuest": "Add Guest",
   "cancel": "Cancel",
@@ -46,5 +47,7 @@
   "Total:": "Total:",
   "Services": "Services",
   "Next": "Next",
-  "Previous": "Previous"
+  "Previous": "Previous",
+  "FilterByType": "Filter by room type",
+  "All": "All"
 }

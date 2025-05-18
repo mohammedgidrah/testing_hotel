@@ -8,11 +8,13 @@ import { motion } from "framer-motion";
 import BookingModal from "../components/Booking";
 
 export default function Reception() {
-  const { t } = useTranslation("reception");
+  const { t, i18n } = useTranslation("reception");
   const [rooms, setRooms] = useState([]);
   const [guests, setGuests] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filterType, setFilterType] = useState("all");
+
   const [stats, setStats] = useState({
     total: 0,
     available: 0,
@@ -76,6 +78,11 @@ export default function Reception() {
       openModal(selectedRoom);
     }
   };
+  const filteredRooms =
+  filterType === "all"
+    ? rooms
+    : rooms.filter((room) => room.type === filterType);
+
 
   return (
     <div className="flex-1 overflow-auto relative z-10">
@@ -100,17 +107,39 @@ export default function Reception() {
           color="orange"
         />
       </div>
+      <div className="p-4 flex items-center justify-end">
+      
+        <select
+          id="filterType"
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          className="border rounded p-1 text-white   bg-gray-700 "
+        >
+          <option value="all">{t("All")}</option>
+          {[...new Set(rooms.map((room) => room.type))].map((type) => (
+            <option key={type} value={type}>
+              {t(type)}
+            </option>
+          ))}
+        </select>
+        
+          <label htmlFor="filterType" className="mr-2 font-semibold   "style={i18n.language === "ar" ? { marginRight: "10px" } : { marginLeft: "10px" }}>
+          {t("FilterByType")}
+        </label>
+      </div>
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4 p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
       >
-        {rooms.map((room) => (
+        {filteredRooms.map((room) => (
           <StatCard
             key={room.id}
-            value={t("room") + " " + room.room_number + " ( " + t(room.type)+" )"}
-             icon={
+            value={
+              t("room") + " " + room.room_number 
+            }
+            icon={
               room.status === "available"
                 ? User
                 : room.status === "occupied"
@@ -124,8 +153,6 @@ export default function Reception() {
                 ? "red"
                 : "orange"
             }
-
-            
             onButtonClick={
               room.status === "available" ? () => openModal(room) : null
             }
