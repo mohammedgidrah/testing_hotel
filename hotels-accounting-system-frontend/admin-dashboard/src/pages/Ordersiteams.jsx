@@ -313,13 +313,16 @@ useEffect(() => {
 
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <motion.div
-        className=" flex-1 overflow-auto relative z-10 "
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        style={i18n.language === "ar" ? { direction: "rtl" } : {}}
-      >
+<motion.div
+  className={`flex-1 relative z-10 ${
+    showDeleteModal ? '' : 'overflow-auto'
+  }`}
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.2 }}
+  style={i18n.language === "ar" ? { direction: "rtl" } : {}}
+>
+
         <Header title={t("OrderItems")} />
         {/* Search and Add Button Section */}
         <div className="flex justify-end items-center mb-6 p-4 ">
