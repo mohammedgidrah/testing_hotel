@@ -48,6 +48,11 @@ export default function Orders() {
     const currentorders = filteredOrders.slice(indexOfFirstorder, indexOfLastorder);
   
     const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+      useEffect(() => {
+    if (currentorders.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentorders, currentPage]);
     
     // For dropdown options
   const [items, setItems] = useState([]);
@@ -462,7 +467,7 @@ export default function Orders() {
                 ))}
               </tbody>
             </table>
-                  {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center mt-4 space-x-2">
           {[...Array(totalPages)].map((_, index) => (
             <button

@@ -26,7 +26,7 @@ export default function CategoryManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [isItemsLoading, setIsItemsLoading] = useState(false);
   const [error, setError] = useState(null);
- 
+
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
@@ -44,6 +44,11 @@ export default function CategoryManagement() {
 
   const totalPages = Math.ceil(filteredCategories.length / categoryPerPage);
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  useEffect(() => {
+    if (currentcategory.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentcategory, currentPage]);
 
   const [formErrors, setFormErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);

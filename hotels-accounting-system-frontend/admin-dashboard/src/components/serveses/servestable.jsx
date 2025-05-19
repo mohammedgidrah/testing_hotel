@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Edit, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Modal, Button } from "react-bootstrap";
@@ -10,13 +10,19 @@ function ServicesTable({ services, onEdit, onDelete, refreshServices }) {
   const [currentPage, setCurrentPage] = useState(1);
   const servicesPerPage = 5;
 
+  const totalPages = Math.ceil(services.length / servicesPerPage);
   const indexOfLastService = currentPage * servicesPerPage;
   const indexOfFirstService = indexOfLastService - servicesPerPage;
   const currentServices = services.slice(indexOfFirstService, indexOfLastService);
 
-  const totalPages = Math.ceil(services.length / servicesPerPage);
-
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  // 🔁 Automatically go to previous page if current is empty and not page 1
+  useEffect(() => {
+    if (currentServices.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentServices, currentPage]);
 
   return (
     <div className="m-10 border border-gray-700 rounded-md bg-gray-800 p-4" style={{ direction: "ltr" }}>

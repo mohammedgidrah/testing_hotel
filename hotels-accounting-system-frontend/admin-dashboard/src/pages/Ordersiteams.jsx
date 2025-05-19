@@ -49,6 +49,11 @@ function OrderItems() {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    useEffect(() => {
+    if (currentitems.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentitems, currentPage]);
   const [formErrors, setFormErrors] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -458,7 +463,7 @@ useEffect(() => {
                 ))}
               </tbody>
             </table>
-                              {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center mt-4 space-x-2">
           {[...Array(totalPages)].map((_, index) => (
             <button

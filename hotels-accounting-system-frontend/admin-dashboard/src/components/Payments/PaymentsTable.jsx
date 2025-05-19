@@ -32,6 +32,11 @@ const PaymentsTable = () => {
   const totalPages = Math.ceil(filteredPayments.length / paymentPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+      useEffect(() => {
+    if (currentpayment.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentpayment, currentPage]);
 
   const fetchPayments = useCallback(async () => {
     try {
@@ -206,53 +211,25 @@ const PaymentsTable = () => {
             )}
           </tbody>
         </table>
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-4 space-x-2">
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => paginate(index + 1)}
-                className={`px-3 py-1 text-sm rounded ${
-                  currentPage === index + 1
-                    ? "bg-indigo-500 text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-        )}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 space-x-2">
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => paginate(index + 1)}
+                  className={`px-3 py-1 text-sm rounded ${
+                    currentPage === index + 1
+                      ? "bg-indigo-500 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+          )}
       </div>
-
-      {/* {showEditModal && selectedPayment && (
-        <EditPayment
-          show={!!selectedPayment}
-          payment={selectedPayment}
-          onClose={() => setSelectedPayment(null)}
-          onPaymentUpdated={handlePaymentUpdated}
-        />
-      )} */}
-
-      {/* Delete Confirmation Modal */}
-      {/* <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        style={{ direction: "ltr" }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{t("DeletePayment")}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{t("DeleteConfirmation")}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            {t("cancel")}
-          </Button>
-          <Button variant="danger" onClick={handleDeletePayment}>
-            {t("delete")}
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
+ 
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-gray-800 p-6 rounded-lg w-96">

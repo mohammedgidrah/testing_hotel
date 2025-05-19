@@ -18,6 +18,11 @@ function RoomsTable({ rooms, onEdit, onDelete, refreshRooms }) {
   const totalPages = Math.ceil((filteredrooms || []).length / roomPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+        useEffect(() => {
+      if (currentroom.length === 0 && currentPage > 1) {
+        setCurrentPage((prevPage) => prevPage - 1);
+      }
+    }, [currentroom, currentPage]);
 
   useEffect(() => {
     setFilteredRooms(rooms || []);
@@ -106,23 +111,23 @@ function RoomsTable({ rooms, onEdit, onDelete, refreshRooms }) {
             ))}
           </tbody>
         </table>
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-4 space-x-2">
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => paginate(index + 1)}
-                className={`px-3 py-1 text-sm rounded ${
-                  currentPage === index + 1
-                    ? "bg-indigo-500 text-white"
-                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-        )}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === index + 1
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
       </div>
     </div>
   );

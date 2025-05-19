@@ -26,6 +26,11 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
     const totalPages = Math.ceil(filteredExpenses.length / expensePerPage);
   
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
+      useEffect(() => {
+    if (currentexpense.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentexpense, currentPage]);
 
   useEffect(() => {
     const fetchExpensesAndUsers = async () => {
@@ -215,7 +220,7 @@ const ExpensesTable = ({ handleEdit, successMessage, ondelete }) => {
             ))}
           </tbody>
         </table>
-                                      {totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center mt-4 space-x-2">
           {[...Array(totalPages)].map((_, index) => (
             <button

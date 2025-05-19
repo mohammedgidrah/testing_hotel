@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Edit, Trash2 } from "lucide-react"; // Import icons
 import { Modal, Button } from "react-bootstrap"; // Import Modal and Button components from react-bootstrap
 import { motion } from "framer-motion";
@@ -25,6 +25,11 @@ export default function GuestTable({
   const totalPages = Math.ceil(filteredGuests.length / guestsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    useEffect(() => {
+    if (currentguests.length === 0 && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  }, [currentguests, currentPage]);
 
   const handleDelete = () => {
     if (guestToDelete) {
@@ -102,23 +107,23 @@ export default function GuestTable({
               ))}
             </tbody>
           </table>
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-4 space-x-2">
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => paginate(index + 1)}
-                  className={`px-3 py-1 text-sm rounded ${
-                    currentPage === index + 1
-                      ? "bg-indigo-500 text-white"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-            </div>
-          )}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === index + 1
+                  ? "bg-indigo-500 text-white"
+                  : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      )}
         </div>
       ) : (
         !loading && (
