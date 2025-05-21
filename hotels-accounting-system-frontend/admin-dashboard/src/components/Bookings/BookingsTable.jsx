@@ -12,16 +12,18 @@ function BookingsTable({ ondelete }) {
   const [filteredBookings, setFilteredBookings] = useState([]);
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-const bookingsPerPage = 5;
-const indexOfLastBooking = currentPage * bookingsPerPage;
-const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
-const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const bookingsPerPage = 5;
+  const indexOfLastBooking = currentPage * bookingsPerPage;
+  const indexOfFirstBooking = indexOfLastBooking - bookingsPerPage;
+  const currentBookings = filteredBookings.slice(
+    indexOfFirstBooking,
+    indexOfLastBooking
+  );
 
-const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
-
+  const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-      useEffect(() => {
+  useEffect(() => {
     if (currentBookings.length === 0 && currentPage > 1) {
       setCurrentPage((prevPage) => prevPage - 1);
     }
@@ -41,6 +43,8 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
   const [payments, setPayments] = useState([]);
   const [showArrivals, setShowArrivals] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+    const [bookingToDelete, setBookingToDelete] = useState(null);
+  
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -56,6 +60,19 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
     return `${day}/${month}/${year}`;
   };
 
+  //  const fetchBookings = async () => {
+  //   try {
+  //     const response = await axios.get("http://127.0.0.1:8000/api/bookings", {
+  //       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //     });
+  //     setBookings(response.data);
+  //   } catch (err) {
+  //     setError(t("fetchError"));
+  //   }
+  //  };
+  //  useEffect(() => {
+
+  //  })
   const fetchPayments = async () => {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/payments", {
@@ -92,7 +109,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
       setError(t("fetchError"));
     }
   };
-
+ 
   useEffect(() => {
     fetchBookings();
     fetchrooms();
@@ -146,7 +163,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
 
     setFilteredBookings(filtered);
   };
-
+ 
   const handleSearch = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -175,6 +192,10 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
     }
   };
 
+  const openDeleteModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setShowModal(true);
+  };
   const handleShowDetails = async (booking) => {
     try {
       const response = await axios.get(
@@ -227,6 +248,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
   };
 
   return (
+    <>
     <motion.div
       className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8 m-4"
       initial={{ opacity: 0, y: 20 }}
@@ -234,6 +256,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
       transition={{ delay: 0.2 }}
       style={{ direction: "ltr" }}
     >
+      
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-gray-100">
           {t("BookingList")} {showArrivals && `- ${t("TodayArrivals")}`}
@@ -260,6 +283,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
         </div>
       </div>
+  
 
       {isLoading ? (
         <div className="text-center py-8 text-gray-400">{t("Loading")}...</div>
@@ -367,8 +391,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
                     </button>
                     <button
                       onClick={() => {
-                        setSelectedBookingId(booking.id);
-                        ondelete(booking.id);
+                        openDeleteModal(booking.id);
                       }}
                       className="text-red-500 hover:text-red-300"
                     >
@@ -407,8 +430,7 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
             </div>
           )}
         </div>
-       )}
- 
+      )}
 
       {selectedBooking && (
         <EditBookingForm
@@ -533,6 +555,32 @@ const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
         </Modal.Footer>
       </Modal>
     </motion.div>
+        {showModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          style={{ direction: "ltr" }}
+        >
+          <div className="bg-gray-800 p-6 rounded-lg w-96">
+            <h3 className="text-xl text-white mb-4">{t("AreYouSure")}</h3>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-600 text-white px-4 py-2 rounded"
+              >
+                {t("Cancel")}
+              </button>
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                {t("Delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+    
   );
 }
 
